@@ -1,0 +1,15 @@
+# Datasets are reproduced via datasets/download_datasets.py — not committed.
+datasets/*
+!datasets/download_datasets.py
+!datasets/README.md
+
+# Python / venv
+venv/
+cpdsai/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Caches
+.cache/
+.pytest_cache/

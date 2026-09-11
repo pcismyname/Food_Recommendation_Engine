@@ -1,5 +1,55 @@
 # Thai Food Recommendation — CP Proposal (Group: Flower)
 
+## Setup
+
+Requires Python 3.10+.
+
+```bash
+git clone <repo-url>
+cd Food_Recommendation_Engine
+
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# Mac/Linux
+source venv/bin/activate
+
+pip install -r requirements.txt
+jupyter notebook
+```
+
+Then open any notebook under `eda/` to explore the data.
+
+## Dataset Setup
+
+Datasets are **not committed to git** (see `.gitignore`) — they are reproduced from
+their sources. After installing requirements, run:
+
+```bash
+python datasets/download_datasets.py
+```
+
+This rebuilds `datasets/` with everything that can be fetched without credentials:
+
+| Dataset | Source | Path | Auto? |
+|---|---|---|---|
+| RIRD (English, labelled — evaluation protocol) | GitHub `D3Mlab/rir_data` | `datasets/rir_data-main/` | ✅ |
+| M-ABSA (Thai aspect sentiment) | HF `Multilingual-NLP/M-ABSA` | `datasets/m-absa/` | ✅ |
+| Wongnai (Thai reviews) | HF `Highgroundbkk/wongnai_reviews` | `datasets/wongnai/` | ✅ |
+| Thailand Foods (dish gazetteer) | Kaggle `ponthakornsodchun/foods-in-thailand` | `datasets/thailand_foods.csv` | ⚠️ manual |
+
+**Thailand Foods (manual):** Kaggle requires an account. Either download the CSV from
+the [dataset page](https://www.kaggle.com/datasets/ponthakornsodchun/foods-in-thailand)
+and save it as `datasets/thailand_foods.csv`, or with a Kaggle API token
+(`~/.kaggle/kaggle.json`):
+
+```bash
+pip install kaggle
+kaggle datasets download -d ponthakornsodchun/foods-in-thailand -p datasets --unzip
+```
+
+See `PROJECT.md` for what each dataset is for and how they fit the pipeline.
+
 Members: Ton (st127004, Chidsanuphong Pengchai) · Sam (st127012, Samichi Rungta)
 
 ## What we are building

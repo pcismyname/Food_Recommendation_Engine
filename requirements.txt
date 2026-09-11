@@ -1,0 +1,8 @@
+pandas
+matplotlib
+datasets
+pyarrow
+huggingface_hub
+jupyter
+ipykernel
+nbformat
