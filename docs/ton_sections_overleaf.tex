@@ -1,0 +1,348 @@
+% =====================================================================
+%  COPY THIS WHOLE FILE INTO OVERLEAF (select all -> paste into main.tex)
+%  Self-contained: 2-column, references embedded (no .bib, no BibTeX run).
+%  Compiler: pdfLaTeX (Overleaf default) works as-is.
+%
+%  Ton's sections — §1 Introduction, §2 Problem Statement, §3 Related Works
+%  Group: Flower — Explainable Reviewed-Item Retrieval  (OPTION C)
+%  Author: Chidsanuphong "Ton" Pengchai (st127004), DSAI, AIT
+%
+%  NOTE: the Thai example query is given as an English gloss so this compiles
+%  under pdfLaTeX. To show Thai script, switch the Overleaf compiler to
+%  XeLaTeX and add in the preamble:
+%     \usepackage{fontspec}\newfontfamily\thaifont{Noto Sans Thai}
+%  then use {\thaifont อยากกินอะไรเปรี้ยวๆ เผ็ดๆ ไม่แพง}.
+%
+%  Numbers in §1.1 (Time Out ranking, street-food revenue, tourist spending,
+%  Wongnai user counts) still need proper source citations before submission.
+% =====================================================================
+\documentclass[10pt,twocolumn]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{cite}
+\usepackage[hidelinks]{hyperref}
+\usepackage[margin=1in]{geometry}
+
+\title{Explainable Reviewed-Item Retrieval:\\Searching Restaurants by Taste Preference}
+\author{Chidsanuphong ``Ton'' Pengchai (st127004)\\Data Science and AI, AIT --- Group Flower}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+\subsection{Background of the Work}
+Food occupies a central place in Thai culture and in Thailand's national economy,
+and Thai cuisine---street food in particular---is treated as an instrument of
+national soft power that drives tourism revenue. The global standing of this food
+scene is measurable: Bangkok was ranked the world's No.~2 food city (and No.~1 in
+Asia) in \emph{Time Out}'s \emph{Best Cities for Food 2026}, behind only Lima, with
+an 80\% expert-panel score and 81\% of surveyed locals rating the city highly for
+food quality and diversity. The street-food segment is not a marginal niche but the
+backbone of the sector: Thailand has roughly 103{,}000 street-food operators, about
+69\% of all food businesses, generating approximately 271{,}355 million baht---about
+32.4\% of food-business revenue---making street food the single largest foodservice
+segment. Food is also where visitors spend: food and beverage accounted for 23\% of
+foreign tourists' spending in 2023 according to the Bank of Thailand's Q2~2024
+Monetary Policy Report (second only to accommodation at 36\%). What distinguishes
+Thai food choice from many other cuisines is the centrality of \emph{flavour
+balance}---the interplay of spicy, sour, sweet, salty, and rich (fatty/umami)
+notes---so that diners frequently choose a meal by desired taste profile rather than
+by dish name.
+
+The digital layer over this landscape is dominated by two incumbents. Wongnai (now
+part of the LINE MAN Wongnai group) is Thailand's leading restaurant-review platform;
+its app draws on user-generated reviews and feedback from over 5.7~million users,
+with more than 2.4~million reviews and 84~million photos across more than one million
+locations nationwide. Google Maps provides the other major review and discovery
+surface. Both, however, expose discovery primarily through keyword search, category
+filters, star ratings, and geographic proximity---none of which lets a user search by
+the \emph{sensory experience} they want. Academic NLP has matured enough to make such
+a system feasible: transformer sentence encoders~\cite{devlin2019bert,reimers2019sbert}
+and multilingual models, together with Thai-specific pretrained models such as
+WangchanBERTa~\cite{lowphansirikul2021wangchanberta} and the publicly released Wongnai
+review corpus, provide the ingredients for processing review text---including
+low-resource Thai---at scale.
+
+\subsection{Why Conduct This Project}
+Three gaps motivate the work. First, \textbf{there is no mainstream way to search
+restaurants by taste preference}: a user who wants ``something sour and spicy that is
+not expensive'' must translate that intent into keywords, guess at dish names, and
+manually cross-read reviews. Second, the recommendation \textbf{cold-start problem} is
+acute here---a tourist or newcomer has no interaction history and no ratings, so
+collaborative-filtering systems that depend on behavioural logs~\cite{koren2009mf}
+cannot serve them, and the natural-language, content-based paradigm is the appropriate
+alternative~\cite{gao2021crs,kostric2024usage}. Third, the evidence needed to answer
+such a query \textbf{already exists latent in review text}---diners constantly describe
+spiciness, sourness, value, and atmosphere in their own words---yet this signal remains
+untapped as a first-class retrieval mechanism, and prior work leaves open \emph{how}
+that sentence-level evidence should be combined into a restaurant-level
+decision~\cite{rird2023,zhang2020explainable}.
+
+\subsection{Business and Research Understanding of the Problem}
+The problem is felt by several groups. \textbf{Tourists and newcomers} bear a search
+cost: they cannot express taste intent as keywords and cannot efficiently read long
+review threads, leading to poor or risky choices. \textbf{Locals} face choice overload
+across a very large restaurant catalogue. \textbf{Vendors}---especially small and
+street-food operators---are poorly served by rating-and-proximity ranking, because a
+distinctive but niche flavour offering is invisible to a user who cannot search for it.
+Crucially, star ratings measure \emph{overall satisfaction}, not spicy/sour/sweet/rich
+intensity, so the incumbents' interaction model captures none of this. The research
+question is therefore not ``which restaurant is best'' but a \textbf{retrieval
+question}: given a free-text preference query, can review text be used to retrieve and
+rank restaurants in a way that is both accurate and self-justifying, and does the way
+sentence-level evidence is \emph{fused} into a restaurant-level score materially affect
+that accuracy? This reframing turns a subjective ``flavour recommender'' into a
+measurable information-retrieval problem with human relevance judgements~\cite{rird2023}.
+
+\subsection{Potential Impact and Benefits}
+For \textbf{tourists and newcomers}, the system removes the language and knowledge
+barrier by accepting intent in natural language and by returning, alongside each
+recommendation, the exact review sentences that justify it---an explainable output that
+builds trust~\cite{zhang2020explainable}. For \textbf{locals} it offers taste-driven
+discovery beyond rating and distance. For \textbf{vendors} it creates a fairer surface
+where a distinctive flavour profile can be matched to demand rather than buried beneath
+aggregate stars. Methodologically, and in line with the scope fixed in
+Section~\ref{sec:scope}, the project contributes: (i)~a \emph{systematic comparison of
+sentence-to-restaurant fusion functions} (max, mean-of-top-$k$, rating-weighted sum),
+evaluated on the labelled RIRD benchmark with nDCG@10, MAP, and Recall@10---evidence
+currently missing because the anchor prior work reports only a single aggregation
+method (top-$K$ mean) and only two metrics (R-Precision, MAP)~\cite{rird2023};
+(ii)~an explainable, content-based retrieval pipeline that attaches justifying review
+sentences to every ranked restaurant~\cite{zhang2020explainable,kostric2024usage};
+(iii)~a \emph{cross-lingual demonstration} of the same language-agnostic pipeline on
+the Thai Wongnai corpus, showing the method transfers to a low-resource language at the
+review/sentence level; and (iv)~an optional \emph{flavour-feature ablation} that tests
+whether explicit sensory features add value over pure dense retrieval, judged against
+independent human labels rather than against its own domain assumptions.
+
+\section{Problem Statement}
+
+\subsection{Problem Definition}
+We address a natural-language, review-grounded restaurant retrieval problem. Let
+$R = \{r_1, \dots, r_n\}$ be a corpus of restaurants, where each restaurant $r_i$ is
+associated with a set of reviews $D_i = \{d_{i,1}, \dots, d_{i,m}\}$, and each review is
+decomposed into sentences $S_i = \{s_{i,1}, s_{i,2}, \dots\}$. Given a free-text
+preference query $q$, the task is to produce a \textbf{ranking of the restaurants in
+$R$ by relevance to $q$}. The system first scores each sentence against the query with a
+sentence encoder, $\mathrm{score}(q, s_{i,j})$; it then applies a fusion function $f$
+that aggregates the sentence-level scores of restaurant $r_i$ into a single
+restaurant-level score
+\begin{equation}
+  \mathrm{Score}(q, r_i) = f\big(\{\,\mathrm{score}(q, s_{i,j}) : s_{i,j} \in S_i\,\}\big),
+\end{equation}
+used for ranking; the top-ranked restaurants are returned together with their
+highest-scoring justifying sentences. The central research contribution concerns the
+choice of $f$---whether \emph{max}, \emph{mean-of-top-$k$}, or \emph{rating-weighted
+sum} yields the best ranking. This is the \emph{reviewed-item retrieval} formulation, in
+which the two-level restaurant/review structure requires an explicit aggregation
+step~\cite{rird2023}.
+
+The formulation is language-agnostic. It is \emph{developed and quantitatively
+evaluated} on the English RIRD benchmark~\cite{rird2023}, which supplies the restaurant
+grouping, 100 preference queries, and human relevance labels needed to measure ranking
+quality. The same pipeline is then \emph{demonstrated} on the Thai Wongnai corpus---for
+example, on the query ``I want something sour and spicy that is not expensive''---at the
+review/sentence level, illustrating cross-lingual transfer to a low-resource setting
+where relevance labels are not yet available.
+
+\subsection{Objectives}
+\begin{enumerate}
+  \item \textbf{Implement the retrieval pipeline.} Build sentence-level dense retrieval
+        using transformer sentence embeddings~\cite{reimers2019sbert,karpukhin2020dpr}:
+        split reviews into sentences, encode query and sentences into a shared vector
+        space, and retrieve the top-$k$ sentences per query.
+  \item \textbf{Implement and systematically compare fusion.} Compare fusion strategies
+        (max, mean-of-top-$k$, rating-weighted sum) for aggregating sentence scores into
+        a restaurant score---the primary research contribution, filling the gap left by
+        the anchor work, which tested only the top-$K$ mean~\cite{rird2023}.
+  \item \textbf{Benchmark against baselines on RIRD.} Compare the pipeline against
+        random ranking, rating-only sorting, BM25 lexical
+        matching~\cite{robertson2009bm25}, and embedding retrieval with mean fusion,
+        reporting \textbf{nDCG@10, MAP, and Recall@10} on the RIRD relevance labels.
+  \item \textbf{Deliver explainable output.} For every recommended restaurant, return the
+        specific review sentences that justify its position in the
+        ranking~\cite{zhang2020explainable,kostric2024usage}.
+  \item \textbf{Demonstrate cross-lingual application (Thai).} Port the same pipeline to
+        the Thai Wongnai corpus and show qualitative review/sentence-level retrieval for
+        Thai preference queries. This is a \emph{demonstration}, not a measured claim:
+        Wongnai lacks restaurant grouping, queries, and relevance labels, so no
+        quantitative result is asserted on it.
+  \item \textbf{Test the flavour-feature layer (optional ablation).} Evaluate whether
+        adding explicit sensory-intensity features (built from the Thailand Foods
+        gazetteer and Thai aspect signals) improves ranking over pure dense retrieval,
+        judging the layer against \textbf{independent human labels} rather than against
+        its own domain assumptions~\cite{pontiki2014semeval}.
+\end{enumerate}
+
+\subsection{Scope and Boundaries}
+\label{sec:scope}
+The project is deliberately scoped to \textbf{content- and review-based retrieval}. All
+\emph{quantitative} claims are made on the labelled RIRD benchmark; the Thai Wongnai
+corpus is used only for a \emph{qualitative} cross-lingual demonstration, and full Thai
+\emph{restaurant-level} recommendation---which would require Wongnai metadata with
+restaurant identifiers or a purpose-built labelled Thai query set---is left as future
+work. The project does \textbf{not} attempt collaborative filtering; it does \textbf{not}
+use click logs or any behavioural interaction data; and it does \textbf{not} build
+per-user profiles. It is \textbf{single-turn} (one query in, one ranking out) rather
+than a multi-turn conversational dialogue. It does not perform menu-price extraction,
+delivery logistics, or real-time availability checking, and it does not \emph{generate}
+new natural-language explanations---only \emph{select} existing review sentences as
+evidence. Geographic and temporal personalisation are out of scope. These boundaries
+keep the study focused on the measurable retrieval-and-fusion research question defined
+in Section~2.1.
+
+\section{Related Works}
+
+\subsection{Reviewed-Item Retrieval and the Fusion Gap}
+The closest prior work and the anchor for this project is the Reviewed-Item Retrieval
+(RIR) task of Abdollah Pour et al.~\cite{rird2023}, which formalises exactly our
+setting: given a natural-language query and items each described by many reviews, a
+system must aggregate query--review similarities into an item-level score and rank
+items. The authors distinguish \emph{early fusion} (average an item's reviews into one
+embedding, then score) from \emph{late fusion} (score each review, then aggregate the
+top-$K$), and release the RIRD dataset---50 Toronto restaurants, roughly 29{,}000
+reviews, and 100 preference queries in five categories (indirect, negation, general,
+detailed, contradictory) with binary relevance from five annotators. Their best
+late-fusion contrastive model reaches MAP~0.626, well above BM25 and off-the-shelf
+BERT. Crucially for us, the paper evaluates with \emph{only} R-Precision and MAP and
+aggregates with \emph{only} a top-$K$ mean; it does not test max or rating-weighted
+fusion, nor report nDCG or Recall. This is the precise, non-manufactured gap our fusion
+comparison fills, on the same dataset and query protocol.
+
+\subsection{From Collaborative Filtering to Cold-Start, Content-Based Recommendation}
+The dominant classical recommendation paradigm is collaborative filtering via matrix
+factorization~\cite{koren2009mf}, which learns latent user and item factors from a
+history of ratings or interactions. This paradigm is powerful when behavioural logs are
+abundant, but it is structurally unable to serve the cold-start user---a tourist or
+newcomer with no history---which is precisely our target scenario. Surveys of
+conversational and content-based recommendation~\cite{gao2021crs} argue that
+natural-language interfaces let users express current, context-specific intent directly
+and are especially valuable when interaction data is unavailable. Our system is a
+single-turn instance of this natural-language paradigm: it deliberately avoids
+collaborative filtering and instead retrieves over review content, which is exactly what
+makes it applicable to users the classical paradigm cannot reach.
+
+\subsection{Natural-Language Preference Elicitation at the Review-Sentence Level}
+Kostric et al.~\cite{kostric2024usage} observe that ordinary users often cannot answer
+questions about item \emph{attributes}---they know how they intend to use an item, not
+its technical specifications---and show that review sentences are a mineable source of
+user-facing, preference-relevant language. This supports two of our design decisions.
+First, it validates operating at the \emph{review-sentence} granularity, the same level
+at which we retrieve and return justifications. Second, its central premise matches our
+tourist/newcomer use case exactly: a visitor cannot name a Thai dish but can type
+``something sour and spicy, not expensive,'' which is why free-text taste queries are
+preferable to fixed attribute filters.
+
+\subsection{Lexical and Dense Text Retrieval}
+Our retrieval stack builds on two families of methods. The lexical family is anchored by
+BM25~\cite{robertson2009bm25}, the probabilistic relevance model that remains a strong
+and standard baseline; we use it as the lexical baseline our embedding approach must
+beat. The dense family begins with BERT~\cite{devlin2019bert} and its sentence-level
+adaptation, Sentence-BERT~\cite{reimers2019sbert}, which produces semantically
+meaningful sentence embeddings comparable by cosine similarity---the technique we use to
+encode both queries and review sentences into a shared space. Dense Passage
+Retrieval~\cite{karpukhin2020dpr} then established that dense embedding retrieval can
+substantially outperform lexical matching for natural-language queries; our BM25-vs-dense
+comparison on restaurant reviews is a structurally identical experiment applied to a new
+domain.
+
+\subsection{Explainable Recommendation}
+The explainable component of our system---returning the specific review sentences that
+justify each restaurant's ranking---sits squarely within the ``review-sentence-as-
+explanation'' paradigm catalogued by Zhang and Chen's survey of explainable
+recommendation~\cite{zhang2020explainable}. The survey organises the field by
+information source and model type, and argues that user reviews are a rich explanation
+source because individual sentences can both justify a recommendation and surface the
+aspects a user cares about. It also stresses evaluating explanations against independent
+signals rather than self-referentially---guidance we adopt for the optional
+flavour-feature layer.
+
+\subsection{Aspect-Based Sentiment and the Flavour-Feature Layer}
+The optional flavour layer draws on aspect-based sentiment analysis (ABSA), defined as a
+mainstream task by SemEval-2014~\cite{pontiki2014semeval}, whose restaurant-domain
+taxonomy---\emph{food, service, price, ambience, anecdotes/miscellaneous}---the
+multilingual M-ABSA resource (used in our project) inherits. This citation lets us state
+a precise design boundary: the standard ABSA taxonomy contains \emph{no}
+flavour-intensity axes such as spicy, sour, or sweet. Consequently, off-the-shelf ABSA
+aspects cannot serve as ground truth for a flavour-intensity layer; the layer must
+instead be validated against independent human labels. This both motivates the layer's
+place as an optional ablation and directly answers the concern that ingredient- and
+lexicon-derived flavour features might otherwise validate each other circularly.
+
+\subsection{Thai Language Processing}
+Because the cross-lingual demonstration operates on Thai text, which is written without
+inter-word spaces and is comparatively low-resource, it relies on Thai-specific
+language technology. WangchanBERTa~\cite{lowphansirikul2021wangchanberta} is a
+transformer model pretrained on large Thai corpora and, together with multilingual
+sentence encoders and the PyThaiNLP toolkit for word segmentation, makes review-level
+retrieval over the Wongnai corpus feasible without English-centric assumptions.
+
+% =====================================================================
+%  REFERENCES (embedded — no .bib / BibTeX needed). IEEE-style numbering.
+% =====================================================================
+\begin{thebibliography}{99}
+
+\bibitem{rird2023}
+M.~M. Abdollah Pour, P.~Farinneya, A.~Toroghi, A.~Korikov, A.~Pesaranghader,
+T.~Sajed, M.~Bharadwaj, B.~Mavrin, and S.~Sanner,
+``Self-supervised contrastive BERT fine-tuning for fusion-based reviewed-item
+retrieval,'' in \emph{Advances in Information Retrieval (ECIR 2023)}, LNCS vol.~13980.
+Cham, Switzerland: Springer, 2023, pp.~3--17, doi: 10.1007/978-3-031-28244-7\_1.
+
+\bibitem{koren2009mf}
+Y.~Koren, R.~Bell, and C.~Volinsky, ``Matrix factorization techniques for recommender
+systems,'' \emph{Computer}, vol.~42, no.~8, pp.~30--37, 2009,
+doi: 10.1109/MC.2009.263.
+
+\bibitem{devlin2019bert}
+J.~Devlin, M.-W. Chang, K.~Lee, and K.~Toutanova, ``BERT: Pre-training of deep
+bidirectional transformers for language understanding,'' in \emph{Proc. NAACL-HLT},
+2019, doi: 10.18653/v1/N19-1423.
+
+\bibitem{reimers2019sbert}
+N.~Reimers and I.~Gurevych, ``Sentence-BERT: Sentence embeddings using Siamese
+BERT-networks,'' in \emph{Proc. EMNLP-IJCNLP}, 2019, doi: 10.18653/v1/D19-1410.
+
+\bibitem{karpukhin2020dpr}
+V.~Karpukhin, B.~O\u{g}uz, S.~Min, P.~Lewis, L.~Wu, S.~Edunov, D.~Chen, and W.-t. Yih,
+``Dense passage retrieval for open-domain question answering,'' in \emph{Proc. EMNLP},
+2020, doi: 10.18653/v1/2020.emnlp-main.550.
+
+\bibitem{robertson2009bm25}
+S.~Robertson and H.~Zaragoza, ``The probabilistic relevance framework: BM25 and
+beyond,'' \emph{Foundations and Trends in Information Retrieval}, vol.~3, no.~4,
+pp.~333--389, 2009, doi: 10.1561/1500000019.
+
+\bibitem{zhang2020explainable}
+Y.~Zhang and X.~Chen, ``Explainable recommendation: A survey and new perspectives,''
+\emph{Foundations and Trends in Information Retrieval}, vol.~14, no.~1, pp.~1--101,
+2020, doi: 10.1561/1500000066.
+
+\bibitem{gao2021crs}
+C.~Gao, W.~Lei, X.~He, M.~de Rijke, and T.-S. Chua, ``Advances and challenges in
+conversational recommender systems: A survey,'' \emph{AI Open}, vol.~2, pp.~100--126,
+2021, doi: 10.1016/j.aiopen.2021.06.002.
+
+\bibitem{kostric2024usage}
+I.~Kostric, K.~Balog, and F.~Radlinski, ``Generating usage-related questions for
+preference elicitation in conversational recommender systems,'' \emph{ACM Trans.
+Recommender Systems}, vol.~2, no.~2, art.~12, pp.~1--24, 2024, doi: 10.1145/3629981.
+
+\bibitem{pontiki2014semeval}
+M.~Pontiki, D.~Galanis, J.~Pavlopoulos, H.~Papageorgiou, I.~Androutsopoulos, and
+S.~Manandhar, ``SemEval-2014 Task~4: Aspect based sentiment analysis,'' in \emph{Proc.
+8th Int. Workshop on Semantic Evaluation (SemEval 2014)}, Dublin, Ireland, 2014,
+pp.~27--35, doi: 10.3115/v1/S14-2004.
+
+\bibitem{lowphansirikul2021wangchanberta}
+L.~Lowphansirikul, C.~Polpanumas, N.~Jantrakulchai, and S.~Nutanong,
+``WangchanBERTa: Pretraining transformer-based Thai language models,''
+arXiv:2101.09635, 2021.
+
+\end{thebibliography}
+
+\end{document}
