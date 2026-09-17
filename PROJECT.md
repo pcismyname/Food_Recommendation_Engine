@@ -123,7 +123,9 @@ a vector index (`faiss` / `scikit-learn` nearest-neighbour), `rank-bm25` (baseli
 - [x] Download RIRD, confirm columns & licence, run EDA → **English, use as protocol**
 - [x] Download Thai datasets (Wongnai, Thailand Foods, M-ABSA Thai) + EDA
 - [x] Reproducible dataset setup (`datasets/download_datasets.py`)
-- [ ] BM25 baseline on RIRD producing a retrieval number (MAP / nDCG)
+- [/] BM25 baseline on RIRD → `baselines/baseline_models.ipynb` (run to get numbers)
+- [/] Dense (no fusion) baseline → same notebook, Section 4
+- [/] Cross-model evaluation harness → `baselines/eval_utils.py`
 - [ ] Sentence split + multilingual encoding + top-k retrieval
 - [ ] Fusion method (the contribution) + ablation vs. baseline
 - [ ] Port pipeline to the Thai (Wongnai) corpus — review-level demo

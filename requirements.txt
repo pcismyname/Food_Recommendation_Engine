@@ -6,3 +6,8 @@ huggingface_hub
 jupyter
 ipykernel
 nbformat
+# baselines
+rank-bm25
+sentence-transformers
+scikit-learn
+tqdm
