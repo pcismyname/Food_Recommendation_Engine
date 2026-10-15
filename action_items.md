@@ -76,50 +76,63 @@ properly investigated and explained.
 
 Status: `[ ]` not started, `[/]` in progress, `[x]` done.
 **Thai?** marks tasks that need someone who reads Thai.
+**Phase:** 1 = due for the progress submission (Monday 2026-10-19), 2 = after the presentation.
+**Priority:** High / Medium / Low within that phase.
 
-### A. Fair fusion study on RIRD (English) — answers F2
+### Owners
 
-| ID | Task | Thai? | Depends on |
-|---|---|---|---|
-| A1 | `[/]` Shared retrieval unit for BM25 and dense. Done at review level in v2; sentence splitting is coded but not yet run (`UNIT = 'sentence'`) | No | — |
-| A2 | `[/]` Same fusion variants on both models, with CIs and significance tests. Done at review level; rerun at sentence level | No | A1 |
-| A3 | `[ ]` Volume control: subsample every restaurant to 400 reviews and rerun from cached embeddings; report the correlation between restaurant score and review count for each aggregation | No | A2 (can run on the review-level cache now) |
-| A4 | `[ ]` Save the per-query rankings (not only the metrics) so A3, B1 and B2 can reuse them | No | — |
+| Area | Owner | Focus until Monday |
+|---|---|---|
+| A. Fair fusion study (English) | **Sam** | **Main focus.** A3 first, then the sentence-level rerun |
+| B. Explanation evaluation (English) | **Sam** | Not before Monday; starts in Phase 2 |
+| C. Thai taste test set | **Ton** | C1 and a first Thai example; continues in Phase 2 |
+| D. Writing, E. Guidelines | Not assigned yet | D1, D3, D4 are due Monday |
 
-### B. Explanation evaluation on RIRD (English) — answers F3
+### A. Fair fusion study on RIRD (English) — answers F2 · Owner: Sam
 
-| ID | Task | Thai? | Depends on |
-|---|---|---|---|
-| B1 | `[ ]` Faithfulness (automatic): delete the top-k shown sentences, re-score, compare the rank drop against deleting k random sentences | No | A2 at sentence level |
-| B2 | `[ ]` Support (human): export shown sentences for ~15–30 queries × top 3 restaurants; two people label 0/1/2 separately; report kappa and % rated as supporting | No | A2 at sentence level, E1 |
+| ID | Task | Phase · Priority | Thai? | Depends on |
+|---|---|---|---|---|
+| A3 | `[ ]` Volume control: subsample every restaurant to 400 reviews and rerun from cached embeddings; report the correlation between restaurant score and review count for each aggregation | **1 · High** (do first) | No | Can run now on the review-level cache |
+| A1 | `[/]` Shared retrieval unit for BM25 and dense. Done at review level in v2; sentence splitting is coded but not yet run (`UNIT = 'sentence'`) | **1 · High** | No | — |
+| A2 | `[/]` Same fusion variants on both models, with CIs and significance tests. Done at review level; rerun at sentence level | **1 · High** | No | A1 |
+| A4 | `[ ]` Save the per-query rankings (not only the metrics) so A3, B1 and B2 can reuse them | 1 · Medium | No | — |
 
-### C. Thai taste test set on Wongnai — answers F1
+If the sentence-level run is not finished by Monday, present it as a next step; A3 on review level is the must-have.
 
-| ID | Task | Thai? | Depends on |
-|---|---|---|---|
-| C1 | `[ ]` Write 15–30 Thai taste queries (sour, spicy, sweet, rich, cheap, combinations, a few negations) | **Yes** | — |
-| C2 | `[ ]` Split Wongnai reviews into sentences with PyThaiNLP, build a Thai BM25 index, encode and cache sentences. Spot-check the segmentation | Code: no. Spot-check: **yes** | — |
-| C3 | `[ ]` For each query, pool the top sentences from BM25 and dense into one shuffled sheet that doesn't show which system found each sentence | No | C1, C2 |
-| C4 | `[ ]` Hand-label the sampled pairs 0/1/2 | **Yes** | C3, E1 |
-| C5 | `[ ]` Second opinion: a second Thai speaker labels 50–80 of the same pairs. Fallback: re-label 50 of your own pairs at least a week later | **Yes** | C4 |
-| C6 | `[ ]` *Optional:* two LLMs from different providers label the full pool. Skip if the pool is small enough to label by hand | No (but checking their output: **yes**) | C3, E1 |
-| C7 | `[ ]` Agreement figures, then Thai nDCG@10 / P@10 for BM25 vs. dense | No | C4, C5 (C6 if used) |
+### B. Explanation evaluation on RIRD (English) — answers F3 · Owner: Sam
 
-### D. Writing
+| ID | Task | Phase · Priority | Thai? | Depends on |
+|---|---|---|---|---|
+| B1 | `[ ]` Faithfulness (automatic): delete the top-k shown sentences, re-score, compare the rank drop against deleting k random sentences | 2 · High | No | A2 at sentence level |
+| B2 | `[ ]` Support (human): export shown sentences for ~15–30 queries × top 3 restaurants; two people label 0/1/2 separately; report kappa and % rated as supporting. Sam prepares the sheet; Sam and Ton both label | 2 · High | No | A2 at sentence level, E1 |
 
-| ID | Task | Thai? | Depends on |
-|---|---|---|---|
-| D1 | `[ ]` Related work: add the three papers in 1.1 | No | — |
-| D2 | `[ ]` Rewrite title, claims and limitations. Working title: "Explainable reviewed-item retrieval, with a Thai taste case study" | No | Draft now; final after A3, B2, C7 |
-| D3 | `[ ]` **Feedback summary page** for the progress report (one row per comment in 1.1: action taken / revision / reason not done) | No | — |
-| D4 | `[ ]` Progress report PDF and slides PDF, following the four sections in 1.2 | No | D3, plus whatever of A1–A3 is finished |
-| D5 | `[ ]` Final report, slides and video | No | everything above |
+### C. Thai taste test set on Wongnai — answers F1 · Owner: Ton
 
-### E. Shared setup
+| ID | Task | Phase · Priority | Thai? | Depends on |
+|---|---|---|---|---|
+| C1 | `[ ]` Write 15–30 Thai taste queries (sour, spicy, sweet, rich, cheap, combinations, a few negations) | **1 · High** | **Yes** | — |
+| C2 | `[ ]` Split Wongnai reviews into sentences with PyThaiNLP, build a Thai BM25 index, encode and cache sentences. Spot-check the segmentation. For Monday, one qualitative Thai query → top sentences example is enough | 1 · Medium | Code: no. Spot-check: **yes** | — |
+| C3 | `[ ]` For each query, pool the top sentences from BM25 and dense into one shuffled sheet that doesn't show which system found each sentence | 2 · High | No | C1, C2 |
+| C4 | `[ ]` Hand-label the sampled pairs 0/1/2 | 2 · High | **Yes** | C3, E1 |
+| C5 | `[ ]` Second opinion: a second Thai speaker labels 50–80 of the same pairs. Fallback: re-label 50 of your own pairs at least a week later. Start looking for a second Thai speaker now | 2 · Medium | **Yes** | C4 |
+| C6 | `[ ]` *Optional:* two LLMs from different providers label the full pool. Skip if the pool is small enough to label by hand | 2 · Low | No (but checking their output: **yes**) | C3, E1 |
+| C7 | `[ ]` Agreement figures, then Thai nDCG@10 / P@10 for BM25 vs. dense | 2 · High | No | C4, C5 (C6 if used) |
 
-| ID | Task | Thai? | Depends on |
-|---|---|---|---|
-| E1 | `[ ]` Annotation guidelines in English: 0/1/2 scale, worked examples, decided edge-case rules, for both the Thai sheet and the explanation sheet | Thai examples: **yes** | — |
+### D. Writing · Owner: not assigned yet
+
+| ID | Task | Phase · Priority | Thai? | Depends on |
+|---|---|---|---|---|
+| D3 | `[ ]` **Feedback summary page** for the progress report (one row per comment in 1.1: action taken / revision / reason not done) | **1 · High** | No | — |
+| D4 | `[ ]` Progress report PDF and slides PDF, following the four sections in 1.2 | **1 · High** | No | D3, plus whatever of A is finished |
+| D1 | `[ ]` Related work: add the three papers in 1.1 | **1 · High** | No | — |
+| D2 | `[ ]` Rewrite title, claims and limitations. Working title: "Explainable reviewed-item retrieval, with a Thai taste case study" | Draft: 1 · Medium. Final: 2 · High | No | Final after A3, B2, C7 |
+| D5 | `[ ]` Final report, slides and video | 2 · High | No | everything above |
+
+### E. Shared setup · Owner: not assigned yet
+
+| ID | Task | Phase · Priority | Thai? | Depends on |
+|---|---|---|---|---|
+| E1 | `[ ]` Annotation guidelines in English: 0/1/2 scale, worked examples, decided edge-case rules, for both the Thai sheet and the explanation sheet | 2 · High (blocks all labelling; finish early in Phase 2) | Thai examples: **yes** | — |
 
 ---
 
@@ -129,21 +142,22 @@ Status: `[ ]` not started, `[/]` in progress, `[x]` done.
 
 Aim: show the fixed baselines, an honest answer to each comment, and a concrete plan.
 
-| Priority | Task | Why it matters for Oct 19 |
-|---|---|---|
-| 1 | D3 feedback summary page | Explicitly required |
-| 2 | A3 volume control on the review-level cache | Closes the second half of F2 with a real number |
-| 3 | A1/A2 at sentence level (set `UNIT = 'sentence'`, rerun on Colab GPU) | Sentence level is our proposed method and is needed for explanations |
-| 4 | D1 related work | Explicitly requested in F4 |
-| 5 | C1 draft Thai queries + one qualitative Thai example | Shows the Thai track has started |
-| 6 | D4 report and slides | Required deliverable |
+| Order | Sam | Ton | Not assigned yet |
+|---|---|---|---|
+| 1 | A3 volume control (review-level cache) | C1 Thai queries | D3 feedback summary page |
+| 2 | A1/A2 sentence-level rerun (Colab GPU) | C2 one qualitative Thai example | D1 related work |
+| 3 | A4 save per-query rankings | | D4 report and slides; D2 draft claims |
 
 If time is short, present the sentence-level run and the Thai work as next steps; the review-level
-results in section 2 are already enough to show progress.
+results in section 2 plus A3 are enough to show progress.
 
 ### Phase 2 — after the presentation, to the final deadline
 
-B1, B2, E1, C2–C7, D2 (final), D5.
+| Priority | Sam | Ton | Not assigned yet |
+|---|---|---|---|
+| High | B1, B2 (sheet + labelling with Ton) | C3, C4, C7; B2 labelling | E1 (early, blocks labelling), D2 final, D5 |
+| Medium | Finish any Phase 1 leftovers in A | C5 | |
+| Low | | C6 (optional) | |
 
 ---
 
@@ -151,11 +165,9 @@ B1, B2, E1, C2–C7, D2 (final), D5.
 
 Can start **now**, independently of each other:
 
-- A3, A4 (English code)
-- A1/A2 sentence-level rerun (English code)
-- D1, D3 (writing, English)
-- C1, E1 (**need Thai**)
-- C2 (code; Thai only for the spot-check)
+- **Sam:** A3, A4, then the A1/A2 sentence-level rerun
+- **Ton:** C1, C2
+- **Unassigned:** D1, D3 (writing, English)
 
 Dependency chains:
 
@@ -177,8 +189,8 @@ A3, B1, B2, C7 ──► D2 (final) ──► D5
 - The RIRD track (A, B) and the Thai track (C) are independent until the report.
 - **A2 at sentence level is the main bottleneck** for the explanation work (B1, B2).
 - **E1 blocks all labelling** (B2, C4, C6).
-- **Thai tasks (C1, C2 spot-check, C4, C5, E1 examples) all fall on one person**, so the English
-  tasks should go to whoever doesn't read Thai.
+- **Thai tasks (C1, C2 spot-check, C4, C5, E1 examples) all fall on Ton**, so Ton should not also
+  carry the English code tasks.
 
 ---
 
