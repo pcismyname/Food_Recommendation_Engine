@@ -22,3 +22,6 @@ submission_ipynb.zip
 
 # Thai retrieval caches (sentences, embeddings)
 thai/cache/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/

@@ -133,7 +133,7 @@ The file name records the **model, unit, max length** (and for Thai the sample s
 
 ## 10. Hybrid retrieval in one paragraph
 
-Since the two make different mistakes, many systems **combine** them: run both, then merge the result lists, for example with a weighted sum of normalized scores or with **reciprocal rank fusion** (each document gets $\sum 1/(k + \text{rank})$ over the systems, with $k$ a constant, often 60). Hybrid retrieval is a common, strong baseline in the literature, but it is **not** in our current plan. Our "fusion" research question is about combining *review scores into a restaurant score* (file 03), not combining BM25 with dense. Don't confuse the two meanings of "fusion".
+Since the two make different mistakes, many systems **combine** them: run both, then merge the result lists, for example with a weighted sum of normalized scores or with **reciprocal rank fusion** (each document gets $\sum 1/(k + \text{rank})$ over the systems, with $k$ a constant, often 60). Hybrid retrieval is a common, strong baseline in the literature, but it is **not** in our current plan. In our project, "fusion" means aggregating *review or sentence scores into a restaurant score* (file 03), compared under the same unit for both models in Track A. It never means combining BM25 with dense, and learned or weighted fusion is out of scope. Don't confuse the two meanings of "fusion".
 
 ---
 

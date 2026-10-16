@@ -1,5 +1,10 @@
 # Research Decision — Language, Cuisine, and Evaluation
 
+> **Proposal-era record (superseded 2026-10-17).** Scope has since changed: see
+> [README.md](../README.md#response-to-proposal-feedback) and [action_items.md](../action_items.md).
+> Fusion is no longer a method contribution; Thai is evaluated at sentence level only; the flavour
+> layer, Thailand Foods, M-ABSA and rating-weighted fusion are out of scope.
+
 Status: open for team discussion (Ton + Sam). Captures the core scope decision
 surfaced during dataset EDA. See `PROJECT.md` for the technical framing and
 `eda/` for the evidence.

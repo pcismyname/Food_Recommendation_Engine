@@ -11,3 +11,6 @@ rank-bm25
 sentence-transformers
 scikit-learn
 tqdm
+# thai track
+pythainlp
+python-crfsuite

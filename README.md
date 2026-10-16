@@ -1,4 +1,61 @@
-# Thai Food Recommendation — CP Proposal (Group: Flower)
+# Explainable Reviewed-Item Retrieval, with a Thai Taste Case Study (Group: Flower)
+
+Members: Ton (st127004, Chidsanuphong Pengchai) · Sam (st127012, Samichi Rungta)
+
+Working title, revised after the proposal feedback. The project was proposed as a *Thai Food
+Recommendation Engine*; the problem and pipeline are the same, but the claims are now limited to
+what we can measure (see [Response to proposal feedback](#response-to-proposal-feedback)).
+
+## What we are building
+
+Given a free-text taste preference query, rank restaurants and show the review sentences that
+justify each restaurant's position (the "explainable" part).
+
+```
+query → ① retrieve review sentences → ② fuse into a restaurant score → ③ show top sentences as the explanation
+```
+
+We compare BM25 and a dense multilingual encoder (`paraphrase-multilingual-mpnet-base-v2`) at
+stage ①, and several aggregations (max, mean, top-k mean) at stage ②.
+
+| Track | Question | Data | Stages | Owner |
+|---|---|---|---|---|
+| **A. Fair fusion** | Do the rankings hold up when BM25 and dense score the same unit, and are they biased by review volume? | RIRD (English, labelled) | ① ② | Sam |
+| **B. Explanation evaluation** | Do the shown sentences really support the ranking (deletion test, human rating)? | RIRD | ③ | Sam |
+| **C. Thai taste test set** | Does sentence retrieval carry over to real Thai reviews with human taste labels? | Wongnai (Thai) | ① only | Ton |
+
+- RIRD is the only dataset with restaurant ids **and** relevance labels, so restaurant ranking and
+  explanations are measured in English.
+- Wongnai has no restaurant ids, so the Thai track is a sentence-level transfer test. Thai
+  restaurant ranking is future work.
+- C reuses A's method (same encoder, same BM25 vs. dense comparison, same sentence unit), not A's
+  results.
+
+## Status and plan
+
+Task list, owners, dependencies and the plan are in **[action_items.md](action_items.md)**.
+
+- **Next deadline:** Monday 2026-10-19, 11:59 PM, updated report (PDF) and slides (PDF), including a
+  feedback summary page. Progress presentation Tuesday 2026-10-20 (10 min + 5 min Q&A).
+- **Done:** review-level baselines with CIs and significance tests
+  ([baselines/baseline_models_v2.ipynb](baselines/baseline_models_v2.ipynb)); Thai queries frozen
+  and Thai sentence pipeline built ([thai/](thai/)).
+- **Next:** review-volume control (A3), sentence-level rerun (A1/A2), feedback page and related work
+  (D3, D1).
+
+### Repository map
+
+| Path | What it is |
+|---|---|
+| [action_items.md](action_items.md) | Current tasks, owners, plan |
+| [professor_commmend.md](professor_commmend.md) | Professor's feedback on the proposal |
+| [PROJECT.md](PROJECT.md) | Technical framing: pipeline, data, evaluation |
+| [baselines/](baselines/) | RIRD baselines. `baseline_models_v2.ipynb` is current; `baseline_models.ipynb` is the proposal-era v1 |
+| [thai/](thai/) | Thai taste queries, query rules, Wongnai sentence retrieval notebook |
+| [eda/](eda/) | EDA for RIRD and the Thai datasets |
+| [knowledge_base/](knowledge_base/) | Background notes on retrieval, fusion, evaluation, explainability, Thai NLP |
+| [docs/](docs/) | Paper notes, references, proposal LaTeX sections |
+| [project_proposal.md](project_proposal.md), `CP_Proposal (1).pdf` | The submitted proposal (historical record) |
 
 ## Setup
 
@@ -18,7 +75,8 @@ pip install -r requirements.txt
 jupyter notebook
 ```
 
-Then open any notebook under `eda/` to explore the data.
+Then open any notebook under `eda/`, `baselines/` or `thai/`. The Thai notebook also needs
+`pythainlp` and `python-crfsuite` (both in `requirements.txt`).
 
 ## Dataset Setup
 
@@ -38,7 +96,11 @@ This rebuilds `datasets/` with everything that can be fetched without credential
 | Wongnai (Thai reviews) | HF `Highgroundbkk/wongnai_reviews` | `datasets/wongnai/` | ✅ |
 | Thailand Foods (dish gazetteer) | Kaggle `ponthakornsodchun/foods-in-thailand` | `datasets/thailand_foods.csv` | ⚠️ manual |
 
-**Thailand Foods (manual):** Kaggle requires an account. Either download the CSV from
+Only **RIRD** and **Wongnai** are used in the current scope. M-ABSA and Thailand Foods were part of
+the proposal and are now out of scope (see [action_items.md](action_items.md) §7); the downloader
+still fetches them so the proposal EDA can be reproduced.
+
+**Thailand Foods (manual, optional):** Kaggle requires an account. Either download the CSV from
 the [dataset page](https://www.kaggle.com/datasets/ponthakornsodchun/foods-in-thailand)
 and save it as `datasets/thailand_foods.csv`, or with a Kaggle API token
 (`~/.kaggle/kaggle.json`):
@@ -49,8 +111,6 @@ kaggle datasets download -d ponthakornsodchun/foods-in-thailand -p datasets --un
 ```
 
 See `PROJECT.md` for what each dataset is for and how they fit the pipeline.
-
-Members: Ton (st127004, Chidsanuphong Pengchai) · Sam (st127012, Samichi Rungta)
 
 ## Response to proposal feedback
 
@@ -134,82 +194,12 @@ Tasks, owners and deadlines are in [action_items.md](action_items.md).
   independently labelled Thai test set is underway. The final answer will be at sentence level,
   not restaurant level, and we say so.
 
-## What we are building
-
-A search system where the **query is a taste preference in Thai** and the
-**documents are restaurant reviews**.
-
-- **Input:** one free-text Thai query, e.g. `อยากกินอะไรเปรี้ยวๆ เผ็ดๆ ไม่แพง`
-- **Output:** ranked list of restaurants, each with the review sentences that
-  justify its position (the "explainable" part)
-
-Pipeline: split reviews into sentences → segment with PyThaiNLP → encode with a
-Thai/multilingual model → retrieve top-k sentences for the query → **fuse**
-sentence scores up to a restaurant score → rank.
-
-The fusion step is the research contribution. Everything else is plumbing.
-
-## Section ownership
-
-| § | Section | Owner |
-|---|---|---|
-| 1 | Introduction | Ton |
-| 2 | Problem Statement | Ton |
-| 3 | Related Works | Ton |
-| 4 | Datasets | Sam |
-| 5 | Methodology | Sam |
-| 6 | Baseline and Proposed Approach | Sam |
-| 7 | Preliminary Results | **unassigned — decide** |
-
-**Both:** find 5 papers each (10 total) for §3 Related Works. Ton writes the
-section, but Sam's 5 should come from the modelling side (retrieval, fusion,
-Thai NLP models) so §5 and §6 have something to cite too. Drop them in a shared
-doc with a one-line note on why each is relevant — not just the link.
-
-## Data ownership
-
-| Dataset | Owner |
-|---|---|
-| RIRD (professor's recommendation) — D3Mlab/rir_data | Ton |
-| Wongnai corpus | Sam |
-| Third dataset (TBC — Kaggle Foods in Thailand / M-ABSA) | Sam |
-
-## First unblocking task each
-
-Do these before anything else. If either fails, the plan changes.
-
-- **Ton:** download RIRD, open the CSVs, confirm the licence and column
-  structure. Note that it is **Toronto / Yelp / English**, not Thai — decide and
-  write down how we use it (protocol template vs. direct data).
-- **Sam:** get a BM25 baseline producing a number. One afternoon, no fine-tuning,
-  no GPU. Once a number exists, §6 and §7 can be written even if everything
-  else slips.
-
-## Deliverables
-
-1. Proposal report — AIT thesis template, https://languages.ait.ac.th/thesis-format/
-   (start in the template, do not reformat later)
-2. Proposal slides
-3. 15-minute presentation video on YouTube — submit the link
-
-## Video split (~7 min each, one handoff)
-
-- **Ton:** §1–2 framing (~2 min), §3 related works (~2 min), plus demo (~3 min)
-- **Sam:** §4 datasets (~2 min), §5 models (~3 min), §6 baseline (~3 min)
-
-## Open items
-
-- §7 Preliminary Results has no owner
-- Sam writes §4 Datasets but Ton owns the professor's dataset — Ton must supply
-  the RIRD description and licence paragraph to Sam
-- Google Places licensing / reproducibility still unconfirmed
-- Confirm whether M-ABSA's Thai aspect list actually overlaps our flavour axes
-  before citing it
-
 ## References
 
 - RIRD dataset: https://github.com/D3Mlab/rir_data
 - RIR paper (ECIR 2023): https://arxiv.org/pdf/2308.00762
+- Korikov et al., Multi-Aspect Reviewed-Item Retrieval via LLM Query Decomposition and Aspect Fusion: https://arxiv.org/abs/2408.00878
+- Zhang et al., Enhancing Recommendation Explanations through User-Centric Refinement (Findings of EMNLP 2025): https://aclanthology.org/2025.findings-emnlp.434/
+- Hasan et al., Review-based Recommender Systems: A Survey (ACM Computing Surveys): https://doi.org/10.1145/3742421
 - Wongnai challenge: https://www.kaggle.com/c/wongnai-challenge-review-rating-prediction
-- Foods in Thailand: https://www.kaggle.com/datasets/ponthakornsodchun/foods-in-thailand
-- M-ABSA: https://huggingface.co/datasets/Multilingual-NLP/M-ABSA
+- PyThaiNLP: https://github.com/PyThaiNLP/pythainlp

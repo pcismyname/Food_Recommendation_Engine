@@ -43,7 +43,7 @@ M. M. Abdollah Pour, P. Farinneya, A. Toroghi, A. Korikov, A. Pesaranghader, T. 
 - **Why for us:**
   - It defines our task (score reviews, then fuse them into an item score), our English dataset, and the query categories you will copy for the Thai queries (**C1**).
   - Its comparison of early and late fusion is the background to the professor's fusion-bias concern (**F2**, **A3**).
-  - Its MAP 0.626 is the number our dense top-10 model (MAP 0.608) is compared against.
+  - Its MAP 0.626 (fine-tuned) is the reference point for our off-the-shelf dense top-10 model (MAP 0.608). We don't fine-tune (out of scope), so this is not a like-for-like comparison.
 - **Read:**
   - Abstract and introduction.
   - The task definition and the early vs. late fusion section.
@@ -205,7 +205,7 @@ M. D. Smucker, J. Allan, B. Carterette. "A Comparison of Statistical Significanc
 
 - **Why for us:**
   - The v2 baselines already use paired randomization tests. This paper is the standard justification for that choice over the sign test and the Wilcoxon test.
-  - Use the same test for Thai BM25 vs. dense in **C7**. Note that with only 15–30 queries, statistical power will be low.
+  - Use the same test for Thai BM25 vs. dense in **C7**. Note that with only 24 frozen Thai queries, statistical power will be low.
 - **Read:**
   - Introduction.
   - The section describing the randomization (permutation) test.
@@ -318,7 +318,7 @@ C. D. Manning, P. Raghavan, H. Schütze. *Introduction to Information Retrieval*
 L. Lowphansirikul, C. Polpanumas, N. Jantrakulchai, S. Nutanong. "WangchanBERTa: Pretraining Transformer-based Thai Language Models." arXiv preprint, 2021. [arXiv:2101.09635](https://arxiv.org/abs/2101.09635)
 
 - **Why for us:**
-  - This is the main Thai-only encoder. It is a candidate alternative to the multilingual model for **C2/C7**, and the citation for the claim that Thai NLP has matured.
+  - This is the main Thai-only encoder. It needs fine-tuning, which is out of scope, so it is background only: the citation for the claim that Thai NLP has matured.
   - It also discusses Thai tokenization choices.
 - **Read:**
   - Introduction.
@@ -388,9 +388,9 @@ C. Saetia, E. Chuangsuwanich, T. Chalothorn, P. Vateekul. "Semi-supervised Thai 
 | BM25, Robertson & Zaragoza 2009 | Yes (`robertson2009bm25`) | — |
 | Zhang & Chen 2020 | Yes (`zhang2020explainable`) | — |
 | WangchanBERTa 2021 | Yes (`lowphansirikul2021wangchanberta`) | — |
-| Korikov et al. 2024 | **No** | Add (professor, D1) |
-| Zhang et al. 2025 | **No** | Add (professor, D1) |
-| Hasan et al. 2025 | **No** | Add (professor, D1) |
+| Korikov et al. 2024 | Yes (`korikov2024multiaspect`) | — |
+| Zhang et al. 2025 | Yes (`zhang2025enhancing`) | — |
+| Hasan et al. 2025 | Yes (`hasan2025reviewsurvey`) | — |
 | PyThaiNLP 2023 | **No** | Add (C2 methods) |
 | IIR book 2008 | **No** | Add if we cite metric definitions |
 | Multilingual distillation 2020 | **No** | Add: this is our Thai encoder |

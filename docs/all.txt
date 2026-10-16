@@ -1,3 +1,5 @@
+[Proposal-era citation notes, superseded 2026-10-17. Current bibliography: docs/references.bib]
+
 1. Self-Supervised Contrastive BERT Fine-tuning for Fusion-Based Reviewed-Item Retrieval
  Authors: Mohammad Mahdi Abdollah Pour, Parsa Farinneya, Armin Toroghi, Anton Korikov, Ali Pesaranghader, Touqir Sajed, Manasa Bharadwaj, Borislav Mavrin, Scott Sanner
  Published: ECIR 2023

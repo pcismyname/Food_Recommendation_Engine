@@ -1,7 +1,7 @@
 # 03 · Aggregation and Fusion: From Review Scores to a Restaurant Score
 
 > **Why this matters for our project**
-> The fusion step is our stated research contribution, and it is exactly what the professor criticised (F2): different units for BM25 and dense, and max / top-k fusion biased by review volume.
+> Fusion was the proposal's stated research contribution. The current scope (Track A) is a fair comparison instead: BM25 and dense on the same unit with the same aggregations, plus a review-volume control. This is exactly what the professor criticised (F2): different units for BM25 and dense, and max / top-k fusion biased by review volume.
 > This file explains what "unit" and "aggregation" mean, why the bias happens, and how task A3 tests it.
 
 ---

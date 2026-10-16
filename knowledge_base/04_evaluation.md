@@ -192,7 +192,7 @@ A score of 0.6 means nothing until you know what a dumb system gets. The v2 note
 - **Review count**: restaurants with more reviews first, same order for every query.
 - **Popularity (LOO)**: restaurants relevant to the most *other* queries first (leave-one-query-out, so a query never sees its own labels).
 
-If a model barely beats "popular restaurants first", it is not really understanding queries. In v2, every model beats popularity except BM25 with mean aggregation. For Thai, a useful floor is random sentences from the pool.
+If a model barely beats "popular restaurants first", it is not really understanding queries. In v2, every model beats popularity on nDCG@10 and MAP; BM25 with mean aggregation is the exception that is not significantly better, and it loses to popularity on P@10 (0.377 vs. 0.41). For Thai, a useful floor is random sentences from the pool.
 
 ---
 

@@ -1,5 +1,10 @@
 # Project Proposal: Thai Food Recommendation Engine
 
+> **Historical record.** This is the proposal as submitted. The scope has since been revised after
+> the professor's feedback: see [README.md](README.md#response-to-proposal-feedback) and
+> [action_items.md](action_items.md). Thailand Foods, M-ABSA and Thai restaurant-level ranking are
+> no longer in scope.
+
 **Group:** Flower | **Members:** Ton (st127004) · Sam (st127012)
 **Section ownership:** Datasets (§4), Methodology (§5), Baseline & Proposed Approach (§6) — Sam
 

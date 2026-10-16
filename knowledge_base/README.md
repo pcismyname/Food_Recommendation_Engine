@@ -5,8 +5,16 @@ the tasks in [action_items.md](../action_items.md).
 
 ## The project in one picture
 
+Working title: *Explainable reviewed-item retrieval, with a Thai taste case study*.
+
+- **Track A (English, RIRD):** fair fusion. BM25 and dense score the same unit with the same aggregations, plus a review-volume control.
+- **Track B (English, RIRD):** do the shown sentences faithfully support the ranking?
+- **Track C (Thai, Wongnai):** does sentence retrieval carry over to Thai? Sentence level only, because Wongnai has no restaurant ids.
+
+Out of scope: see [action_items.md](../action_items.md) §7.
+
 ```
- query ("อาหารรสเผ็ดจัด")
+ query ("I am on a budget" on RIRD; "อยากกินอะไรเปรี้ยวๆ" on Wongnai)
       │
       ▼
  ┌──────────────┐   score every review / sentence     ┌───────────────┐
@@ -15,14 +23,14 @@ the tasks in [action_items.md](../action_items.md).
  └──────────────┘                                     └──────┬────────┘
                                                              │ aggregate (max / mean / top-k mean)
                                                              ▼
-                                                    restaurant ranking
+                                     restaurant ranking (RIRD only; Thai stops at sentences)
                                                              │
                                                              ▼
                                          top sentences shown as the explanation
 ```
 
-- **Evaluate the ranking** against human labels: RIRD (English, restaurant level) and our own Thai labels (sentence level).
-- **Evaluate the explanation:** is it faithful, and does it support the ranking?
+- **Evaluate the ranking** (Tracks A, C) against human labels: RIRD (English, restaurant level) and our own Thai labels (sentence level).
+- **Evaluate the explanation** (Track B): is it faithful, and does it support the ranking?
 
 ## Reading order
 

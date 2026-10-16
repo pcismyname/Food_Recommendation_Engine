@@ -140,7 +140,7 @@ Partial help: `pythainlp.util.normalize` removes duplicated **vowels and tone ma
 
 | Model | What it is | Use for us |
 |---|---|---|
-| **WangchanBERTa** (`airesearch/wangchanberta-base-att-spm-uncased`) | RoBERTa-base pretrained only on Thai (about 78 GB of text, reported in the paper). Beats mBERT/XLM-R on Thai classification and tagging | A strong Thai **encoder**, but it is a masked language model, not a sentence-embedding model. It needs fine-tuning (e.g. on sentence pairs) before cosine similarity is meaningful |
+| **WangchanBERTa** (`airesearch/wangchanberta-base-att-spm-uncased`) | RoBERTa-base pretrained only on Thai (about 78 GB of text, reported in the paper). Beats mBERT/XLM-R on Thai classification and tagging | A strong Thai **encoder**, but it is a masked language model, not a sentence-embedding model. It needs fine-tuning (e.g. on sentence pairs) before cosine similarity is meaningful. Fine-tuning is out of scope, so we don't use it |
 | **paraphrase-multilingual-mpnet-base-v2** (sentence-transformers) | Multilingual sentence encoder (50+ languages including Thai), 768-dim vectors | **What we use**, same as the English baseline, so the two tracks are comparable |
 | **multilingual-e5** (`intfloat/multilingual-e5-base` / `-large`) | Multilingual retrieval embeddings built on XLM-RoBERTa; inputs are prefixed with `"query: "` and `"passage: "` | Stronger retrieval alternative |
 | **BGE-M3** (`BAAI/bge-m3`) | Multilingual (100+ languages), long inputs (up to 8,192 tokens), gives dense, sparse and multi-vector outputs | Stronger alternative; its sparse output is a learned BM25-like signal |
@@ -159,7 +159,7 @@ Facts (Hugging Face card `Wongnai/wongnai_reviews` and our local files in `datas
 
 What this limits:
 
-1. **No restaurant-level ranking.** We cannot group reviews by restaurant, so we cannot aggregate sentences into restaurant scores the way we do on RIRD. Thai evaluation is **sentence level only**, and restaurant-level Thai ranking is future work.
+1. **No restaurant-level ranking.** We cannot group reviews by restaurant, so we cannot aggregate sentences into restaurant scores the way we do on RIRD. Thai evaluation is **sentence level only**, and restaurant-level Thai ranking is out of scope (future work).
 2. **Stars are not taste labels.** A 4-star review says the person was happy, not that the food was sour or spicy. That is why we need human 0/1/2 labels (C4).
 3. **Subsample.** The notebook uses 2,000 reviews (19,294 sentences) for CPU. Results on all 40k may differ (more near-duplicates, larger pool).
 

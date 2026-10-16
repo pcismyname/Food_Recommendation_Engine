@@ -1,4 +1,10 @@
 # Related Works, Introduction, and Problem Statement
+
+> **Proposal-era record (superseded 2026-10-17).** Scope has since changed: see
+> [README.md](../README.md#response-to-proposal-feedback) and [action_items.md](../action_items.md).
+> Fusion is no longer a method contribution; Thai is evaluated at sentence level only; the flavour
+> layer, Thailand Foods, M-ABSA and rating-weighted fusion are out of scope.
+
 ### Course project proposal support materials — AT82.01, Chidsanuphong "Ton" Pengchai (st127004), Data Science and AI, AIT
 
 **How to use this document:** The five papers below are all verified as real and citable (each has a DOI or arXiv ID confirmed against the publisher/ACL/Springer record). Citations are in IEEE format. Section 1 and Section 2 drafts use inline placeholders `[1]`–`[5]` that map to those five papers. One verification caveat is flagged at the end of Deliverable 1.
