@@ -97,7 +97,7 @@ We cannot label all 19,294 Thai sentences for 24 queries (over 460,000 pairs). T
 3. Merge them (remove duplicates) into one **pool**.
 4. Humans judge only the pool. Anything outside the pool is **assumed not relevant**.
 
-In our Thai notebook, pooling BM25 top-10 and dense top-10 gives 441 pairs for 24 queries (on average only about 1.6 sentences overlap per query, so the pool is about 18 per query). That is the labelling budget for C4.
+In our Thai notebook, pooling BM25 top-10 and dense top-10 gives 465 pairs for the 24 frozen queries (on average only about 0.6 sentences overlap per query, so the pool is about 19 per query). That is the labelling budget for C4.
 
 **Pool bias**: a new system that was *not* in the pool (say, a future BGE-M3 run) may find relevant sentences nobody labelled. They count as 0, so the new system looks worse than it really is. Report this as a limitation, and if you add a system later, label its unjudged top-10 items before comparing.
 

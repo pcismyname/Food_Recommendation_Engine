@@ -36,6 +36,7 @@ Out of scope: see [action_items.md](../action_items.md) §7.
 
 | # | Note | What you learn | Time | Needed for |
 |---|---|---|---|---|
+| 0 | [08_english_vs_thai.md](08_english_vs_thai.md) | What English and Thai each test, what we can claim, how they connect | 10 min | Everyone; D2, D3, D4 |
 | 1 | [01_retrieval_basics.md](01_retrieval_basics.md) | Query, document, relevance, TF-IDF, BM25 | 30 min | Everything |
 | 2 | [02_dense_retrieval.md](02_dense_retrieval.md) | Embeddings, Sentence-BERT, cosine, bi- vs. cross-encoder | 30 min | C2, C7 |
 | 3 | [06_thai_nlp.md](06_thai_nlp.md) | Thai segmentation, PyThaiNLP, negation | 25 min | C1, C2, C4 |
