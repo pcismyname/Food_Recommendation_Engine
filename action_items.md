@@ -1,6 +1,6 @@
 # Action Items — Group Flower
 
-Last updated 2026-10-15.
+Last updated 2026-10-17.
 
 **Next deadline: Monday 2026-10-19, 11:59 PM** — updated report (PDF) and slides (PDF).
 Progress presentation on Tuesday 2026-10-20: 10 minutes plus 5 minutes Q&A.
@@ -110,9 +110,10 @@ If the sentence-level run is not finished by Monday, present it as a next step; 
 
 | ID | Task | Phase · Priority | Thai? | Depends on |
 |---|---|---|---|---|
-| C1 | `[ ]` Write 15–30 Thai taste queries (sour, spicy, sweet, rich, cheap, combinations, a few negations) | **1 · High** | **Yes** | — |
-| C2 | `[ ]` Split Wongnai reviews into sentences with PyThaiNLP, build a Thai BM25 index, encode and cache sentences. Spot-check the segmentation. For Monday, one qualitative Thai query → top sentences example is enough | 1 · Medium | Code: no. Spot-check: **yes** | — |
-| C3 | `[ ]` For each query, pool the top sentences from BM25 and dense into one shuffled sheet that doesn't show which system found each sentence | 2 · High | No | C1, C2 |
+| C1 | `[/]` Write 15–30 Thai taste queries (sour, spicy, sweet, rich, cheap, combinations, a few negations). 24 queries in [thai/thai_queries.csv](thai/thai_queries.csv): drafted by an LLM, then revised by an LLM against the rules in [thai/query_guidelines.md](thai/query_guidelines.md). The original draft is kept in [thai/thai_queries_ai_draft.csv](thai/thai_queries_ai_draft.csv) | **1 · High** | **Yes** | — |
+| C1b | `[ ]` Ton reviews and rewords the revised queries in natural Thai using the checklist in [thai/query_guidelines.md](thai/query_guidelines.md), **without opening the notebook outputs**, then signs off and freezes the file. After that, rerun [thai/thai_retrieval.ipynb](thai/thai_retrieval.ipynb); its current outputs and pool come from the old draft queries | **1 · High** | **Yes** | C1 |
+| C2 | `[/]` Split Wongnai reviews into sentences with PyThaiNLP, build a Thai BM25 index, encode and cache sentences. Spot-check the segmentation. For Monday, one qualitative Thai query → top sentences example is enough. Pipeline built and run on a 2,000-review subsample ([thai/thai_retrieval.ipynb](thai/thai_retrieval.ipynb)); segmentation spot-check notes still empty | 1 · Medium | Code: no. Spot-check: **yes** | — |
+| C3 | `[ ]` For each query, pool the top sentences from BM25 and dense into one shuffled sheet that doesn't show which system found each sentence | 2 · High | No | C1b, C2 |
 | C4 | `[ ]` Hand-label the sampled pairs 0/1/2 | 2 · High | **Yes** | C3, E1 |
 | C5 | `[ ]` Second opinion: a second Thai speaker labels 50–80 of the same pairs. Fallback: re-label 50 of your own pairs at least a week later. Start looking for a second Thai speaker now | 2 · Medium | **Yes** | C4 |
 | C6 | `[ ]` *Optional:* two LLMs from different providers label the full pool. Skip if the pool is small enough to label by hand | 2 · Low | No (but checking their output: **yes**) | C3, E1 |
@@ -144,7 +145,7 @@ Aim: show the fixed baselines, an honest answer to each comment, and a concrete 
 
 | Order | Sam | Ton | Not assigned yet |
 |---|---|---|---|
-| 1 | A3 volume control (review-level cache) | C1 Thai queries | D3 feedback summary page |
+| 1 | A3 volume control (review-level cache) | C1b review and freeze Thai queries | D3 feedback summary page |
 | 2 | A1/A2 sentence-level rerun (Colab GPU) | C2 one qualitative Thai example | D1 related work |
 | 3 | A4 save per-query rankings | | D4 report and slides; D2 draft claims |
 
@@ -166,7 +167,7 @@ results in section 2 plus A3 are enough to show progress.
 Can start **now**, independently of each other:
 
 - **Sam:** A3, A4, then the A1/A2 sentence-level rerun
-- **Ton:** C1, C2
+- **Ton:** C1b, C2
 - **Unassigned:** D1, D3 (writing, English)
 
 Dependency chains:
@@ -176,10 +177,10 @@ A1 ──► A2 ──┬──► A3
             ├──► B1
             └──► B2 ◄── E1
 
-C1 ──┐
-     ├──► C3 ──┬──► C4 ──► C5 ──┐
-C2 ──┘         │                ├──► C7
-               └──► C6 ─────────┘   (C6 optional)
+C1 ──► C1b ──┐
+              ├──► C3 ──┬──► C4 ──► C5 ──┐
+C2 ───────────┘         │                ├──► C7
+                        └──► C6 ─────────┘   (C6 optional)
           E1 ──► C4, C6
 
 D3 + current results ──► D4 (progress, Oct 19)
@@ -189,7 +190,7 @@ A3, B1, B2, C7 ──► D2 (final) ──► D5
 - The RIRD track (A, B) and the Thai track (C) are independent until the report.
 - **A2 at sentence level is the main bottleneck** for the explanation work (B1, B2).
 - **E1 blocks all labelling** (B2, C4, C6).
-- **Thai tasks (C1, C2 spot-check, C4, C5, E1 examples) all fall on Ton**, so Ton should not also
+- **Thai tasks (C1b, C2 spot-check, C4, C5, E1 examples) all fall on Ton**, so Ton should not also
   carry the English code tasks.
 
 ---

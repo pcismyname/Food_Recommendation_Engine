@@ -1,0 +1,25 @@
+qid,query_th,query_en,taste_tags,type
+T01,อยากกินอะไรเปรี้ยวๆ,I want something sour,sour,single
+T02,อาหารรสเผ็ดจัด,very spicy food,spicy,single
+T03,ขนมหวานที่หวานกำลังดี,desserts that are just sweet enough,sweet,single
+T04,ซุปน้ำข้นรสเข้มข้น,rich thick soup,rich,single
+T05,เมนูมันๆ เลี่ยนๆ แบบของทอด,greasy fried dishes,rich,single
+T06,ร้านราคาถูกแต่อร่อย,cheap but tasty place,cheap,single
+T07,อาหารรสจัดจ้าน,boldly flavoured food,bold,single
+T08,รสชาติกลมกล่อม,well-balanced flavour,balanced,single
+T09,น้ำซุปหอมกลิ่นสมุนไพร,broth fragrant with herbs,herbal,single
+T10,อาหารรสอ่อน ทานง่าย,mild easy-to-eat food,mild,single
+T11,ต้มยำเปรี้ยวเผ็ด,sour and spicy tom yum,sour;spicy,combo
+T12,ส้มตำแซ่บๆ เปรี้ยวเผ็ดเค็ม,zesty som tam: sour spicy salty,sour;spicy;salty,combo
+T13,ของหวานไม่แพง,inexpensive desserts,sweet;cheap,combo
+T14,แกงกะทิรสเข้มข้นหวานมัน,rich sweet creamy coconut curry,rich;sweet,combo
+T15,ยำรสจัดเปรี้ยวหวาน,sweet and sour spicy salad,sour;sweet;spicy,combo
+T16,อาหารเผ็ดแต่ราคาไม่แพง,spicy food at a low price,spicy;cheap,combo
+T17,เครื่องดื่มหวานน้อย สดชื่น,refreshing drink with little sugar,sweet;fresh,combo
+T18,บุฟเฟต์คุ้มราคา,buffet that is good value,cheap,combo
+T19,อาหารไม่เผ็ดเหมาะกับเด็ก,non-spicy food suitable for kids,spicy;negation,negation
+T20,ขนมที่ไม่หวานเกินไป,desserts that are not too sweet,sweet;negation,negation
+T21,ก๋วยเตี๋ยวน้ำซุปไม่เค็ม,noodle soup with broth that is not salty,salty;negation,negation
+T22,อาหารไม่มันไม่เลี่ยน,food that is not oily or greasy,rich;negation,negation
+T23,กาแฟเข้มข้นไม่เปรี้ยว,strong coffee that is not sour,rich;sour;negation,negation
+T24,อาหารรสชาติจืด ไม่ค่อยมีรสชาติ,bland food with little flavour,bland,single

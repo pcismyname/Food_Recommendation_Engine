@@ -1,0 +1,25 @@
+qid,query_th,query_en,taste_tags,type
+T01,อยากกินอะไรเปรี้ยวๆ,I want something sour,sour,single
+T02,อยากกินอะไรเผ็ดๆ แบบจัดๆ,I want something really spicy,spicy,single
+T03,ของหวานหวานกำลังดี,desserts that are just sweet enough,sweet,single
+T04,น้ำซุปข้นๆ เข้มข้น,thick rich broth,rich,single
+T05,อยากกินของทอดมันๆ,I want oily fried food,oily,single
+T06,ร้านถูกๆ แต่อร่อย,cheap but tasty place,cheap,single
+T07,อยากกินอะไรรสจัดๆ,I want something strongly flavoured,bold,single
+T08,อาหารรสเค็มนำ,salt-forward food,salty,single
+T09,น้ำซุปหอมสมุนไพร,broth fragrant with herbs,herbal,single
+T10,อาหารรสอ่อนๆ กินง่าย,mild easy-to-eat food,mild,single
+T11,ต้มยำเปรี้ยวๆ เผ็ดๆ,sour and spicy tom yum,sour;spicy,combo
+T12,อะไรแซ่บๆ เปรี้ยวเผ็ดเค็ม,something zesty: sour spicy salty,sour;spicy;salty,combo
+T13,ของหวานถูกๆ,cheap desserts,sweet;cheap,combo
+T14,แกงกะทิเข้มข้น หวานมัน,rich sweet creamy coconut curry,rich;sweet,combo
+T15,ยำรสจัด เปรี้ยวหวาน,strongly flavoured sweet-and-sour yam salad,bold;sour;sweet,combo
+T16,ร้านอาหารเผ็ดๆ ราคาถูก,cheap place with spicy food,spicy;cheap,combo
+T17,น้ำผลไม้เปรี้ยวหวาน สดชื่น,refreshing sweet-and-sour fruit juice,sour;sweet,combo
+T18,บุฟเฟต์คุ้มๆ,buffet that is good value,cheap,single
+T19,อาหารไม่เผ็ด เด็กกินได้,non-spicy food kids can eat,spicy,negation
+T20,ของหวานที่ไม่หวานมาก,desserts that are not too sweet,sweet,negation
+T21,ก๋วยเตี๋ยวน้ำซุปไม่เค็ม,noodle soup with broth that is not salty,salty,negation
+T22,อาหารไม่มัน ไม่เลี่ยน,food that is not oily or greasy,oily,negation
+T23,กาแฟเข้มๆ ไม่เปรี้ยว,strong coffee that is not sour,rich;sour,negation
+T24,อยากกินอะไรหวานๆ เค็มๆ,I want something sweet and salty,sweet;salty,combo

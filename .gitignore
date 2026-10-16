@@ -19,3 +19,6 @@ baselines/cache/*.npy
 *-Copy*.ipynb
 submission_ipynb/
 submission_ipynb.zip
+
+# Thai retrieval caches (sentences, embeddings)
+thai/cache/
