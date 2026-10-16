@@ -112,7 +112,7 @@ If the sentence-level run is not finished by Monday, present it as a next step; 
 |---|---|---|---|---|
 | C1 | `[x]` Write 15–30 Thai taste queries (sour, spicy, sweet, rich, cheap, combinations, a few negations). 24 queries in [thai/thai_queries.csv](thai/thai_queries.csv): drafted by an LLM, then revised by an LLM against the rules in [thai/query_guidelines.md](thai/query_guidelines.md). The original draft is kept in [thai/thai_queries_ai_draft.csv](thai/thai_queries_ai_draft.csv) | **1 · High** | **Yes** | — |
 | C1b | `[x]` Ton reviews and rewords the revised queries in natural Thai using the checklist in [thai/query_guidelines.md](thai/query_guidelines.md), **without opening the notebook outputs**, then signs off and freezes the file. After that, rerun [thai/thai_retrieval.ipynb](thai/thai_retrieval.ipynb). **Signed off by Ton 2026-10-17 with no changes; queries frozen; notebook rerun on the frozen queries** | **1 · High** | **Yes** | C1 |
-| C2 | `[/]` Split Wongnai reviews into sentences with PyThaiNLP, build a Thai BM25 index, encode and cache sentences. Spot-check the segmentation. For Monday, one qualitative Thai query → top sentences example is enough. Pipeline built and run on a 2,000-review subsample ([thai/thai_retrieval.ipynb](thai/thai_retrieval.ipynb)); segmentation spot-check notes still empty | 1 · Medium | Code: no. Spot-check: **yes** | — |
+| C2 | `[x]` Split Wongnai reviews into sentences with PyThaiNLP, build a Thai BM25 index, encode and cache sentences. Spot-check the segmentation. For Monday, one qualitative Thai query → top sentences example is enough. Pipeline built and run on a 2,000-review subsample (19,294 sentences, [thai/thai_retrieval.ipynb](thai/thai_retrieval.ipynb)). Spot-check done (§2a–2b): good enough for retrieval; ~0.7% of sentences cut at abbreviation dots, ~1.6% merged long sentences. Qualitative T02/T11/T20 notes and takeaways written (§6a, §8). Notes drafted by Claude, confirmed by Ton 2026-10-17 | 1 · Medium | Code: no. Spot-check: **yes** | — |
 | C3 | `[ ]` For each query, pool the top sentences from BM25 and dense into one shuffled sheet that doesn't show which system found each sentence | 2 · High | No | C1b, C2 |
 | C4 | `[ ]` Hand-label the sampled pairs 0/1/2 | 2 · High | **Yes** | C3, E1 |
 | C5 | `[ ]` Second opinion: a second Thai speaker labels 50–80 of the same pairs. Fallback: re-label 50 of your own pairs at least a week later. Start looking for a second Thai speaker now | 2 · Medium | **Yes** | C4 |
@@ -146,7 +146,7 @@ Aim: show the fixed baselines, an honest answer to each comment, and a concrete 
 | Order | Sam | Ton | Not assigned yet |
 |---|---|---|---|
 | 1 | A3 volume control (review-level cache) | ~~C1b review and freeze Thai queries~~ (done) | D3 feedback summary page |
-| 2 | A1/A2 sentence-level rerun (Colab GPU) | C2 one qualitative Thai example | D1 related work |
+| 2 | A1/A2 sentence-level rerun (Colab GPU) | ~~C2 one qualitative Thai example~~ (done) | D1 related work |
 | 3 | A4 save per-query rankings | | D4 report and slides; D2 draft claims |
 
 If time is short, present the sentence-level run and the Thai work as next steps; the review-level
@@ -167,7 +167,7 @@ results in section 2 plus A3 are enough to show progress.
 Can start **now**, independently of each other:
 
 - **Sam:** A3, A4, then the A1/A2 sentence-level rerun
-- **Ton:** C2 (C1/C1b done)
+- **Ton:** C1, C1b, C2 done; next is E1 Thai examples and finding a second annotator (C5)
 - **Unassigned:** D1, D3 (writing, English)
 
 Dependency chains:

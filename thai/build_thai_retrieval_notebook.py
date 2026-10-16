@@ -83,12 +83,39 @@ code('''for rid in sents.review_id.drop_duplicates().sample(5, random_state=1):
     print(f"--- review {rid} ---")
     for s in sents.loc[sents.review_id == rid, "text"]:
         print("  |", s)''')
-md("""**Spot-check notes (Ton):**
+md("""### 2b. Error patterns across all sentences
+Counts the two failure patterns seen in 2a: cuts at abbreviation dots (กทม. / อ. / ม.ค.) and very
+long "sentences" where several ideas were merged.""")
+code(r"""t = sents.text
+thai_abbr = t.str.contains(r"(?:^|[\s(])(?:[ก-ฮ]{1,3}\.)+$")
+time_dot  = t.str.contains(r"\d\.\d\d\s*น\.$")
+merged    = t.str.len() > 200
+label     = t.str.contains(r"(?:\.\.\.|…)\s*$")
+non_thai  = (t.str.count(r"[ก-๙]") / t.str.len()) < 0.2
+for name, m in [("cut after a Thai abbreviation (excl. times like 18.00 น.)", thai_abbr & ~time_dot),
+                ("ends with a '...' section label", label),
+                ("> 200 chars (likely merged)", merged),
+                ("mostly non-Thai (< 20% Thai characters)", non_thai)]:
+    print(f"{name:58s} {m.sum():5,}  ({m.mean():.1%})")
+per = sents.groupby("review_id").size()
+print(f"\nsentences per review: median {per.median():.0f}; reviews left as one sentence: {(per == 1).mean():.1%}")""")
+md("""**Spot-check notes** (drafted by Claude from 2a and 2b; confirmed by Ton 2026-10-17):
 
-- Reviews checked: …
-- Bad cuts (mid-phrase): …
-- Merged sentences: …
-- Verdict: good enough for sentence retrieval? …
+- **Reviews checked:** the 5 in 2a, plus pattern counts over all 19,294 sentences in 2b.
+- **Short, informal reviews** (most of Wongnai) split cleanly at natural pauses, e.g.
+  `ก๋วยเตี๋ยวเรือชามละ 20 บาท ปรุงมาอร่อยแล้วไม่ต้องปรุงเพิ่ม แต่ระวัง!` | `พริกเผ็ดมาก (ไม่กินเผ็ดก็บอกเค้าได้นะ ...)`.
+- **Bad cuts (mid-phrase):** crfcut treats the dot in Thai abbreviations as a sentence end:
+  `... ใกล้ ๆ กทม.` | `เกษตร วิทยาเขตกำแพงแสน`, `ร้านอาหาร K.U.` | `สโมสร แทน`, `ม.ค.` | `58 ไปจะมีเนื้อดี...`.
+  About 0.7% of sentences end in such an abbreviation.
+- **Merged sentences / shifted labels:** long blog-style reviews with sections like `รสชาติ ...`,
+  `บรรยากาศ ...` get the label glued to the end of the previous section, e.g.
+  `ถือว่าเป็นข้อดีข้อเดียวเลยแหละ รสชาตกาแฟ` | `ถ้าเทียบกับราคาคงแพงเกิน`, so the second sentence
+  loses what it is about. About 1.6% of sentences are over 200 characters (several ideas merged).
+- **Other:** about 0.7% of sentences are mostly English; Thai queries will rarely match them.
+- **Verdict:** good enough for sentence retrieval. Taste statements (`เผ็ดมาก`, `ไม่หวานมาก`) are
+  short and almost always survive intact. Errors affect a few percent of sentences, mostly in long
+  blog-style reviews. State crfcut's published accuracy on review text (≈ 0.77 F1,
+  scb-mt-en-th-2020) as a limitation; no fix needed before labelling.
 """)
 
 md("## 3. Queries (C1)")
@@ -150,12 +177,20 @@ md("""### 6a. Qualitative examples for the progress slides
 One query of each type: single taste, combination, negation.""")
 code('''for qid in ["T02", "T11", "T20"]:
     show(qid)''')
-md("""**Observations (Ton):** which system returns sentences that actually describe the taste?
-Does either system handle the negation (ไม่หวานเกินไป)?
+md("""**Observations** (drafted by Claude, confirmed by Ton 2026-10-17; eyeballed, not labels):
 
-- T02: …
-- T11: …
-- T20: …
+- **T02 อยากกินอะไรเผ็ดๆ แบบจัดๆ (really spicy):** BM25 fails. Its top 5 match the words
+  อยากกินอะไร / จัด, not spiciness (`อยากกินปูเน้นๆเนื้อๆ เลยจัดเต็ม`). Dense ranks 1–2 are on target
+  (`ถ้าชอบเผ็ดสั่งเพิ่มได้เลย`, `สำหรับคนชอบเผ็ดๆเลย`), then drifts, and its rank 5 is the opposite
+  taste (`รสชาติจะออกอ่อนๆ`).
+- **T11 ต้มยำเปรี้ยวๆ เผ็ดๆ (sour and spicy tom yum):** both are reasonable. BM25 finds exact
+  sour-spicy statements (`รสชาติเปรี้ยว เผ็ด ลงตัวดี`) but also a negated one (`รสชาติต้มยำไม่เผ็ดมาก`).
+  Dense finds sour-spicy sentences about *other* dishes (ลาบหมู, ยำหมูยอ, มาม่าต้มยำ).
+- **T20 ของหวานที่ไม่หวานมาก (not too sweet):** both handle the negation well; most of the top 5
+  from each say ไม่หวานมาก / หวานน้อย. One BM25 miss (`ทีเด็ดอยู่ที่ของหวาน`).
+- **Pattern:** BM25 is fooled by filler words in casual queries; dense is fooled by topic (any taste
+  word, any dish). Both look fine on this negation query, contrary to the English NevIR findings.
+  The labels in C4 decide.
 """)
 
 md("""## 7. How different are the two systems?
@@ -175,9 +210,12 @@ ov''')
 
 md("""## 8. Takeaways for the progress report
 
-- Segmentation quality: … (from 2a)
-- Qualitative BM25 vs. dense: … (from 6a)
-- Pool size for annotation: … pairs at top-10 (from 7). This sets the labelling budget for C4/C5.
+- Segmentation quality: good enough; abbreviation cuts and merged long sentences affect a few
+  percent of sentences, mostly in blog-style reviews (from 2a/2b).
+- Qualitative BM25 vs. dense: no clear winner. BM25 fails on filler-word queries (T02), dense drifts
+  to related tastes or dishes (T11); both handle the T20 negation (from 6a).
+- Pool size for annotation: 465 pairs at top-10 for 24 queries; BM25 and dense share fewer than one
+  sentence per query on average (from 7). This sets the labelling budget for C4/C5.
 - Limitation to state: Wongnai has no restaurant ids, so the Thai evaluation is **sentence level
   only**; restaurant-level Thai ranking is future work.
 """)

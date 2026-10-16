@@ -43,6 +43,7 @@ Out of scope: see [action_items.md](../action_items.md) §7.
 | 4 | [04_evaluation.md](04_evaluation.md) | P@k, MAP, nDCG, pooling, kappa, significance tests | 45 min | C3–C7, B2 |
 | 5 | [03_aggregation_and_fusion.md](03_aggregation_and_fusion.md) | Retrieval unit, max/mean/top-k, volume bias | 25 min | A1–A3, D3 |
 | 6 | [05_explainability.md](05_explainability.md) | Faithfulness vs. plausibility, deletion test | 25 min | B1, B2, E1 |
+| — | [09_related_work_novelty.md](09_related_work_novelty.md) | What others already did, what is new in our project, what to cite | 20 min | D1, D2, D3 |
 | — | [07_reading_list.md](07_reading_list.md) | Papers to read, in priority order, with links | — | D1 and all tasks |
 | — | [glossary.md](glossary.md) | One-line definitions of every term | — | Lookup |
 
