@@ -1,13 +1,13 @@
 # Thai Taste Queries — Writing Rules and Change Log (task C1)
 
-Last updated 2026-10-17.
+Last updated 2026-10-17. **Frozen 2026-10-17 (signed off by Ton). Do not edit.**
 
 ## Status
 
 | File | What it is |
 |---|---|
 | [thai_queries_ai_draft.csv](thai_queries_ai_draft.csv) | Original LLM draft, kept unchanged as a record |
-| [thai_queries.csv](thai_queries.csv) | Revised by an LLM (Claude) using the rules below. **Not final**: Ton must review it before it is frozen |
+| [thai_queries.csv](thai_queries.csv) | Revised by an LLM (Claude) using the rules below, then reviewed by Ton (native Thai speaker) with no changes. **Frozen 2026-10-17** |
 
 The revision was made **without looking at any retrieval output** (the notebook results were not
 read). Ton should also review it without opening the outputs of `thai_retrieval.ipynb`.
@@ -84,8 +84,8 @@ T15, T21, T23).
 
 ## Checklist for Ton
 
-- [ ] Each query sounds like something a real person would type. Reword freely
-- [ ] Each query is clear enough to label 0/1/2 from one sentence
-- [ ] The tags and type match the Thai
-- [ ] Didn't open the notebook outputs while reviewing
-- [ ] Sign-off: name + date → file frozen
+- [x] Each query sounds like something a real person would type. Reword freely
+- [x] Each query is clear enough to label 0/1/2 from one sentence
+- [x] The tags and type match the Thai
+- [x] Didn't open the notebook outputs while reviewing
+- [x] Sign-off: **Ton, 2026-10-17**. No changes to the revised queries. File frozen
