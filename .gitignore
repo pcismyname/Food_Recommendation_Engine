@@ -17,6 +17,14 @@ __pycache__/
 # Local-only files
 baselines/cache/*.npy
 baselines/cache/evidence_*.csv
+baselines/cache/**/evidence_*.csv
+baselines/cache/**/emb_*.npy
+baselines/cache/**/rankings_*.csv
+baselines/cache/**/per_query_*.csv
+baselines/cache/**/results_*.csv
+baselines/cache/**/a3_*.csv
+baselines/cache/**/.DS_Store
+baselines/cache/.DS_Store
 *-Copy*.ipynb
 submission_ipynb/
 submission_ipynb.zip
