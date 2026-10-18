@@ -1,6 +1,6 @@
 # Action Items — Group Flower
 
-Last updated 2026-10-17.
+Last updated 2026-10-18.
 
 **Next deadline: Monday 2026-10-19, 11:59 PM** — updated report (PDF) and slides (PDF).
 Progress presentation on Tuesday 2026-10-20: 10 minutes plus 5 minutes Q&A.
@@ -68,14 +68,22 @@ properly investigated and explained.
 - **Best model:** Dense, top-10 mean — nDCG@10 0.668 [0.625, 0.711], MAP 0.608. The RIRD paper's fine-tuned best is MAP 0.626, so off-the-shelf dense is already close.
 - **Top-k mean beats max and mean** for both models; max is the weakest dense variant.
 - All models beat the popularity floor except BM25 mean (not significant).
-- **Not yet done:** the sentence-level run and the review-volume control, so the volume half of F2 is still open.
-- **A3 implementation prepared:** [baselines/baseline_models_v2.ipynb](baselines/baseline_models_v2.ipynb)
-  now tracks source review rows, samples exactly 400 reviews per restaurant with `SEED = 42`, reuses
-  the existing score matrices/cached embeddings, and saves A3 metrics and score/count correlations.
-  The experiment is not marked complete until it is run and the outputs are inspected.
-- **A4 implementation prepared:** the same notebook now retains the shared-unit BM25/dense runs and
-  exports reusable restaurant rankings plus top evidence units for each query, model and aggregation.
-  The export is not marked complete until the notebook has been run and the files have been checked.
+- **A3 volume control (run 2026-10-18, Colab):** every restaurant capped at 400 reviews (`SEED = 42`),
+  same unit scores re-aggregated. Review volume barely matters:
+  - Dense nDCG@10 changes by at most ±0.004 (top-10 mean 0.668 → 0.672); BM25 drops by about 0.005–0.011
+    (top-10 mean 0.634 → 0.628, max 0.575 → 0.564).
+  - The order of models does not change; dense is still best under every aggregation.
+  - Pooled score vs. review-count correlation in the full run is weak: Pearson ≈ 0.05 for BM25, up to
+    0.11 for dense (max, top-3 mean); about 0 after capping.
+  - This closes the volume half of F2. Caveats: one sampling seed, no paired test between full and
+    capped runs, and only the pooled correlation is displayed (per-query values are computed).
+- **A4 rankings export (run 2026-10-18, Colab):** 50,000 ranking rows and 500,000 evidence rows (top-10
+  units per query × restaurant × model) for the review level.
+- **Output files not in the repo yet:** the Colab run wrote `a3_volume_control_*.csv`,
+  `rankings_review.csv` and `evidence_review.csv` to `/content/cache`. Download them into
+  `baselines/cache/` or rerun the notebook locally (a few minutes with the cached embeddings); B1 and
+  B2 need the evidence file.
+- **Not yet done:** the sentence-level run (A1/A2).
 
 ---
 
@@ -99,10 +107,10 @@ Status: `[ ]` not started, `[/]` in progress, `[x]` done.
 
 | ID | Task | Phase · Priority | Thai? | Depends on |
 |---|---|---|---|---|
-| A3 | `[/]` **Code prepared; execution pending.** Subsample every restaurant to 400 reviews with a fixed seed, reuse cached embeddings, rerun every aggregation, and report score/count correlations plus controlled metrics | **1 · High** (do first) | No | Can run now on the review-level cache |
+| A3 | `[x]` Subsample every restaurant to 400 reviews with a fixed seed, reuse cached embeddings, rerun every aggregation, and report score/count correlations plus controlled metrics. **Run 2026-10-18: volume effect ≤ 0.011 nDCG@10, model order unchanged** (see §2). Optional extra: more seeds and a paired test | **1 · High** (do first) | No | — |
 | A1 | `[/]` Shared retrieval unit for BM25 and dense. Done at review level in v2; sentence splitting is coded but not yet run (`UNIT = 'sentence'`) | **1 · High** | No | — |
 | A2 | `[/]` Same fusion variants on both models, with CIs and significance tests. Done at review level; rerun at sentence level | **1 · High** | No | A1 |
-| A4 | `[/]` **Code prepared; execution pending.** Save per-query restaurant rankings and the top-10 selected source units, including source row IDs and text, so A3, B1 and B2 can reuse them | 1 · Medium | No | — |
+| A4 | `[x]` Save per-query restaurant rankings and the top-10 selected source units, including source row IDs and text, so A3, B1 and B2 can reuse them. **Run 2026-10-18 at review level; CSVs still on Colab, need copying into `baselines/cache/`.** Sentence-level export comes with the A1/A2 rerun | 1 · Medium | No | — |
 
 If the sentence-level run is not finished by Monday, present it as a next step; A3 on review level is the must-have.
 
@@ -152,8 +160,8 @@ Aim: show the fixed baselines, an honest answer to each comment, and a concrete 
 
 | Order | Sam | Ton | Not assigned yet |
 |---|---|---|---|
-| 1 | Run and inspect A3 volume control (review-level cache) | ~~C1b review and freeze Thai queries~~ (done) | D3 feedback summary page |
-| 2 | Implement/run A4 ranking export, then run A1/A2 sentence-level rerun (Colab GPU) | ~~C2 one qualitative Thai example~~ (done) | D1 related work |
+| 1 | ~~Run and inspect A3 volume control~~ (done 2026-10-18) | ~~C1b review and freeze Thai queries~~ (done) | D3 feedback summary page |
+| 2 | ~~A4 ranking export~~ (done; copy CSVs from Colab), then A1/A2 sentence-level rerun (Colab GPU) | ~~C2 one qualitative Thai example~~ (done) | D1 related work |
 | 3 | Summarize A3/A1/A2 findings and draft D2 claims | | D4 report and slides |
 
 If time is short, present the sentence-level run and the Thai work as next steps; the review-level
@@ -173,7 +181,7 @@ results in section 2 plus A3 are enough to show progress.
 
 Can start **now**, independently of each other:
 
-- **Sam:** run/inspect A3, implement A4 ranking export, then run A1/A2 sentence-level rerun
+- **Sam:** A3 and A4 done; copy the Colab output CSVs into the repo, then run the A1/A2 sentence-level rerun
 - **Ton:** C1, C1b, C2 done; next is E1 Thai examples and finding a second annotator (C5)
 - **Unassigned:** D1, D3 (writing, English)
 

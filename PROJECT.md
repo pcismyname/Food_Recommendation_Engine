@@ -127,8 +127,9 @@ The sentence-level RIRD run is planned on a Colab GPU.
 - [x] Proposal report, slides, video
 - [x] v1 baselines (BM25 on concatenated documents vs. mean-pooled dense)
 - [x] v2 review-level baselines: same unit, same aggregations, bootstrap CIs, Holm-corrected paired tests
-- [ ] A3 review-volume control (subsample to 400 reviews; score vs. review count)
-- [ ] A1/A2 sentence-level rerun; A4 save per-query rankings
+- [x] A3 review-volume control (subsample to 400 reviews; score vs. review count): effect ≤ 0.011 nDCG@10
+- [x] A4 save per-query rankings and evidence (review level)
+- [ ] A1/A2 sentence-level rerun
 - [x] C1 Thai taste queries (24, frozen 2026-10-17)
 - [/] C2 Thai sentence pipeline (built on 2,000 reviews; segmentation spot-check pending)
 - [ ] Progress report and slides (2026-10-19), presentation (2026-10-20)

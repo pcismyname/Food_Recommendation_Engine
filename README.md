@@ -40,15 +40,11 @@ Task list, owners, dependencies and the plan are in **[action_items.md](action_i
 - **Done:** review-level baselines with CIs and significance tests
   ([baselines/baseline_models_v2.ipynb](baselines/baseline_models_v2.ipynb)); Thai queries frozen
   and Thai sentence pipeline built ([thai/](thai/)).
-- **Prepared, not yet run:** A3 review-volume control is implemented in the baseline notebook and
-  reuses the existing review-level score matrices and cached embeddings. It still needs to be run in
-  Colab and its output tables need to be inspected.
-- **Prepared, not yet run:** A4 ranking/evidence export is also implemented. It will write
-  `rankings_review.csv` and `evidence_review.csv` for review-level runs, and the corresponding
-  `*_sentence.csv` files for the sentence-level run.
-- **Next execution order:** run A3 and inspect its outputs, run the A4 export, then run the
-  sentence-level A1/A2 experiment. The feedback page and related work (D3, D1) can proceed in
-  parallel.
+- **Done 2026-10-18:** A3 review-volume control (capping every restaurant at 400 reviews changes
+  nDCG@10 by at most 0.011; model order unchanged) and A4 ranking/evidence export at review level.
+  The output CSVs are still on Colab and need copying into `baselines/cache/`.
+- **Next:** sentence-level rerun (A1/A2), feedback page and related work (D3, D1), report and slides
+  (D4).
 
 ### Repository map
 
@@ -147,7 +143,7 @@ Tasks, owners and deadlines are in [action_items.md](action_items.md).
 
 ### Q2 (F2): BM25 and dense use different units; fusion is biased by review volume
 
-**Answer:** The unit half is fixed; the volume half is next.
+**Answer:** Both halves are now tested at review level; the volume effect turned out to be small.
 
 - **Fixed:** in [baselines/baseline_models_v2.ipynb](baselines/baseline_models_v2.ipynb), BM25 and
   dense both score individual reviews and use the same aggregations (max, mean, top-3/5/10 mean).
@@ -157,11 +153,14 @@ Tasks, owners and deadlines are in [action_items.md](action_items.md).
   - The best model is dense with top-10 mean: nDCG@10 0.668 [0.625, 0.711] and MAP 0.608. That is
     close to the RIRD paper's fine-tuned 0.626.
   - Top-k mean beats both max and mean.
-- **Open:** A3 still requires execution and result review. The notebook now samples every restaurant
-  to exactly 400 source reviews with a fixed seed, reuses cached embeddings, evaluates all
-  aggregations for BM25 and dense, and saves metrics plus score/count correlations. A3 will be
-  considered complete only after the Colab output is checked and summarized. A sentence-level rerun
-  (A1/A2) follows.
+- **Volume control (A3):** every restaurant was capped at 400 reviews (fixed seed) and the same unit
+  scores were re-aggregated.
+  - Dense nDCG@10 moves by at most ±0.004 (top-10 mean 0.668 → 0.672); BM25 drops by 0.005–0.011.
+  - The order of models is unchanged; dense is still best under every aggregation.
+  - Restaurant score vs. review count correlates weakly in the full run (Pearson ≈ 0.05 for BM25, up
+    to 0.11 for dense max / top-3 mean) and about 0 after capping.
+  - Caveats: one sampling seed and no paired test between full and capped runs yet.
+- **Open:** a sentence-level rerun (A1/A2).
 
 ### Q3 (F3): No evidence for explainability
 
