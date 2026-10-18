@@ -40,8 +40,15 @@ Task list, owners, dependencies and the plan are in **[action_items.md](action_i
 - **Done:** review-level baselines with CIs and significance tests
   ([baselines/baseline_models_v2.ipynb](baselines/baseline_models_v2.ipynb)); Thai queries frozen
   and Thai sentence pipeline built ([thai/](thai/)).
-- **Next:** review-volume control (A3), sentence-level rerun (A1/A2), feedback page and related work
-  (D3, D1).
+- **Prepared, not yet run:** A3 review-volume control is implemented in the baseline notebook and
+  reuses the existing review-level score matrices and cached embeddings. It still needs to be run in
+  Colab and its output tables need to be inspected.
+- **Prepared, not yet run:** A4 ranking/evidence export is also implemented. It will write
+  `rankings_review.csv` and `evidence_review.csv` for review-level runs, and the corresponding
+  `*_sentence.csv` files for the sentence-level run.
+- **Next execution order:** run A3 and inspect its outputs, run the A4 export, then run the
+  sentence-level A1/A2 experiment. The feedback page and related work (D3, D1) can proceed in
+  parallel.
 
 ### Repository map
 
@@ -150,8 +157,10 @@ Tasks, owners and deadlines are in [action_items.md](action_items.md).
   - The best model is dense with top-10 mean: nDCG@10 0.668 [0.625, 0.711] and MAP 0.608. That is
     close to the RIRD paper's fine-tuned 0.626.
   - Top-k mean beats both max and mean.
-- **Open:** A3, the volume control. Every restaurant is subsampled to 400 reviews, and we report how
-  restaurant score correlates with review count for each aggregation. A sentence-level rerun
+- **Open:** A3 still requires execution and result review. The notebook now samples every restaurant
+  to exactly 400 source reviews with a fixed seed, reuses cached embeddings, evaluates all
+  aggregations for BM25 and dense, and saves metrics plus score/count correlations. A3 will be
+  considered complete only after the Colab output is checked and summarized. A sentence-level rerun
   (A1/A2) follows.
 
 ### Q3 (F3): No evidence for explainability

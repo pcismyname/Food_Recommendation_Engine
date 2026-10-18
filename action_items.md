@@ -69,6 +69,13 @@ properly investigated and explained.
 - **Top-k mean beats max and mean** for both models; max is the weakest dense variant.
 - All models beat the popularity floor except BM25 mean (not significant).
 - **Not yet done:** the sentence-level run and the review-volume control, so the volume half of F2 is still open.
+- **A3 implementation prepared:** [baselines/baseline_models_v2.ipynb](baselines/baseline_models_v2.ipynb)
+  now tracks source review rows, samples exactly 400 reviews per restaurant with `SEED = 42`, reuses
+  the existing score matrices/cached embeddings, and saves A3 metrics and score/count correlations.
+  The experiment is not marked complete until it is run and the outputs are inspected.
+- **A4 implementation prepared:** the same notebook now retains the shared-unit BM25/dense runs and
+  exports reusable restaurant rankings plus top evidence units for each query, model and aggregation.
+  The export is not marked complete until the notebook has been run and the files have been checked.
 
 ---
 
@@ -92,10 +99,10 @@ Status: `[ ]` not started, `[/]` in progress, `[x]` done.
 
 | ID | Task | Phase · Priority | Thai? | Depends on |
 |---|---|---|---|---|
-| A3 | `[ ]` Volume control: subsample every restaurant to 400 reviews and rerun from cached embeddings; report the correlation between restaurant score and review count for each aggregation | **1 · High** (do first) | No | Can run now on the review-level cache |
+| A3 | `[/]` **Code prepared; execution pending.** Subsample every restaurant to 400 reviews with a fixed seed, reuse cached embeddings, rerun every aggregation, and report score/count correlations plus controlled metrics | **1 · High** (do first) | No | Can run now on the review-level cache |
 | A1 | `[/]` Shared retrieval unit for BM25 and dense. Done at review level in v2; sentence splitting is coded but not yet run (`UNIT = 'sentence'`) | **1 · High** | No | — |
 | A2 | `[/]` Same fusion variants on both models, with CIs and significance tests. Done at review level; rerun at sentence level | **1 · High** | No | A1 |
-| A4 | `[ ]` Save the per-query rankings (not only the metrics) so A3, B1 and B2 can reuse them | 1 · Medium | No | — |
+| A4 | `[/]` **Code prepared; execution pending.** Save per-query restaurant rankings and the top-10 selected source units, including source row IDs and text, so A3, B1 and B2 can reuse them | 1 · Medium | No | — |
 
 If the sentence-level run is not finished by Monday, present it as a next step; A3 on review level is the must-have.
 
@@ -145,9 +152,9 @@ Aim: show the fixed baselines, an honest answer to each comment, and a concrete 
 
 | Order | Sam | Ton | Not assigned yet |
 |---|---|---|---|
-| 1 | A3 volume control (review-level cache) | ~~C1b review and freeze Thai queries~~ (done) | D3 feedback summary page |
-| 2 | A1/A2 sentence-level rerun (Colab GPU) | ~~C2 one qualitative Thai example~~ (done) | D1 related work |
-| 3 | A4 save per-query rankings | | D4 report and slides; D2 draft claims |
+| 1 | Run and inspect A3 volume control (review-level cache) | ~~C1b review and freeze Thai queries~~ (done) | D3 feedback summary page |
+| 2 | Implement/run A4 ranking export, then run A1/A2 sentence-level rerun (Colab GPU) | ~~C2 one qualitative Thai example~~ (done) | D1 related work |
+| 3 | Summarize A3/A1/A2 findings and draft D2 claims | | D4 report and slides |
 
 If time is short, present the sentence-level run and the Thai work as next steps; the review-level
 results in section 2 plus A3 are enough to show progress.
@@ -166,7 +173,7 @@ results in section 2 plus A3 are enough to show progress.
 
 Can start **now**, independently of each other:
 
-- **Sam:** A3, A4, then the A1/A2 sentence-level rerun
+- **Sam:** run/inspect A3, implement A4 ranking export, then run A1/A2 sentence-level rerun
 - **Ton:** C1, C1b, C2 done; next is E1 Thai examples and finding a second annotator (C5)
 - **Unassigned:** D1, D3 (writing, English)
 
