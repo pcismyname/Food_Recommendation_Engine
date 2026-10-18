@@ -29,6 +29,11 @@ properly.
 | **nDCG@k** | Normalized discounted cumulative gain. Uses graded labels and discounts results further down the list. Our main metric. | [04](04_evaluation.md) |
 | **Pooling** | Labelling only the union of the top-k results from several systems instead of the whole corpus. This is what C3 does. | [04](04_evaluation.md) |
 | **Cohen's kappa (κ)** | Agreement between two annotators, corrected for the agreement you would expect by chance. | [04](04_evaluation.md) |
+| **Linear-weighted kappa** | Cohen's kappa for ordered labels (0/1/2) where a disagreement counts by its distance, so 1-vs-2 is half as bad as 0-vs-2. `score_labels.py` reports it next to plain kappa. | [04](04_evaluation.md) |
+| **Volume control / capping** | A3: keep the same number of reviews (400) for every restaurant and re-run, to see how much of the ranking comes from review count. | [03](03_aggregation_and_fusion.md) |
+| **Pooled vs. per-query correlation** | Pooled: one correlation over all (query, restaurant) pairs, which mixes queries with different score scales. Per-query: one correlation per query, then averaged. We report per-query. | [03](03_aggregation_and_fusion.md) |
+| **Comprehensiveness** | ERASER's faithfulness measure: how much the model's output drops when the explanation is removed. B1 is a ranking version of it. | [05](05_explainability.md) |
+| **Topic vs. polarity** | Topic is what a text is about (price); polarity is whether it is for or against (cheap vs. pricey). Dense retrieval matches topic, not polarity. | [05](05_explainability.md) |
 | **Bootstrap CI** | A confidence interval made by resampling queries with replacement. | [04](04_evaluation.md) |
 | **Randomization test** | A significance test that randomly swaps the two systems' per-query scores to see whether the observed gap could be chance. | [04](04_evaluation.md) |
 | **Holm correction** | An adjustment to p-values when many comparisons are tested at once. | [04](04_evaluation.md) |

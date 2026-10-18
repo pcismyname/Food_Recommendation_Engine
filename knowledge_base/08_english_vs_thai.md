@@ -5,7 +5,7 @@
 > This file puts the English (RIRD) and Thai (Wongnai) tracks side by side so it is clear what each
 > one tests, what each one can claim, and how they connect.
 
-Numbers are as of 2026-10-17.
+Numbers are as of 2026-10-18.
 
 ---
 
@@ -25,14 +25,14 @@ Numbers are as of 2026-10-17.
 
 | | 🇬🇧 English (RIRD) | 🇹🇭 Thai (Wongnai) |
 |---|---|---|
-| Reviews | 29,168 reviews of 50 Toronto restaurants (Yelp) | 40,000 reviews; 2,000-review subsample → 19,294 sentences |
+| Reviews | 29,168 reviews of 50 Toronto restaurants (Yelp) | 40,000 reviews. Pilot used a 2,000-review subsample (19,294 sentences); the labelled corpus is fixed at **10,000 reviews (~95,000 sentences)** |
 | Restaurant ids? | ✅ Yes | ❌ No |
 | Queries | 100, written by the RIRD authors (e.g. *"I am on a budget"*) | 24, ours, frozen 2026-10-17 (e.g. *อยากกินอะไรเปรี้ยวๆ*) |
 | Query types | Broad restaurant needs (budget, friends, late night…) | Taste: 11 single, 8 combo, 5 negation |
 | Labels already exist? | ✅ Yes, 5 annotators per query × restaurant | ❌ No, we create them (C4, C5) |
 | What a label says | "Restaurant R fits query Q" (yes/no; vote count 0–5) | "Sentence S fits query Q" (0/1/2) |
 | Who labels | RIRD's annotators (independent of us) | Ton, plus a second Thai speaker on a subset |
-| What the system scores | Reviews now; sentences next (A1) | Sentences |
+| What the system scores | Reviews and sentences (both runs done, A1) | Sentences |
 | What gets evaluated | **Restaurant ranking** | **Sentence ranking** |
 | Models | BM25 vs. dense (`paraphrase-multilingual-mpnet-base-v2`) | Same: BM25 vs. the same dense model |
 | Aggregation to restaurant | max, mean, top-3/5/10 mean | None (no restaurants) |
@@ -107,10 +107,25 @@ the other's.
 |---|---|
 | Same models (BM25 + the same dense encoder) | ✅ Done |
 | Same comparison (BM25 vs. dense) | ✅ Done |
-| Same scoring unit (sentence) | ⏳ Needs A1, the English sentence-level rerun. Until then English scores reviews and Thai scores sentences, so the bridge is weaker |
-| Shared annotation scale (0/1/2) and guidelines | ⏳ E1 covers both the Thai sheet and the English explanation sheet |
+| Same scoring unit (sentence) | ✅ Done (A1/A2, 2026-10-18). English now has a sentence-level run, so both tracks score sentences and the bridge is stronger |
+| Shared annotation scale (0/1/2) and guidelines | ✅ Written: [thai/annotation_guidelines.md](../thai/annotation_guidelines.md) covers the Thai sheet, and its Appendix A covers the English explanation sheet (B2) |
 
-After A1, the report can say: *"The identical sentence-retrieval step is evaluated in both
+**English sentence-level numbers** (dense vs. BM25, nDCG@10):
+
+| Aggregation | Dense | BM25 | Review-level dense, for comparison |
+|---|---|---|---|
+| top-10 mean | **0.682** (best; MAP 0.618) | 0.609 | 0.668 |
+| max | 0.611 | 0.546 | 0.625 |
+| mean | 0.587 | 0.548 | 0.642 |
+
+- Dense beats BM25 at sentence level under max and all top-k means (significant), but **not under
+  mean** (+0.039, p = 0.072).
+- Sentences help **dense top-k only**. BM25 gets worse with sentences (top-10 0.609 vs. 0.634 at
+  review level), and dense mean drops (0.587 vs. 0.642).
+- Not done yet: a paired review-vs-sentence test, and A3 at sentence level. These results go into
+  the final report; in the 2026-10-19 progress report they are listed as future work.
+
+Now the report can say: *"The identical sentence-retrieval step is evaluated in both
 languages. In English we also show it leads to good restaurant rankings; in Thai we can test the
 step itself."*
 
@@ -120,7 +135,7 @@ step itself."*
 
 | | 🇬🇧 English | 🇹🇭 Thai |
 |---|---|---|
-| Done | Review-level BM25 vs. dense with CIs and significance tests | 24 queries frozen; sentence pipeline built; pool of 465 pairs ready |
-| Next (Phase 1) | A3 volume control; A1/A2 sentence-level rerun | C2 segmentation spot-check; one example for the slides |
-| Phase 2 | B1 deletion test; B2 human support rating | C3 blind sheet, C4/C5 labels, C7 Thai nDCG@10 |
+| Done | Review-level BM25 vs. dense with CIs and significance tests; **A3** volume control (capping to 400 reviews changes nDCG@10 by ≤ 0.011, model order unchanged); **A4** rankings and evidence exported; **A1/A2** sentence-level rerun (dense top-10 mean 0.682); first look at explanations ([05](05_explainability.md) §6) | 24 queries frozen; pilot on 2,000 reviews (pool of 465 pairs); corpus fixed at **10,000 reviews**; Colab notebook (`thai/thai_retrieval_10k_colab.ipynb`), pool builder (`build_label_pool.py`), scorer (`score_labels.py`) and annotation guidelines ready |
+| Next | B1 deletion test (can use sentence evidence); B2 human support rating (270 items) | Run the 10k Colab notebook, build the blind sheet, then **labelling** (C4, C5) |
+| After that | Paired review-vs-sentence test; A3 at sentence level | C7 Thai nDCG@10 with CIs, by query type |
 | Final answer will be | "X% of shown sentences support the ranking; deleting them drops rank by Y vs. Z for random" | "On 24 labelled Thai queries, dense = X vs. BM25 = Y nDCG@10 at sentence level" |

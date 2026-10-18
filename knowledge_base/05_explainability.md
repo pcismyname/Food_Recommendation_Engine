@@ -125,7 +125,48 @@ Sentiment coherence links directly to the Thai negation problem in [06_thai_nlp.
 
 ---
 
-## 6. How this answers the professor (F3)
+## 6. What we saw when we looked at real explanations
+
+Before running B1 or B2 we read the exported evidence ([A4](../action_items.md): `evidence_review.csv`, the top-10 reviews behind each restaurant's score) for the best system, **dense with top-10 mean, review level**. Three examples were enough to show the problems.
+
+**Example 1. Query *"I am on a budget"*.**
+
+| Rank | Restaurant | Top evidence | RIRD label |
+|---|---|---|---|
+| 1 | Fishman Lobster Clubhouse | *"It's not bad but kinda pricey."* | ❌ not relevant |
+| 2 | Dragon Boat Fusion | *"Good dim sum, pretty standard prices/service."* | ✅ relevant |
+
+The rank-1 evidence is about price, so it really is the kind of text that drove the score (faithful to the model). But "kinda pricey" argues *against* a budget recommendation.
+
+**Example 2. Query *"Non-spicy Chinese meals"*.**
+
+- Rank 1 is Ding Tai Fung (✅ relevant), but its 2nd piece of evidence says *"...Wonton was spicy ... red chili oil"*. The encoder saw "spicy" and ignored the "non-".
+- Rank 2 is Pai Northern Thai Kitchen (❌ not relevant). It is Thai, not Chinese.
+
+**Example 3.** The Pai case above is also a ranking error, not just an explanation error: a wrong cuisine reached rank 2, and its evidence looks on-topic enough to fool a quick reader.
+
+### What these teach us
+
+1. **Topic, not polarity.** Dense retrieval matches what a text is *about* (price, spiciness), not whether it says yes or no. "Pricey" and "cheap" are close in embedding space. This is the English version of the Thai negation problem in [06_thai_nlp.md](06_thai_nlp.md).
+2. **Faithful but not supporting.** "Kinda pricey" is a faithful explanation (it is the score's input) that a human would rate 0 in B2. This is exactly why we need both B1 and B2: they can disagree, and the disagreement is a finding.
+3. **Whole reviews are too coarse.** Some evidence units are whole reviews of around 94 words. One sentence may fit the query while the rest is about something else, and a user cannot see which part mattered. Sentence-level evidence fixes this.
+
+### Aggregation decides whether a faithful extractive explanation is even possible
+
+- Under **max** or **top-k mean**, the restaurant score is computed *from* the top units. Showing those units shows the score's real inputs, so a faithful extractive explanation is possible.
+- Under plain **mean**, every one of the restaurant's hundreds of reviews has equal weight. Showing the top 3 hides almost all of what made the score, so the display is **not faithful by construction**, however good the sentences look.
+
+So the choice of aggregation (A) is also a choice about what kind of explanation (B) you can honestly give. B1 should report results per aggregation for this reason.
+
+### Status
+
+- B1 (deletion test) and B2 (human rating) have **not been run yet**.
+- **B1** can now use sentence-level evidence: the sentence-level run (A1/A2) exported `evidence_sentence.csv` (gitignored, local only).
+- **B2** plan: 30 queries × top-3 restaurants × top-3 sentences = **270 items**, labelled on the same 0/1/2 scale as Thai, using Appendix A of [thai/annotation_guidelines.md](../thai/annotation_guidelines.md).
+
+---
+
+## 7. How this answers the professor (F3)
 
 F3: *"A top-scoring sentence can be relevant without being a complete or faithful explanation. The group has not evaluated explanatory quality."*
 
@@ -166,4 +207,6 @@ Together they turn "we show sentences" into a measured claim. A negative result 
 - Professor's comment: [professor_commmend.md](../professor_commmend.md) (F3 in [action_items.md](../action_items.md), section 1.1)
 - Aggregations (max, mean, top-k mean) whose faithfulness B1 tests: `aggregate()` in [baselines/baseline_models_v2.ipynb](../baselines/baseline_models_v2.ipynb)
 - Kappa and paired tests: [04_evaluation.md](04_evaluation.md) and [baselines/eval_utils.py](../baselines/eval_utils.py)
-- Tasks: **B1** (deletion faithfulness, needs **A2** at sentence level and **A4** saved rankings), **B2** (human support labels + kappa; Sam and Ton label), **E1** (guidelines with the sentiment-coherence rule), **D1** (cite Zhang et al. 2025)
+- Saved rankings and evidence (A4, done): `baselines/cache/rankings_review.csv` (tracked) and `evidence_review.csv` (gitignored, local only); sentence-level evidence in `evidence_sentence.csv` (local only)
+- B2 labelling rules: Appendix A of [thai/annotation_guidelines.md](../thai/annotation_guidelines.md)
+- Tasks: **B1** (deletion faithfulness; its inputs A2 and A4 are now done), **B2** (human support labels + kappa; Sam and Ton label), **E1** (guidelines with the sentiment-coherence rule, written), **D1** (cite Zhang et al. 2025)

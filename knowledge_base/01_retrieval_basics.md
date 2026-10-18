@@ -26,7 +26,7 @@ We do the second because:
 |---|---|---|
 | **Query** | What the user types | "cozy place with spicy food", or a Thai query like `อาหารรสเผ็ดจัด` |
 | **Document** | One thing we score against the query | One review (v2), or later one sentence |
-| **Corpus** | All documents | 29,168 RIRD reviews; 2,000 sampled Wongnai reviews split into sentences |
+| **Corpus** | All documents | 29,168 RIRD reviews; for Thai, 10,000 sampled Wongnai reviews split into about 95,000 sentences (the test set; an earlier pilot used 2,000 reviews) |
 | **Relevance** | Does the item satisfy the query? Judged by humans | `PMD.csv`: 5 annotators per (query, restaurant) |
 | **Ranking** | Items sorted best-first by score | 50 restaurants per query, evaluated by nDCG@10, MAP |
 
@@ -155,6 +155,8 @@ Dense retrieval (file 02) addresses 1–2 and sometimes 3.
 **Stop words** are very common function words ("the", "a", "is") that many pipelines delete before indexing to save space. BM25's IDF already down-weights them, so deleting them gains little.
 
 For us, deleting them would be harmful. PyThaiNLP's standard Thai stop-word list (1,030 words) **contains `ไม่` ("not") and `ไม่ค่อย` ("not very")**. If we removed stop words, the query `ขนมที่ไม่หวานเกินไป` ("desserts that are not too sweet") would lose its negation and become a query for *sweet* desserts — the exact opposite. Our Thai queries include a whole negation group (T19–T23). So **our tokenizers do not remove stop words**, in either language. (BM25 still can't *understand* negation, but at least the token is there for a later model or analysis to use.)
+
+Pilot observation: for T20 `ของหวานที่ไม่หวานมาก` ("desserts that are not too sweet"), keeping `ไม่` let BM25 match sentences saying `ไม่หวานมาก` ("not very sweet") literally, so its top results looked right. That keeping stop words actually helps BM25 on negation queries is still a hypothesis; the hand labels (file 06, §8) will test it.
 
 ---
 

@@ -1,6 +1,6 @@
 # Action Items — Group Flower
 
-Last updated 2026-10-18.
+Last updated 2026-10-18 (evening).
 
 **Next deadline: Monday 2026-10-19, 11:59 PM** — updated report (PDF) and slides (PDF).
 Progress presentation on Tuesday 2026-10-20: 10 minutes plus 5 minutes Q&A.
@@ -68,7 +68,25 @@ properly investigated and explained.
 - **Best model:** Dense, top-10 mean — nDCG@10 0.668 [0.625, 0.711], MAP 0.608. The RIRD paper's fine-tuned best is MAP 0.626, so off-the-shelf dense is already close.
 - **Top-k mean beats max and mean** for both models; max is the weakest dense variant.
 - All models beat the popularity floor except BM25 mean (not significant).
-- **Not yet done:** the sentence-level run, so the sentence-level half of A1/A2 remains open.
+- **Sentence-level run (A1/A2) done 2026-10-18** by Sam on Colab
+  ([baselines/baseline_models_v2_sentence.ipynb](baselines/baseline_models_v2_sentence.ipynb)). Same
+  pipeline with `UNIT = 'sentence'`:
+  - **Best model:** Dense, top-10 mean — nDCG@10 0.682, MAP 0.618 (review level: 0.668 / 0.608).
+  - **Dense beats BM25** under max and all top-k means (+0.065 to +0.077 nDCG@10, Holm p ≤ 0.004);
+    under mean the gap (+0.039) is **not significant** (p = 0.072).
+  - **BM25 gets worse with sentences** (top-10 mean 0.609 vs 0.634 at review level); dense mean also
+    drops (0.587 vs 0.642). Sentence units help dense top-k only.
+  - Dense top-k beat the pooled-vector baseline (top-10 mean +0.067, Holm p = 0.009); BM25 max and
+    mean are significantly worse than the concatenated-document baseline.
+  - BM25 max and BM25 mean no longer beat the popularity floor (Holm p = 0.076).
+  - No sentence exceeds the 256-token limit (review level: 19.9%).
+  - Not done yet: a paired review-vs-sentence test, and A3 at sentence level (A3 is defined for
+    reviews only).
+  - The result CSVs (`results_sentence.csv`, `per_query_sentence.csv`, `rankings_sentence.csv`,
+    `evidence_sentence.csv`) are gitignored, so they exist only in local `baselines/cache/` copies.
+- **Monday 2026-10-19 submission:** the sentence-level results are **not** in the progress report or
+  slides. They are presented as **future work / next step**, since they arrived after the report was
+  written. They go into the final report.
 - **A3 completed:** every restaurant was sampled to 400 reviews with `SEED = 42`, reusing the
   review-level score matrices and cached embeddings. The controlled best run was Dense top-10 mean:
   nDCG@10 0.672, MAP 0.611, compared with 0.668 and 0.608 before control. Pooled uncontrolled
@@ -103,11 +121,11 @@ Status: `[ ]` not started, `[/]` in progress, `[x]` done.
 | ID | Task | Phase · Priority | Thai? | Depends on |
 |---|---|---|---|---|
 | A3 | `[x]` Volume control completed: every restaurant sampled to 400 reviews with `SEED = 42`; all aggregations rerun and score/count correlations plus controlled metrics reported | **1 · High** (do first) | No | Can run now on the review-level cache |
-| A1 | `[/]` Shared retrieval unit for BM25 and dense. Done at review level in v2; sentence splitting is coded but not yet run (`UNIT = 'sentence'`) | **1 · High** | No | — |
-| A2 | `[/]` Same fusion variants on both models, with CIs and significance tests. Done at review level; rerun at sentence level | **1 · High** | No | A1 |
+| A1 | `[x]` Shared retrieval unit for BM25 and dense. Done at review level (v2) and at sentence level (2026-10-18, [baseline_models_v2_sentence.ipynb](baselines/baseline_models_v2_sentence.ipynb)). **Monday: shown as future work** | **1 · High** | No | — |
+| A2 | `[x]` Same fusion variants on both models, with CIs and significance tests. Done at review and sentence level (results in §2). Still to add: paired review-vs-sentence test. **Monday: shown as future work** | **1 · High** | No | A1 |
 | A4 | `[x]` Saved per-query restaurant rankings and top-10 selected source units, including source row IDs and text; executed output contains 50,000 ranking rows and 500,000 evidence rows | 1 · Medium | No | — |
 
-If the sentence-level run is not finished by Monday, present it as a next step; A3 on review level is the must-have.
+The sentence-level run finished on 2026-10-18 but after the report was written; for Monday it is presented as a next step (future work), and its results go into the final report.
 
 ### B. Explanation evaluation on RIRD (English) — answers F3 · Owner: Sam
 
@@ -133,9 +151,9 @@ If the sentence-level run is not finished by Monday, present it as a next step; 
 
 | ID | Task | Phase · Priority | Thai? | Depends on |
 |---|---|---|---|---|
-| D3 | `[ ]` **Feedback summary page** for the progress report (one row per comment in 1.1: action taken / revision / reason not done) | **1 · High** | No | — |
-| D4 | `[ ]` Progress report PDF and slides PDF, following the four sections in 1.2 | **1 · High** | No | D3, plus whatever of A is finished |
-| D1 | `[ ]` Related work: add the three papers in 1.1 | **1 · High** | No | — |
+| D3 | `[x]` **Feedback summary page** (Chapter 1 of [report/progress/main.pdf](report/progress/main.pdf)) for the progress report (one row per comment in 1.1: action taken / revision / reason not done) | **1 · High** | No | — |
+| D4 | `[/]` Progress report PDF and slides PDF, following the four sections in 1.2. **Report drafted** in [report/progress/](report/progress/) (Ton revising); **slides not started** | **1 · High** | No | D3, plus whatever of A is finished |
+| D1 | `[x]` Related work: add the three papers in 1.1 (Chapter 3 of the progress report) | **1 · High** | No | — |
 | D2 | `[ ]` Rewrite title, claims and limitations. Working title: "Explainable reviewed-item retrieval, with a Thai taste case study" | Draft: 1 · Medium. Final: 2 · High | No | Final after A3, B2, C7 |
 | D5 | `[ ]` Final report, slides and video | 2 · High | No | everything above |
 
@@ -156,8 +174,8 @@ Aim: show the fixed baselines, an honest answer to each comment, and a concrete 
 | Order | Sam | Ton | Not assigned yet |
 |---|---|---|---|
 | 1 | ~~Run and inspect A3 volume control (review-level cache)~~ (done) | ~~C1b review and freeze Thai queries~~ (done) | D3 feedback summary page |
-| 2 | ~~Implement/run A4 ranking export~~ (done); run A1/A2 sentence-level rerun (Colab GPU) | ~~C2 one qualitative Thai example~~ (done) | D1 related work |
-| 3 | Summarize A3 findings, then draft D2 claims after A1/A2 | | D4 report and slides |
+| 2 | ~~Implement/run A4 ranking export~~ (done); ~~A1/A2 sentence-level rerun~~ (done; future work for Monday) | ~~C2 one qualitative Thai example~~ (done) | ~~D1 related work~~ (done) |
+| 3 | Summarize A3 findings, then draft D2 claims after A1/A2 | Revise the progress report | D4 slides (report drafted) |
 
 If time is short, present the sentence-level run and the Thai work as next steps; the review-level
 results in section 2 plus A3 are enough to show progress.
@@ -176,7 +194,7 @@ results in section 2 plus A3 are enough to show progress.
 
 Can start **now**, independently of each other:
 
-- **Sam:** A3 and A4 are complete; next run A1/A2 sentence-level rerun and summarize the results
+- **Sam:** A3, A4 and the A1/A2 sentence-level run are complete; next is B1 on the sentence-level evidence
 - **Ton:** C1, C1b, C2 done; next: run the 10k Colab notebook, recheck E1 guidelines, label the pool (C4, a pilot first), find a second annotator (C5)
 - **Unassigned:** D1, D3 (writing, English)
 

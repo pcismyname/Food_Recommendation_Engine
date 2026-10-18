@@ -11,6 +11,14 @@ Working title: *Explainable reviewed-item retrieval, with a Thai taste case stud
 - **Track B (English, RIRD):** do the shown sentences faithfully support the ranking?
 - **Track C (Thai, Wongnai):** does sentence retrieval carry over to Thai? Sentence level only, because Wongnai has no restaurant ids.
 
+Status (2026-10-18):
+
+- **A:** done at review level (dense top-10 mean best, nDCG@10 0.668), volume control A3 done (capping changes nDCG@10 by ≤ 0.011), rankings and evidence exported (A4), sentence-level run done (dense top-10 mean 0.682).
+- **B:** first manual look at the explanations done ([05](05_explainability.md) §6); B1 deletion test and B2 human rating not run yet.
+- **C:** Thai corpus fixed at 10,000 reviews; Colab notebook, label-pool and scoring scripts, and annotation guidelines ready; labelling is next.
+
+The progress report (LaTeX source, PDF, figures) lives in [report/progress/](../report/progress/) (`main.tex` → `main.pdf`).
+
 Out of scope: see [action_items.md](../action_items.md) §7.
 
 ```

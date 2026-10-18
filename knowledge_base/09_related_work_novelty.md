@@ -20,7 +20,7 @@ SBERT, DPR, BM25, ERASER, Jacovi & Goldberg, WangchanBERTa, PyThaiNLP…) are no
 | **A.** Dense beats BM25 on RIRD under max / top-k / mean | ✅ **Yes**, by the RIRD paper itself (Table 4: off-the-shelf CoCondenser beats BM25 at K = 1, 10, all) | A **replication** with a multilingual encoder | Abdollah Pour et al. 2023 (Table 4) |
 | **A.** Aggregation choice (max / sum / mean / top-k) as a variable | ✅ Yes, expert finding and blog distillation, 2006–2009 | Not new; describe ours as CombMAX / CombSUM-style voting | Macdonald & Ounis 2006/2008; Balog et al. 2006; Zhang & Balog 2017 |
 | **A.** Bias toward items with many documents | ✅ Known in general (candidate length normalisation, prolific bloggers) | **New for RIR**: no paper tests a review-volume control on RIRD | Glasgow TREC 2006; Macdonald & Ounis CIKM 2008; Elsas et al. 2008 |
-| **A.** Sentence unit vs review unit on RIR | ❌ Not found (every RIR paper scores whole reviews) | **New for RIR** | Dense X Retrieval 2024; Luan et al. 2021; Birch 2019 |
+| **A.** Sentence unit vs review unit on RIR | ❌ Not found (every RIR paper scores whole reviews) | **New for RIR**. We now have the result (A1/A2): sentences help dense top-k (top-10 mean 0.682 vs 0.668 review level) but hurt BM25 and dense mean; paired review-vs-sentence test still to do | Dense X Retrieval 2024; Luan et al. 2021; Birch 2019 |
 | **B.** Review sentences ranked as explanations | ✅ Yes (EXTRA, graph extractor, Rank-Don't-Generate) | Not new as a framing | Li et al. 2021 (EXTRA) |
 | **B.** Deletion faithfulness test + human support rating with kappa, on the same sentences, for a reviewed-item ranker | ❌ Not found together | **New as a combined protocol**; recent preprints are close, so don't say "first" | ERASER; CountER 2021; AIS 2023; TRACE 2026 |
 | **C.** Thai taste-preference retrieval test set | ❌ Not found | **New**: "to our knowledge, the first small human-labelled test set for this domain" | MIRACL; NitiBench; Wongnai aspect-sentiment paper |
@@ -192,12 +192,14 @@ reproducibility, and the low-resource Thai setting.
 
 ## 7. Suggested follow-ups (not yet in action_items.md)
 
-| Suggestion | Track | Cost |
-|---|---|---|
-| Put RIRD Table 4 next to our A numbers; call it a replication | A, D2 | Low |
-| Report the 406–2,281 review range with A3 | A | Low |
-| Add these must-cites to related work (D1): Macdonald & Ounis, Balog 2006, Dense X, EXTRA, CountER, AIS, TRACE, MIRACL, NevIR | D1 | Low |
-| Report Thai negation queries as a separate slice | C7 | Low |
-| State the power limit and "not validated for reuse" for the Thai collection | C7 | Low |
-| Add an RRF hybrid as a third pooled Thai run | C3 | Medium (adds ~5–7 sentences per query to label) |
-| Cite the Wongnai search-query corpus as a realism check on our queries | C1, D2 | Low |
+Status checked 2026-10-18 against `\cite` keys in [report/progress/main.tex](../report/progress/main.tex).
+
+| Suggestion | Track | Cost | Status |
+|---|---|---|---|
+| Put RIRD Table 4 next to our A numbers; call it a replication | A, D2 | Low | ✅ Done: report Ch. 3 calls our dense > BM25 result a replication of RIRD (table number not cited) |
+| Report the 406–2,281 review range with A3 | A | Low | ✅ Done in the progress report |
+| Add these must-cites to related work (D1): Macdonald & Ounis, Balog 2006, Dense X, EXTRA, CountER, AIS, TRACE, MIRACL, NevIR | D1 | Low | ✅ Mostly: Macdonald & Ounis 2008, Balog 2006, Dense X (Chen 2024), EXTRA, ERASER, Jacovi & Goldberg, MIRACL, NevIR are cited. ⏳ CountER, AIS, TRACE still missing |
+| Report Thai negation queries as a separate slice | C7 | Low | ✅ Planned: `thai/score_labels.py` breaks results down by query type (single / combo / negation) |
+| State the power limit and "not validated for reuse" for the Thai collection | C7 | Low | ✅ Power limit (~0.11–0.17 nDCG@10) stated in the report; ⏳ "not validated for reuse" not yet |
+| Add an RRF hybrid as a third pooled Thai run | C3 | Medium (adds ~5–7 sentences per query to label) | ⏳ Not done |
+| Cite the Wongnai search-query corpus as a realism check on our queries | C1, D2 | Low | ⏳ Not done |

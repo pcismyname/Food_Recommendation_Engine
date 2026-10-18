@@ -92,7 +92,17 @@ Consequences for us:
 - A `.` after an abbreviation makes a cut very likely (`กทม.`, `อ.`, `K.U.`).
 - Some "sentences" merge several ideas because the reviewer used no spaces.
 
-We drop fragments under 15 characters (`MIN_CHARS = 15`) and get 19,294 sentences from 2,000 reviews (9.6 per review). The C2 spot-check is where you record how often cuts are bad. A simple fix to try: protect common abbreviations (replace `กทม.` with `กทม` before splitting).
+We drop fragments under 15 characters (`MIN_CHARS = 15`). On the 2,000-review pilot this gave 19,294 sentences (9.6 per review); the 10,000-review test corpus gives about 95,000 (see §7).
+
+**C2 spot-check result (done).** In the hand-checked sample of split sentences:
+
+| Problem | Share of sentences |
+|---|---|
+| Cut right after an abbreviation (`กทม.`, `อ.`, `K.U.`) | 0.7% |
+| Several sentences merged into one piece longer than 200 characters | 1.6% |
+| Mostly non-Thai (English menu names, emojis, numbers) | 0.7% |
+
+**Verdict: good enough.** Bad cuts are rare, and a sentence that is a bit too long or too short still carries its taste words, so it can still be retrieved and labelled. We keep `crfcut` as it is and do not add an abbreviation fix. We report the remaining weakness as a limitation: published results put `crfcut` at only about **0.77 F1** for sentence boundaries, so it is not a solved step, just an acceptable one for our purpose. (If we ever need a fix, the simple one is to protect common abbreviations, e.g. replace `กทม.` with `กทม` before splitting.)
 
 ---
 
@@ -107,7 +117,7 @@ Thai negation is a separate word placed **before** the thing it negates:
 | ไม่ + adj + เกินไป | not too ___ (ไม่หวานเกินไป = not too sweet, usually a **compliment**) |
 | ไม่ + adj + เลย | not ___ at all |
 
-**BM25 is a bag of words.** It counts which query tokens appear in a sentence (weighted by rarity) and ignores order. Our real output for T02 `อาหารรสเผ็ดจัด` ("very spicy food"):
+**BM25 is a bag of words.** It counts which query tokens appear in a sentence (weighted by rarity) and ignores order. Our real output for an earlier draft of T02, `อาหารรสเผ็ดจัด` ("very spicy food"; the frozen wording is `อยากกินอะไรเผ็ดๆ แบบจัดๆ`):
 
 ```
 [BM25]
@@ -117,9 +127,18 @@ Thai negation is a separate word placed **before** the thing it negates:
 
 Sentence 5 contains `รส`, `เผ็ด` and `จัด`, all query words, so it scores high. The extra `ไม่` is simply not in the query, so it costs almost nothing. BM25 cannot know that `ไม่` flips the meaning.
 
-The opposite case works *by accident*: for T20 `ขนมที่ไม่หวานเกินไป` ("desserts not too sweet"), the query itself contains `ไม่` and `เกินไป`, so BM25 rewards sentences with the same phrase. Note that the notebook deliberately **keeps stop words** so that `ไม่` is not thrown away.
+The opposite case works *by accident*: when the query itself contains the negation, BM25 rewards sentences with the same phrase. Note that the notebook deliberately **keeps stop words** so that `ไม่` is not thrown away.
 
-Dense encoders read the whole sentence, so they *can* model negation, but multilingual models are known to be weak at it. That is why C1 includes negation queries (T19–T23) and why these sentences need careful labels in C4 (a "not spicy" sentence is a **0** for a spicy query).
+**Pilot observation (2,000 reviews).** For T20 `ของหวานที่ไม่หวานมาก` ("desserts that are not too sweet"; an earlier draft worded it `ขนมที่ไม่หวานเกินไป`), **both** systems returned sentences that really say ไม่หวานมาก (not very sweet). BM25 got there by literal matching of `ไม่` + `หวาน` + `มาก`; dense got there by meaning. So the negation group is not automatically a BM25 loss. Whether this holds across all of T19–T23 is something the labels will show, not something we can claim yet.
+
+Dense encoders read the whole sentence, so they *can* model negation, but multilingual models are known to be weak at it. That is why C1 includes negation queries (T19–T23) and why these sentences need careful labels in C4.
+
+**Guideline rule for negation queries** ([thai/annotation_guidelines.md](../thai/annotation_guidelines.md), R1 and the degree table in 3.2): read every `ไม่` before deciding.
+
+- For a query that *wants* the taste, a negated taste is contradicted: `ไม่เผ็ด` (not spicy) is a **0** for a spicy query.
+- For a query that wants *not / less* of the taste (T20–T22), it flips: for "not too sweet", `ไม่หวานมาก` (not very sweet) or `หวานกำลังดี` (just sweet enough) = **2**, while `หวานเกินไป` (too sweet) = **0**.
+- T19 (no spice, for kids) is strictest: `ไม่เผ็ด` = 2, but `ไม่เผ็ดมาก` (not very spicy) is only 1.
+- A `ไม่` that does not apply to the food does not count: in *"ลืมบอกทางร้านว่าไม่เผ็ด … จะทำรสแซ่บจัดจ้านมากกก"* ("forgot to tell the shop not spicy … they make it really fiery") the food was very spicy.
 
 ---
 
@@ -161,7 +180,36 @@ What this limits:
 
 1. **No restaurant-level ranking.** We cannot group reviews by restaurant, so we cannot aggregate sentences into restaurant scores the way we do on RIRD. Thai evaluation is **sentence level only**, and restaurant-level Thai ranking is out of scope (future work).
 2. **Stars are not taste labels.** A 4-star review says the person was happy, not that the food was sour or spicy. That is why we need human 0/1/2 labels (C4).
-3. **Subsample.** The notebook uses 2,000 reviews (19,294 sentences) for CPU. Results on all 40k may differ (more near-duplicates, larger pool).
+3. **Subsample: 10,000 reviews (decided).** The first notebook was a CPU pilot on 2,000 reviews (19,294 sentences). The test set uses **10,000 sampled reviews (about 95,000 sentences)**, run on Colab. Why the bigger sample: rare tastes and negations (e.g. ไม่หวานมาก, "not very sweet") need enough relevant sentences in the corpus, or the top 10 is mostly filler. Why fix it *now*: labels are tied to the corpus. If the corpus changed after labelling, each system's top 10 would change and new unjudged sentences would appear, so the size is fixed before anyone labels. Results on all 40k may still differ (more near-duplicates, larger pool).
+
+---
+
+## 8. From retrieval to labels
+
+Wongnai has no relevance labels, so we make them by hand. The workflow:
+
+```
+thai_retrieval_10k_colab.ipynb ──► results/topk_n10000_s42.csv ──► build_label_pool.py
+  (10k reviews, seed 42;              (BM25 + dense top 10 per         (blind label sheet)
+   BM25 + dense)                       query, 480 rows)                       │
+                                                                              ▼
+score_labels.py ◄── hand labels 0/1/2 (annotation_guidelines.md) ◄── label_sheet.csv
+```
+
+1. **Retrieve.** The Colab notebook splits the 10,000 reviews into sentences, runs BM25 and the dense encoder for every query and writes each system's top 10 to `thai/results/topk_n10000_s42.csv` (480 rows = 24 queries × 2 systems × 10).
+2. **Pool.** `build_label_pool.py` takes the union of both top-10 lists per query, removes duplicates and **shuffles** the order, so the sheet does not show which system found a sentence or at what rank (a *blind* pool). That is about **19 sentences per query**. It writes `label_sheet.csv` (to label), `pool_key.csv` (the hidden key; annotators don't open it) and `label_sheet_annotator2.csv`, a seeded sample of **60 pairs** spread across queries for the second annotator.
+3. **Label.** Each (query, sentence) gets 0 / 1 / 2 by [thai/annotation_guidelines.md](../thai/annotation_guidelines.md): taste must be *described*, not guessed from a dish name (`ต้มยำ` alone is not "sour"); a combination needs both parts for a 2, one part = 1; a contradiction = 0; hedges lower the label by one.
+4. **Score.** `score_labels.py` computes **nDCG@10** (gains 0/1/2) and **P@10** (lenient: label ≥ 1; strict: label = 2) per system, with bootstrap 95% CIs, a paired randomization test dense vs. BM25 (Holm-corrected), a descriptive breakdown by query type (single / combo / negation), and agreement with annotator 2 (Cohen's kappa, unweighted and linear-weighted). `--partial` scores only fully labelled queries, for a pilot.
+
+Why "about 19" and not 20: the two systems rarely find the same sentence. In the 2,000-review pilot (pool of 465 pairs), BM25 and dense shared **fewer than 1 sentence per query** in their top 10 on average.
+
+**What the pilot top 10s looked like** (no labels yet, just reading):
+
+- **BM25 is fooled by filler words.** For T02 `อยากกินอะไรเผ็ดๆ แบบจัดๆ` ("I want something really spicy") it matches sentences that share `อยากกินอะไร` ("want to eat something") or `จัด`, not the spice.
+- **Dense drifts by topic.** For T11 it returns sour-spicy sentences about *other* dishes; for T02 its rank 5 says `รสชาติจะออกอ่อนๆ` ("the taste is rather mild"), on topic but the wrong degree.
+- **Both handle the T20 negation** (§4).
+
+These are impressions; the labels decide. Keep the scale in mind too: with only 24 queries, the test can detect nDCG@10 differences of roughly **0.11–0.17** at best, so a smaller gap would show up as "not significant" even if it is real.
 
 ---
 
@@ -190,7 +238,12 @@ What this limits:
 
 ## Where this lives in our code / tasks
 
-- Sentence splitting, BM25 on `newmm` tokens, dense encoding, overlap/pool size: [thai/thai_retrieval.ipynb](../thai/thai_retrieval.ipynb) (generated by [thai/build_thai_retrieval_notebook.py](../thai/build_thai_retrieval_notebook.py))
+- 2,000-review CPU pilot (sentence splitting, BM25 on `newmm` tokens, dense encoding, overlap/pool size): [thai/thai_retrieval.ipynb](../thai/thai_retrieval.ipynb) (generated by [thai/build_thai_retrieval_notebook.py](../thai/build_thai_retrieval_notebook.py))
+- 10,000-review test run on Colab, exports `thai/results/topk_n10000_s42.csv`: [thai/thai_retrieval_10k_colab.ipynb](../thai/thai_retrieval_10k_colab.ipynb) (generated by [thai/build_thai_retrieval_colab_notebook.py](../thai/build_thai_retrieval_colab_notebook.py))
+- Blind label pool: [thai/build_label_pool.py](../thai/build_label_pool.py) → `thai/labels/` (how to label: [thai/labels/README.md](../thai/labels/README.md))
+- Labelling rules, 0/1/2 scale, per-query rules and real examples: [thai/annotation_guidelines.md](../thai/annotation_guidelines.md)
+- Scoring and agreement: [thai/score_labels.py](../thai/score_labels.py)
 - Queries, including the negation type: [thai/thai_queries.csv](../thai/thai_queries.csv)
 - English baseline using the same encoder: [baselines/baseline_models_v2.ipynb](../baselines/baseline_models_v2.ipynb)
-- Tasks in [action_items.md](../action_items.md): **C1** (queries with negations), **C2** (segmentation + spot-check), **C3** (pool), **C4** (labels: negated taste = 0), **C7** (BM25 vs dense), **E1** (Thai edge-case examples), **F1** (why Thai is sentence-level only)
+- Status: the Colab run has not been executed yet and labelling has not started.
+- Tasks in [action_items.md](../action_items.md): **C1** (queries with negations), **C2** (segmentation + spot-check, done: good enough), **C3** (blind pool from the 10k run), **C4** (labels by the guidelines: negated taste = 0 unless the query asks for less), **C5** (second annotator, 60 pairs), **C7** (BM25 vs dense with `score_labels.py`), **E1** (annotation guidelines with Thai edge cases), **F1** (why Thai is sentence-level only)
