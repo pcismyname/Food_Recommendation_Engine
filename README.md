@@ -40,11 +40,15 @@ Task list, owners, dependencies and the plan are in **[action_items.md](action_i
 - **Done:** review-level baselines with CIs and significance tests
   ([baselines/baseline_models_v2.ipynb](baselines/baseline_models_v2.ipynb)); Thai queries frozen
   and Thai sentence pipeline built ([thai/](thai/)).
-- **Done 2026-10-18:** A3 review-volume control (capping every restaurant at 400 reviews changes
-  nDCG@10 by at most 0.011; model order unchanged) and A4 ranking/evidence export at review level.
-  The output CSVs are still on Colab and need copying into `baselines/cache/`.
-- **Next:** sentence-level rerun (A1/A2), feedback page and related work (D3, D1), report and slides
-  (D4).
+- **Done:** A3 review-volume control was executed with 400 reviews per restaurant and `SEED = 42`.
+  Dense top-10 mean remained the best controlled run: nDCG@10 0.672 and MAP 0.611, versus 0.668
+  and 0.608 before control. Correlations with original uncapped review counts were reduced to
+  near zero after control (Pearson range -0.009 to 0.019; Spearman range -0.021 to 0.001).
+- **Done:** A4 ranking/evidence export produced 50,000 review-level restaurant-ranking rows and
+  500,000 evidence rows across 10 BM25/dense aggregation runs. The files are
+  `rankings_review.csv` and `evidence_review.csv` in the notebook cache.
+- **Next:** run the sentence-level A1/A2 experiment and export `rankings_sentence.csv` and
+  `evidence_sentence.csv`. The feedback page and related work (D3, D1) can proceed in parallel.
 
 ### Repository map
 
@@ -153,14 +157,11 @@ Tasks, owners and deadlines are in [action_items.md](action_items.md).
   - The best model is dense with top-10 mean: nDCG@10 0.668 [0.625, 0.711] and MAP 0.608. That is
     close to the RIRD paper's fine-tuned 0.626.
   - Top-k mean beats both max and mean.
-- **Volume control (A3):** every restaurant was capped at 400 reviews (fixed seed) and the same unit
-  scores were re-aggregated.
-  - Dense nDCG@10 moves by at most ±0.004 (top-10 mean 0.668 → 0.672); BM25 drops by 0.005–0.011.
-  - The order of models is unchanged; dense is still best under every aggregation.
-  - Restaurant score vs. review count correlates weakly in the full run (Pearson ≈ 0.05 for BM25, up
-    to 0.11 for dense max / top-3 mean) and about 0 after capping.
-  - Caveats: one sampling seed and no paired test between full and capped runs yet.
-- **Open:** a sentence-level rerun (A1/A2).
+- **Completed:** A3 sampled every restaurant to exactly 400 source reviews with a fixed seed,
+  reused cached embeddings, evaluated all aggregations for BM25 and dense, and saved metrics plus
+  score/count correlations. The controlled results show that the review-volume relationship is
+  substantially reduced when the original uncapped count is used as the diagnostic count.
+  A sentence-level rerun (A1/A2) remains.
 
 ### Q3 (F3): No evidence for explainability
 
