@@ -106,7 +106,15 @@ Consequences for us:
 
 A transformer has a limit on how many **tokens** (sub-word pieces, not words) it reads. Anything beyond the limit is **cut off and ignored**. This model's default limit is 128 tokens. v1 used that default and so silently ignored the end of long reviews.
 
-In v2 we set `MAX_SEQ_LEN = 256`. That is why the cache file is named `..._review_len256.npy`. The notebook also prints the share of reviews still longer than 256 tokens, so we know how much text is lost. (The Thai notebook keeps the default, but it encodes short sentences, so truncation matters much less there.)
+In v2 we set `MAX_SEQ_LEN = 256`. That is why the cache file is named `..._review_len256.npy`. The notebook also prints the share of reviews still longer than 256 tokens, so we know how much text is lost:
+
+| Setting | Units longer than the limit |
+|---|---|
+| v1: reviews, 128 tokens | 50.6% |
+| v2: reviews, 256 tokens | 19.9% |
+| v2: sentences, 256 tokens | 0% |
+
+So doubling the limit fixed most of the problem, but about one review in five is still cut. Sentence units remove truncation completely. (The Thai notebook keeps the default, but it encodes short sentences, so truncation matters much less there.)
 
 Why not just set 10,000? Attention cost grows roughly with the square of the length, and the model was trained on short texts, so very long inputs get slow and the single averaged vector gets "blurry": one vector cannot represent a review that covers food, service, parking and price equally well. This is another argument for **sentence-level** units (file 03).
 
@@ -121,7 +129,9 @@ The file name records the **model, unit, max length** (and for Thai the sample s
 
 ## 9. When dense wins, when BM25 wins
 
-**Dense tends to win** on paraphrase and vocabulary mismatch: "cozy" vs "intimate atmosphere", "cheap" vs "good value". On RIRD, at the same review unit and with the same aggregation, **dense beats BM25 under every aggregation**, significant after Holm correction (nDCG@10 gap +0.03 to +0.09). Our best model is **Dense, top-10 mean: nDCG@10 0.668 [0.625, 0.711], MAP 0.608** (from `action_items.md` §2).
+**Dense tends to win** on paraphrase and vocabulary mismatch: "cozy" vs "intimate atmosphere", "cheap" vs "good value". On RIRD, at the same review unit and with the same aggregation, **dense beats BM25 under every aggregation**, significant after Holm correction (nDCG@10 gap +0.03 to +0.09). Our best review-level model is **Dense, top-10 mean: nDCG@10 0.668 [0.625, 0.711], MAP 0.608** (from `action_items.md` §2).
+
+**Switching to sentence units widens the gap.** At sentence level, dense top-10 mean rises to **0.682** (MAP 0.618), while BM25 top-10 mean falls from 0.634 to 0.609. Dense gains because a sentence is usually one topic, so its single vector is sharp and nothing is truncated (§7). BM25 loses because a short sentence has few words to match. Dense beats BM25 significantly under max and top-k at sentence level, but not under plain mean (+0.039, p 0.072). Details in file 03 §4.
 
 **BM25 tends to win** when the exact string matters:
 
@@ -130,6 +140,13 @@ The file name records the **model, unit, max length** (and for Thai the sample s
 - **Out-of-domain jargon** the encoder rarely saw in training.
 
 **Neither is reliable on negation.** Bi-encoders are known to place "not spicy" fairly close to "spicy", because the sentences share most of their content. Our Thai negation queries (T19–T23) are there to test this.
+
+**Dense matches topic, not polarity.** Looking at the evidence the best dense model (top-10 mean, review level) shows for its top restaurants:
+
+- *"I am on a budget"*: rank 1 is Fishman Lobster Clubhouse (not relevant in RIRD), and its top evidence is "It's not bad but kinda pricey." The review is about **price**, so the model is being faithful to what it computed, but it says the *opposite* of what the user wants.
+- *"Non-spicy Chinese meals"*: rank 1 Ding Tai Fung is relevant, but its second evidence review says "...Wonton was spicy ... red chili oil": the "non-" was ignored. Rank 2 is Pai Northern Thai Kitchen, which is Thai, not Chinese.
+
+The embedding knows the text is about price or spiciness; it does not reliably know *which way*. A cross-encoder reranker (§5) or a negation-aware step would be the natural fix. These examples also show that whole reviews (one evidence review here is 94 words) are too coarse to serve as explanations.
 
 ## 10. Hybrid retrieval in one paragraph
 
@@ -161,6 +178,8 @@ Since the two make different mistakes, many systems **combine** them: run both, 
 ## Where this lives in our code
 
 - Dense encoding, `MAX_SEQ_LEN = 256`, cache, `l2_normalise`, `S_dense = Q @ E.T`, v1 pooled-vector reference: [baselines/baseline_models_v2.ipynb](../baselines/baseline_models_v2.ipynb)
+- Sentence-level run (same code, `UNIT = 'sentence'`): [baselines/baseline_models_v2_sentence.ipynb](../baselines/baseline_models_v2_sentence.ipynb) (its result CSVs are gitignored, local only)
 - Saved results table: [baselines/cache/results_review.csv](../baselines/cache/results_review.csv)
+- Evidence shown per restaurant (source of the topic-vs-polarity examples in §9): `baselines/cache/evidence_review.csv` (gitignored, local only)
 - Thai sentence encoding, `top_dense` vs `top_bm25`, overlap of their top-10 lists: [thai/thai_retrieval.ipynb](../thai/thai_retrieval.ipynb)
 - Metrics: [baselines/eval_utils.py](../baselines/eval_utils.py)

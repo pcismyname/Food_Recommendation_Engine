@@ -30,7 +30,15 @@ Restaurant  ──────────────────────�
 
 In v1, **BM25 scored one concatenated document per restaurant**, while **dense mean-pooled review embeddings into one vector per restaurant**. When dense won, we couldn't tell whether that was because dense is a better *model* or because its *unit and pooling* happened to suit the task better. Two things changed at once: a **confounded** comparison.
 
-The fix is a controlled experiment: change one thing at a time. In v2 (`UNIT = 'review'`), **both models score the same reviews and go through the same aggregation functions**. Now a BM25 vs. dense gap is about the model. The sentence-level run (`UNIT = 'sentence'`) is coded but not yet run (task A1).
+The fix is a controlled experiment: change one thing at a time. In v2 (`UNIT = 'review'`), **both models score the same reviews and go through the same aggregation functions**. Now a BM25 vs. dense gap is about the model.
+
+The sentence-level run (`UNIT = 'sentence'`, task A1) is also done, in its own notebook. Changing the unit does **not** help everyone equally:
+
+- **Dense top-k mean gets better** (top-10 mean 0.668 → 0.682 nDCG@10).
+- **BM25 gets worse** (top-10 mean 0.634 → 0.609). A short sentence gives BM25 fewer words to match.
+- **Dense mean gets worse** (0.642 → 0.587). With many more, mostly off-topic sentences, the average is diluted even more.
+
+So the best unit depends on the model and the aggregation. (We have not yet run a paired review-vs-sentence significance test, so treat these as observed differences, not tested ones.)
 
 ## 2. Early vs. late fusion
 
@@ -90,13 +98,31 @@ Same per-review luck, very different restaurant outcome. This is the **volume bi
 
 Caution: a correlation with volume is not *automatically* bias. Popular restaurants may genuinely be relevant to more queries (that is why the notebook includes review-count and popularity floors). That's why we need a controlled test, not just a correlation.
 
-## 4. What our review-level results say so far
+## 4. What our results say
 
-From `action_items.md` §2 (review level, v2):
+**Review level** (v2, `baseline_models_v2.ipynb`):
 
 - **Top-k mean beats max and mean** for both BM25 and dense; **max is the weakest dense variant**.
 - Best model: **Dense, top-10 mean**: nDCG@10 **0.668** [0.625, 0.711], MAP **0.608**.
-- **Not yet done:** the sentence-level run and the review-volume control. So the volume half of F2 is still open.
+- Dense beats BM25 under every aggregation (all significant, +0.035 to +0.094 nDCG@10).
+
+**Sentence level** (`baseline_models_v2_sentence.ipynb`), nDCG@10:
+
+| Aggregation | BM25 | Dense |
+|---|---|---|
+| max | 0.546 | 0.611 |
+| mean | 0.548 | 0.587 |
+| top-3 mean | 0.587 | 0.664 |
+| top-5 mean | 0.598 | 0.673 |
+| top-10 mean | 0.609 | **0.682** (MAP 0.618) |
+| v1 reference | concat doc 0.621 | pooled vector 0.614 |
+
+- Dense top-10 mean is the best number we have, and at sentence level it **significantly** beats the v1 pooled vector (+0.067, Holm p 0.009). At review level that gap was not significant.
+- Dense beats BM25 significantly under max and top-k (p ≤ 0.004), but **not under mean** (+0.039, p 0.072).
+- BM25 max and mean are significantly worse than the v1 concat doc, and no longer significantly beat the popularity floor.
+- For the Monday progress report these sentence numbers are presented as future work; they go into the final report.
+
+**Volume control (A3, review level):** max and top-k scores *do* lean towards restaurants with many reviews, but equalising review counts barely changes accuracy (at most 0.011 nDCG@10) and the model order stays the same. Details in §5.
 
 ## 5. The volume-control experiment (task A3)
 
@@ -133,6 +159,40 @@ where $n$ = number of items (restaurants), and $d_i$ = for restaurant $i$, its r
 (ranks from smallest to largest in both columns)
 
 $\sum d^2 = 2$, so $\rho = 1 - \frac{6 \times 2}{5 \times 24} = 1 - 0.1 = 0.9$. Here the restaurant's score almost perfectly follows its review count: a red flag. In practice you compute $\rho$ over the 50 restaurants for each query and summarise across the 100 queries (e.g., the mean), per aggregation (`scipy.stats.spearmanr` handles ties).
+
+### Result (run 2026-10-18: review level, 400 reviews per restaurant, seed 42)
+
+**1. Is there a volume link?** Mean over queries of the per-query correlation between restaurant score and review count (Pearson / Spearman), full data:
+
+| Aggregation | BM25 | Dense |
+|---|---|---|
+| max | 0.21 / 0.18 | 0.22 / 0.11 |
+| mean | −0.05 / −0.06 | 0.04 / −0.06 |
+| top-3 mean | 0.28 / 0.23 | 0.26 / 0.14 |
+| top-5 mean | 0.31 / 0.26 | 0.28 / 0.15 |
+| top-10 mean | 0.36 / 0.30 | 0.30 / 0.16 |
+
+Yes, for max and top-k, and it grows with k (more "lottery tickets" averaged in). Mean shows no link, as §3 predicts. After capping everyone to 400 reviews, the correlation with the *original* count drops to about 0 (−0.07 to 0.04) for all aggregations. So the link really came from volume.
+
+**2. Does it change accuracy?** Hardly. nDCG@10, full → capped:
+
+| Aggregation | BM25 | Dense |
+|---|---|---|
+| max | 0.575 → 0.564 (−0.011) | 0.625 → 0.625 (−0.001) |
+| mean | 0.549 → 0.544 (−0.005) | 0.642 → 0.644 (+0.002) |
+| top-3 mean | 0.611 → 0.600 (−0.011) | 0.665 → 0.662 (−0.003) |
+| top-5 mean | 0.621 → 0.611 (−0.010) | 0.668 → 0.670 (+0.002) |
+| top-10 mean | 0.634 → 0.628 (−0.006) | 0.668 → 0.672 (+0.004) |
+
+Dense is essentially unchanged and still best; the model order does not change. BM25 loses a little when capped, plausibly because fewer reviews means fewer chances of an exact word match.
+
+**3. Part of the link is real signal.** Restaurants with more reviews also tend to be relevant to more queries in RIRD's labels: review count vs. number of queries a restaurant is relevant to has Spearman 0.30 (Pearson 0.255, 50 restaurants). So some of the volume preference is not bias at all; popular places really do fit more requests. This is the caution at the end of §3 in action.
+
+**Bottom line:** the volume bias the professor flagged is visible in the *scores* (max and top-k, not mean), but removing it barely moves accuracy (≤ 0.011 nDCG@10).
+
+**Limits:** only one random seed; no paired significance test of full vs. capped; and RIRD only contains restaurants with ≥ 400 reviews, so truly small restaurants (the "6-review specialist" of §3) are not tested at all.
+
+**Measurement lesson: pooled vs. per-query correlation.** Our first attempt computed one correlation over all (query, restaurant) pairs pooled together and got only 0.05–0.12, which looked like "no bias". The problem: score scales differ between queries (all cosines for one query can sit much higher than for another), so pooling mixes those level differences into the data and drowns the within-query pattern. Computing the correlation **inside each query** and then averaging shows the real effect (up to 0.36). Rule: when the question is "within one ranking, does X go with Y?", compute it per query. (See also file 04 §7.)
 
 ## 6. How Korikov et al. (2024) relates
 
@@ -173,13 +233,15 @@ Why it matters to us:
 3. Max = 0.9. Mean = 2.0 / 4 = 0.5. Top-2 mean = (0.9 + 0.5) / 2 = 0.7.
 4. More reviews means more chances for some review to score high by accident; max needs only one, top-k only k.
 5. The smallest RIRD restaurant has 406 reviews; 400 is the largest size every restaurant can be cut to. At 1,000, small restaurants couldn't be equalised.
-6. Higher-volume restaurants tend to get higher scores, a warning sign. But popular restaurants might genuinely be relevant to more queries, so we need the subsampling experiment to separate volume from real relevance.
+6. Higher-volume restaurants tend to get higher scores, a warning sign. But popular restaurants might genuinely be relevant to more queries, so we need the subsampling experiment to separate volume from real relevance. (In our A3 run both were true: the correlation vanished after capping, accuracy barely moved, and review count itself correlates 0.30 with how many queries a restaurant is relevant to.)
 
 </details>
 
 ## Where this lives in our code
 
 - `UNIT`, `TOP_KS`, `split_sentences`, `aggregate()` (max / mean / top-k), v1 concat-doc and pooled-vector references, review-count and popularity floors: [baselines/baseline_models_v2.ipynb](../baselines/baseline_models_v2.ipynb)
+- Sentence-level run (`UNIT = 'sentence'`): [baselines/baseline_models_v2_sentence.ipynb](../baselines/baseline_models_v2_sentence.ipynb). Its result CSVs are gitignored, so they exist only on the machine that ran it.
 - Saved review-level results and per-query metrics (input for A3 and significance tests): [baselines/cache/results_review.csv](../baselines/cache/results_review.csv), [baselines/cache/per_query_review.csv](../baselines/cache/per_query_review.csv)
+- A3 volume-control outputs (written by the A3 section of `baseline_models_v2.ipynb`): [baselines/cache/a3_volume_control_metrics_review.csv](../baselines/cache/a3_volume_control_metrics_review.csv) (nDCG etc., full vs. capped), [baselines/cache/a3_volume_control_correlations_review.csv](../baselines/cache/a3_volume_control_correlations_review.csv) (per-query score–count correlations)
 - Metrics used for every comparison: [baselines/eval_utils.py](../baselines/eval_utils.py)
 - Task definitions A1–A4 and the F2 critique: [action_items.md](../action_items.md), [professor_commmend.md](../professor_commmend.md)

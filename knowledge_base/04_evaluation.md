@@ -90,14 +90,16 @@ Note: in [eval_utils.py](../baselines/eval_utils.py), IDCG is computed from all 
 
 ## 3. Pooling: where labels come from
 
-We cannot label all 19,294 Thai sentences for 24 queries (over 460,000 pairs). The standard trick, from the TREC evaluations, is **pooling**:
+We cannot label all ~95,000 Thai sentences (10,000-review corpus) for 24 queries (over 2 million pairs; even the 19,294-sentence pilot would be over 460,000). The standard trick, from the TREC evaluations, is **pooling**:
 
 1. Run several systems.
 2. Take the top-k results of each system for each query.
 3. Merge them (remove duplicates) into one **pool**.
 4. Humans judge only the pool. Anything outside the pool is **assumed not relevant**.
 
-In our Thai notebook, pooling BM25 top-10 and dense top-10 gives 465 pairs for the 24 frozen queries (on average only about 0.6 sentences overlap per query, so the pool is about 19 per query). That is the labelling budget for C4.
+In the 2,000-review Thai pilot, pooling BM25 top-10 and dense top-10 gave 465 pairs for the 24 frozen queries (BM25 and dense share less than 1 sentence per query on average, so the pool is about 19 per query). The real labelling run uses the larger 10,000-review corpus (~95,000 sentences); `thai/build_label_pool.py` builds the pool from its top-10 lists and that is the labelling budget for C4.
+
+**Scoring a pool (`thai/score_labels.py`).** Because only the pool is labelled, nDCG@10 is computed at **pool depth 10**: the ideal list (IDCG) is built from all labelled pool sentences of that query, so the score is "relative to the pool", not to every relevant sentence in the corpus. Since each system's whole top 10 is in the pool, BM25 and dense have no unjudged items; pool bias only bites for a future system. The script uses gains 0/1/2 for nDCG and reports P@10 two ways: lenient (grade ≥ 1 counts) and strict (only grade 2). With `--partial` it scores only the queries whose pool is fully labelled, so you can run a pilot before the whole sheet is done (treat those numbers as a sanity check, not a result).
 
 **Pool bias**: a new system that was *not* in the pool (say, a future BGE-M3 run) may find relevant sentences nobody labelled. They count as 0, so the new system looks worse than it really is. Report this as a limitation, and if you add a system later, label its unjudged top-10 items before comparing.
 
@@ -131,7 +133,7 @@ Worked example: Ton and a second annotator label 50 pairs.
 - p_e = (18×16 + 18×18 + 14×16) ÷ 50² = (288 + 324 + 224) ÷ 2500 = **0.334**
 - κ = (0.74 − 0.334) ÷ (1 − 0.334) = **0.61**
 
-**Weighted kappa** is for ordinal labels like 0/1/2. Plain kappa treats "0 vs 1" and "0 vs 2" as equally wrong; weighted kappa gives partial credit for near misses. With linear weights (agreement weight = 1 − |a − b| ÷ 2, so a 1-step miss counts as 0.5 agreement and a 2-step miss as 0), the same table gives weighted p_o = 0.86, weighted p_e = 0.565, and **weighted κ ≈ 0.68**. Report both. In Python: `sklearn.metrics.cohen_kappa_score(y1, y2, weights="linear")`.
+**Weighted kappa** is for ordinal labels like 0/1/2. Plain kappa treats "0 vs 1" and "0 vs 2" as equally wrong; weighted kappa gives partial credit for near misses. With linear weights (agreement weight = 1 − |a − b| ÷ 2, so a 1-step miss counts as 0.5 agreement and a 2-step miss as 0), the same table gives weighted p_o = 0.86, weighted p_e = 0.565, and **weighted κ ≈ 0.68**. Report both. In Python: `sklearn.metrics.cohen_kappa_score(y1, y2, weights="linear")`. `thai/score_labels.py` reports both (unweighted and linear-weighted) for the 60 pairs in `label_sheet_annotator2.csv`.
 
 **Rough interpretation** (Landis & Koch, 1977; a convention, not a law):
 
@@ -180,7 +182,11 @@ We compare many pairs (5 aggregations × BM25 vs dense, each model vs the floor,
 2. Multiply the smallest by m, the next by m − 1, …, the last by 1.
 3. Make the results non-decreasing (each adjusted p is at least the previous one) and cap at 1.
 
-Example, m = 3, raw p = 0.01, 0.03, 0.04 → 0.03, 0.06, 0.04 → non-decreasing: **0.03, 0.06, 0.06**. Only the first stays significant. This is the `holm()` function in the v2 notebook and the `p (Holm)` column.
+Example, m = 3, raw p = 0.01, 0.03, 0.04 → 0.03, 0.06, 0.04 → non-decreasing: **0.03, 0.06, 0.06**. Only the first stays significant. This is the `holm()` function in the v2 notebook and the `p (Holm)` column. `thai/score_labels.py` applies the same three tools (bootstrap CI, paired randomization, Holm) to the Thai labels, overall and by query type.
+
+### How small a difference can 24 queries detect?
+
+Fewer queries means wider CIs and less **power** (the chance a test detects a real difference). With only 24 Thai queries, a BM25 vs. dense gap is only likely to come out significant if it is roughly **0.11–0.17 nDCG@10** or larger. A smaller real gap will probably show as "not significant". So "not significant" on the Thai set means "we can't tell", not "they are equal". Say this in the report.
 
 ---
 
@@ -204,6 +210,7 @@ If a model barely beats "popular restaurants first", it is not really understand
 - **Forgetting the pool**: unjudged ≠ irrelevant for a new system.
 - **Changing labels after seeing system output**: label blind, freeze the labels, then score.
 - **Cherry-picked examples**: qualitative examples are fine for slides, but pick them by a rule (e.g. one query of each type), not by "where we look good".
+- **Pooling a statistic across queries**: when the question is about the order *within* each ranking, compute the statistic per query, then average. In A3 we first correlated restaurant score with review count over all queries pooled together and got only 0.05–0.12. Score levels differ from query to query, and pooling mixes those differences in and hides the pattern. Computed per query and averaged, the correlation is up to 0.36 (BM25 top-10 mean). Same idea as the metrics: nDCG is computed per query, then averaged. (Details in file 03 §5.)
 
 ---
 
@@ -235,4 +242,6 @@ If a model barely beats "popular restaurants first", it is not really understand
 - Metric functions (`precision_at_k`, `recall_at_k`, `mrr`, `average_precision`, `ndcg_at_k`): [baselines/eval_utils.py](../baselines/eval_utils.py)
 - Bootstrap CI, paired randomization test, Holm correction and the three floors: `bootstrap_ci`, `paired_randomization_p`, `holm`, section 7 of [baselines/baseline_models_v2.ipynb](../baselines/baseline_models_v2.ipynb) (they are in the notebook, not in `eval_utils.py`)
 - Pool size and BM25/dense overlap for the Thai set: section 7 of [thai/thai_retrieval.ipynb](../thai/thai_retrieval.ipynb)
+- Blind pooled label sheet, hidden key and second-annotator sheet: [thai/build_label_pool.py](../thai/build_label_pool.py); scoring the Thai labels (pooled-depth nDCG@10, P@10 lenient/strict, bootstrap, paired randomization, Holm, kappa, `--partial`): [thai/score_labels.py](../thai/score_labels.py)
+- Per-query vs. pooled correlation (A3): [baselines/cache/a3_volume_control_correlations_review.csv](../baselines/cache/a3_volume_control_correlations_review.csv)
 - Tasks in [action_items.md](../action_items.md): **C3** (blind pooled sheet), **C4** (0/1/2 labels), **C5** (second annotator, kappa), **C7** (Thai nDCG@10 / P@10 with CIs), **B2** (support labels and kappa), **E1** (guidelines that make kappa high), **A2** (CIs and Holm on the English runs)
