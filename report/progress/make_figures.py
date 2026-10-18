@@ -28,7 +28,8 @@ for name, g in pq.groupby("Model"):
     rows.append((name, g["nDCG@10"].mean(), lo, hi))
 df = pd.DataFrame(rows, columns=["model", "mean", "lo", "hi"]).sort_values("mean")
 df["model"] = (df.model.str.replace("(v1)", "(proposal)", regex=False)
-                 .str.replace("concat doc", "concatenated doc", regex=False))
+                 .str.replace("concat doc", "concatenated doc", regex=False)
+                 .str.replace(" (LOO)", "", regex=False).str.replace(" (expected)", "", regex=False))
 colors = [BLUE if m.startswith("BM25") else ORANGE if m.startswith("Dense") else GREY for m in df.model]
 fig, ax = plt.subplots(figsize=(7.2, 5.2))
 ax.barh(df.model, df["mean"], xerr=[df["mean"] - df.lo, df.hi - df["mean"]], color=colors, capsize=3)
@@ -36,7 +37,7 @@ for y, (m, h) in enumerate(zip(df["mean"], df.hi)):
     ax.text(h + 0.01, y, f"{m:.3f}", va="center", fontsize=8)
 ax.set_xlim(0, 0.85)
 ax.set_xlabel("nDCG@10 (mean over 100 queries, 95% bootstrap CI)")
-ax.set_title("RIRD, review unit: BM25 (blue), dense (orange), query-independent floors (grey)", fontsize=9)
+ax.set_title("BM25 (blue), dense (orange) and simple baselines (grey)", fontsize=9)
 fig.tight_layout(); fig.savefig(OUT / "v2_ndcg_ci.png", dpi=200); plt.close(fig)
 
 # Figure 2: A3 volume control, full vs capped at 400 reviews
@@ -53,7 +54,7 @@ for ax, model, col in zip(axes, ["BM25", "Dense"], [BLUE, ORANGE]):
     ax.set_xticks(x, order, rotation=20); ax.set_ylim(0.5, 0.72); ax.set_title(model)
     ax.legend(fontsize=7, loc="lower right")
 axes[0].set_ylabel("nDCG@10")
-fig.suptitle("A3 volume control: change in nDCG@10 when every restaurant keeps 400 random reviews", fontsize=9)
+fig.suptitle("Change in nDCG@10 when every restaurant keeps 400 random reviews", fontsize=9)
 fig.tight_layout(); fig.savefig(OUT / "a3_volume_control.png", dpi=200); plt.close(fig)
 
 # Table numbers printed for the report: per-query score/count correlation
