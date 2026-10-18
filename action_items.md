@@ -121,11 +121,12 @@ Status: `[ ]` not started, `[/]` in progress, `[x]` done.
 | ID | Task | Phase · Priority | Thai? | Depends on |
 |---|---|---|---|---|
 | A3 | `[x]` Volume control completed: every restaurant sampled to 400 reviews with `SEED = 42`; all aggregations rerun and score/count correlations plus controlled metrics reported | **1 · High** (do first) | No | Can run now on the review-level cache |
-| A1 | `[x]` Shared retrieval unit for BM25 and dense. Done at review level (v2) and at sentence level (2026-10-18, [baseline_models_v2_sentence.ipynb](baselines/baseline_models_v2_sentence.ipynb)). **Monday: shown as future work** | **1 · High** | No | — |
-| A2 | `[x]` Same fusion variants on both models, with CIs and significance tests. Done at review and sentence level (results in §2). Still to add: paired review-vs-sentence test. **Monday: shown as future work** | **1 · High** | No | A1 |
+| A1 | `[x]` Shared retrieval unit for BM25 and dense. Done at review level (v2) and at sentence level (2026-10-18, [baseline_models_v2_sentence.ipynb](baselines/baseline_models_v2_sentence.ipynb)) | **1 · High** | No | — |
+| A2 | `[x]` Same fusion variants on both models, with CIs and significance tests. Done at review and sentence level (results in §2). Still to add: paired review-vs-sentence test. **Sentence run complete 2026-10-18:** 240,660 sentences; Dense top-10 mean nDCG@10 0.682, MAP 0.618; Dense beats BM25 for max and top-k mean after Holm correction, but not for mean | **1 · High** | No | A1 |
 | A4 | `[x]` Saved per-query restaurant rankings and top-10 selected source units, including source row IDs and text; executed output contains 50,000 ranking rows and 500,000 evidence rows | 1 · Medium | No | — |
 
-The sentence-level run finished on 2026-10-18 but after the report was written; for Monday it is presented as a next step (future work), and its results go into the final report.
+The sentence-level run finished on 2026-10-18 after the progress report was written. Its results
+belong in the final report and provide the prerequisite outputs for B1 and B2.
 
 ### B. Explanation evaluation on RIRD (English) — answers F3 · Owner: Sam
 

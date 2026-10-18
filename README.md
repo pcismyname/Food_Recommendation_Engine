@@ -47,8 +47,13 @@ Task list, owners, dependencies and the plan are in **[action_items.md](action_i
 - **Done:** A4 ranking/evidence export produced 50,000 review-level restaurant-ranking rows and
   500,000 evidence rows across 10 BM25/dense aggregation runs. The files are
   `rankings_review.csv` and `evidence_review.csv` in the notebook cache.
-- **Next:** run the sentence-level A1/A2 experiment and export `rankings_sentence.csv` and
-  `evidence_sentence.csv`. The feedback page and related work (D3, D1) can proceed in parallel.
+- **Done:** sentence-level A1/A2 was run on 240,660 sentences. Dense top-10 mean is the best
+  sentence-level run (nDCG@10 0.682 [0.638, 0.723], MAP 0.618 [0.563, 0.670]); the exported
+  files contain 50,000 restaurant-ranking rows and 500,000 evidence rows. Dense significantly
+  beats BM25 for max and top-k mean under Holm correction; the dense-vs-BM25 mean comparison is
+  not significant.
+- **Next code task:** B1 automatic faithfulness testing using the sentence-level evidence. B2 human
+  support annotation follows after the annotation guidelines are finalized.
 
 ### Repository map
 
@@ -161,7 +166,20 @@ Tasks, owners and deadlines are in [action_items.md](action_items.md).
   reused cached embeddings, evaluated all aggregations for BM25 and dense, and saved metrics plus
   score/count correlations. The controlled results show that the review-volume relationship is
   substantially reduced when the original uncapped count is used as the diagnostic count.
-  A sentence-level rerun (A1/A2) remains.
+  The sentence-level A1/A2 rerun is complete; B1 faithfulness testing remains.
+
+### Sentence-level A1/A2 result
+
+The sentence run used 240,660 RIRD sentences with the same BM25/dense models and aggregation
+variants as the review run. Dense top-10 mean was best:
+
+- nDCG@10: `0.682 [0.638, 0.723]`
+- MAP: `0.618 [0.563, 0.670]`
+
+The sentence-level comparison shows significant dense improvements over BM25 for max, top-3 mean,
+top-5 mean and top-10 mean after Holm correction. The dense-vs-BM25 mean comparison is not
+significant. This is evidence about ranking performance, not yet evidence that retrieved sentences
+are faithful explanations; that is the purpose of B1 and B2.
 
 ### Q3 (F3): No evidence for explainability
 
@@ -175,7 +193,7 @@ Tasks, owners and deadlines are in [action_items.md](action_items.md).
 - **B2, support (human):** two people separately rate the shown sentences for 15–30 queries × top 3
   restaurants as 0/1/2 support. We report kappa and the share rated as supporting.
 - **Scope:** we only select existing review sentences; we don't generate explanations.
-- **Status:** Phase 2. It depends on the sentence-level rerun.
+- **Status:** Phase 2. The sentence-level prerequisite is complete; implementation is the next code task.
 
 ### Q4 (F4): Check more literature
 
