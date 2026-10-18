@@ -123,11 +123,11 @@ If the sentence-level run is not finished by Monday, present it as a next step; 
 | C1 | `[x]` Write 15–30 Thai taste queries (sour, spicy, sweet, rich, cheap, combinations, a few negations). 24 queries in [thai/thai_queries.csv](thai/thai_queries.csv): drafted by an LLM, then revised by an LLM against the rules in [thai/query_guidelines.md](thai/query_guidelines.md). The original draft is kept in [thai/thai_queries_ai_draft.csv](thai/thai_queries_ai_draft.csv) | **1 · High** | **Yes** | — |
 | C1b | `[x]` Ton reviews and rewords the revised queries in natural Thai using the checklist in [thai/query_guidelines.md](thai/query_guidelines.md), **without opening the notebook outputs**, then signs off and freezes the file. After that, rerun [thai/thai_retrieval.ipynb](thai/thai_retrieval.ipynb). **Signed off by Ton 2026-10-17 with no changes; queries frozen; notebook rerun on the frozen queries** | **1 · High** | **Yes** | C1 |
 | C2 | `[x]` Split Wongnai reviews into sentences with PyThaiNLP, build a Thai BM25 index, encode and cache sentences. Spot-check the segmentation. For Monday, one qualitative Thai query → top sentences example is enough. Pipeline built and run on a 2,000-review subsample (19,294 sentences, [thai/thai_retrieval.ipynb](thai/thai_retrieval.ipynb)). Spot-check done (§2a–2b): good enough for retrieval; ~0.7% of sentences cut at abbreviation dots, ~1.6% merged long sentences. Qualitative T02/T11/T20 notes and takeaways written (§6a, §8). Notes drafted by Claude, confirmed by Ton 2026-10-17 | 1 · Medium | Code: no. Spot-check: **yes** | — |
-| C3 | `[ ]` For each query, pool the top sentences from BM25 and dense into one shuffled sheet that doesn't show which system found each sentence | 2 · High | No | C1b, C2 |
+| C3 | `[/]` For each query, pool the top sentences from BM25 and dense into one shuffled sheet that doesn't show which system found each sentence. **Corpus fixed at 10,000 reviews (decided 2026-10-18).** Code ready: [thai/thai_retrieval_10k_colab.ipynb](thai/thai_retrieval_10k_colab.ipynb) (run on Colab → `thai/results/topk_n10000_s42.csv`), then [thai/build_label_pool.py](thai/build_label_pool.py) writes the blind sheet to [thai/labels/](thai/labels/). Waiting on the Colab run | 2 · High | No | C1b, C2 |
 | C4 | `[ ]` Hand-label the sampled pairs 0/1/2 | 2 · High | **Yes** | C3, E1 |
 | C5 | `[ ]` Second opinion: a second Thai speaker labels 50–80 of the same pairs. Fallback: re-label 50 of your own pairs at least a week later. Start looking for a second Thai speaker now | 2 · Medium | **Yes** | C4 |
 | C6 | `[ ]` *Optional:* two LLMs from different providers label the full pool. Skip if the pool is small enough to label by hand | 2 · Low | No (but checking their output: **yes**) | C3, E1 |
-| C7 | `[ ]` Agreement figures, then Thai nDCG@10 / P@10 for BM25 vs. dense | 2 · High | No | C4, C5 (C6 if used) |
+| C7 | `[/]` Agreement figures, then Thai nDCG@10 / P@10 for BM25 vs. dense. Script ready and tested on synthetic labels: [thai/score_labels.py](thai/score_labels.py) (`--partial` scores a pilot subset) | 2 · High | No | C4, C5 (C6 if used) |
 
 ### D. Writing · Owner: not assigned yet
 
@@ -143,7 +143,7 @@ If the sentence-level run is not finished by Monday, present it as a next step; 
 
 | ID | Task | Phase · Priority | Thai? | Depends on |
 |---|---|---|---|---|
-| E1 | `[ ]` Annotation guidelines in English: 0/1/2 scale, worked examples, decided edge-case rules, for both the Thai sheet and the explanation sheet | 2 · High (blocks all labelling; finish early in Phase 2) | Thai examples: **yes** | — |
+| E1 | `[/]` Annotation guidelines in English: 0/1/2 scale, worked examples, decided edge-case rules, for both the Thai sheet and the explanation sheet. Drafted in [thai/annotation_guidelines.md](thai/annotation_guidelines.md) (real Wongnai examples, per-query rules, B2 appendix); Ton to recheck using its checklist | 2 · High (blocks all labelling; finish early in Phase 2) | Thai examples: **yes** | — |
 
 ---
 
@@ -177,7 +177,7 @@ results in section 2 plus A3 are enough to show progress.
 Can start **now**, independently of each other:
 
 - **Sam:** A3 and A4 are complete; next run A1/A2 sentence-level rerun and summarize the results
-- **Ton:** C1, C1b, C2 done; next is E1 Thai examples and finding a second annotator (C5)
+- **Ton:** C1, C1b, C2 done; next: run the 10k Colab notebook, recheck E1 guidelines, label the pool (C4, a pilot first), find a second annotator (C5)
 - **Unassigned:** D1, D3 (writing, English)
 
 Dependency chains:
