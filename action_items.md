@@ -1,6 +1,6 @@
 # Action Items — Group Flower
 
-Last updated 2026-10-18 (evening).
+Last updated 2026-10-19.
 
 **Next deadline: Monday 2026-10-19, 11:59 PM** — updated report (PDF) and slides (PDF).
 Progress presentation on Tuesday 2026-10-20: 10 minutes plus 5 minutes Q&A.
@@ -87,6 +87,14 @@ properly investigated and explained.
 - **Monday 2026-10-19 submission:** the sentence-level results are **not** in the progress report or
   slides. They are presented as **future work / next step**, since they arrived after the report was
   written. They go into the final report.
+- **Thai 10k retrieval run (C3) done 2026-10-19** by Ton on Colab (T4 GPU,
+  [thai/thai_retrieval_10k_colab.ipynb](thai/thai_retrieval_10k_colab.ipynb)): 10,000 Wongnai reviews
+  (seed 42) → 93,810 sentences (9.4 per review); BM25 and dense
+  (`paraphrase-multilingual-mpnet-base-v2`) top 10 for all 24 frozen queries. Output:
+  [thai/results/topk_n10000_s42.csv](thai/results/topk_n10000_s42.csv) (480 rows, query text matches
+  the frozen `thai_queries.csv`). The two systems barely overlap: mean 1.2 shared sentences in the
+  top 10 (combo 0.9, negation 1.2, single 1.4; T09 is the outlier with 7). So the pool is 452
+  (query, sentence) pairs, mean 18.8 per query. No BM25 zero-score hits in any top 10.
 - **A3 completed:** every restaurant was sampled to 400 reviews with `SEED = 42`, reusing the
   review-level score matrices and cached embeddings. The controlled best run was Dense top-10 mean:
   nDCG@10 0.672, MAP 0.611, compared with 0.668 and 0.608 before control. Pooled uncontrolled
@@ -142,7 +150,7 @@ belong in the final report and provide the prerequisite outputs for B1 and B2.
 | C1 | `[x]` Write 15–30 Thai taste queries (sour, spicy, sweet, rich, cheap, combinations, a few negations). 24 queries in [thai/thai_queries.csv](thai/thai_queries.csv): drafted by an LLM, then revised by an LLM against the rules in [thai/query_guidelines.md](thai/query_guidelines.md). The original draft is kept in [thai/thai_queries_ai_draft.csv](thai/thai_queries_ai_draft.csv) | **1 · High** | **Yes** | — |
 | C1b | `[x]` Ton reviews and rewords the revised queries in natural Thai using the checklist in [thai/query_guidelines.md](thai/query_guidelines.md), **without opening the notebook outputs**, then signs off and freezes the file. After that, rerun [thai/thai_retrieval.ipynb](thai/thai_retrieval.ipynb). **Signed off by Ton 2026-10-17 with no changes; queries frozen; notebook rerun on the frozen queries** | **1 · High** | **Yes** | C1 |
 | C2 | `[x]` Split Wongnai reviews into sentences with PyThaiNLP, build a Thai BM25 index, encode and cache sentences. Spot-check the segmentation. For Monday, one qualitative Thai query → top sentences example is enough. Pipeline built and run on a 2,000-review subsample (19,294 sentences, [thai/thai_retrieval.ipynb](thai/thai_retrieval.ipynb)). Spot-check done (§2a–2b): good enough for retrieval; ~0.7% of sentences cut at abbreviation dots, ~1.6% merged long sentences. Qualitative T02/T11/T20 notes and takeaways written (§6a, §8). Notes drafted by Claude, confirmed by Ton 2026-10-17 | 1 · Medium | Code: no. Spot-check: **yes** | — |
-| C3 | `[/]` For each query, pool the top sentences from BM25 and dense into one shuffled sheet that doesn't show which system found each sentence. **Corpus fixed at 10,000 reviews (decided 2026-10-18).** Code ready: [thai/thai_retrieval_10k_colab.ipynb](thai/thai_retrieval_10k_colab.ipynb) (run on Colab → `thai/results/topk_n10000_s42.csv`), then [thai/build_label_pool.py](thai/build_label_pool.py) writes the blind sheet to [thai/labels/](thai/labels/). Waiting on the Colab run | 2 · High | No | C1b, C2 |
+| C3 | `[x]` For each query, pool the top sentences from BM25 and dense into one shuffled sheet that doesn't show which system found each sentence. **Corpus fixed at 10,000 reviews (decided 2026-10-18); do not change it once labelling starts.** **Retrieval run done 2026-10-19** on Colab ([thai/thai_retrieval_10k_colab.ipynb](thai/thai_retrieval_10k_colab.ipynb)) → [thai/results/topk_n10000_s42.csv](thai/results/topk_n10000_s42.csv), uploaded and checked (results in §2). **Label pool built 2026-10-19** with [thai/build_label_pool.py](thai/build_label_pool.py): [thai/labels/label_sheet.csv](thai/labels/label_sheet.csv) (452 blind pairs, 13–20 per query), `pool_key.csv` (hidden key; annotators must not open it) and `label_sheet_annotator2.csv` (60 pairs over all 24 queries for C5) | 2 · High | No | C1b, C2 |
 | C4 | `[ ]` Hand-label the sampled pairs 0/1/2 | 2 · High | **Yes** | C3, E1 |
 | C5 | `[ ]` Second opinion: a second Thai speaker labels 50–80 of the same pairs. Fallback: re-label 50 of your own pairs at least a week later. Start looking for a second Thai speaker now | 2 · Medium | **Yes** | C4 |
 | C6 | `[ ]` *Optional:* two LLMs from different providers label the full pool. Skip if the pool is small enough to label by hand | 2 · Low | No (but checking their output: **yes**) | C3, E1 |
@@ -196,7 +204,7 @@ results in section 2 plus A3 are enough to show progress.
 Can start **now**, independently of each other:
 
 - **Sam:** A3, A4 and the A1/A2 sentence-level run are complete; next is B1 on the sentence-level evidence
-- **Ton:** C1, C1b, C2 done; next: run the 10k Colab notebook, recheck E1 guidelines, label the pool (C4, a pilot first), find a second annotator (C5)
+- **Ton:** C1, C1b, C2 and the 10k retrieval run done; C3 label sheet built; next: recheck E1 guidelines, label the pool (C4, a pilot first), find a second annotator (C5)
 - **Unassigned:** D1, D3 (writing, English)
 
 Dependency chains:
