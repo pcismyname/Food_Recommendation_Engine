@@ -5,7 +5,7 @@ Python 3.9 compatible.
 For pre-computed queries (100 English RIRD + 24 Thai):
   → instant lookup, no model needed.
 
-For NEW English queries — full B3 pipeline:
+For NEW English queries — selective B3 pipeline:
   Stage 0: LLM query rewriting  (Groq / qwen3.8-27b)
              Converts negation & vague phrasing to reviewer language.
   Stage 1: Bi-encoder retrieval (paraphrase-multilingual-mpnet-base-v2)
@@ -79,6 +79,14 @@ def _strip_think(text: str) -> str:
     return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
 
 
+def _split_sentences(text: str) -> List[str]:
+    return [
+        sentence.strip()
+        for sentence in re.split(r"(?<=[.!?])\s+|\n+", text)
+        if sentence.strip()
+    ]
+
+
 # Negation/exclusion patterns that trigger cross-encoder re-ranking.
 # For plain positive queries, bi-encoder alone beats ms-marco-MiniLM
 # (which is trained on web search, not restaurant reviews).
@@ -92,7 +100,7 @@ _NEGATION_RE = re.compile(
 # ── Main engine ───────────────────────────────────────────────────────────────
 
 class RetrievalEngine:
-    """Loads all artefacts once at startup; answers queries with the full B3 pipeline."""
+    """Loads all artefacts once at startup and answers English queries live."""
 
     def __init__(self):
         self.ready = False
@@ -113,6 +121,7 @@ class RetrievalEngine:
         self._embedder = None
         self._sentence_embs: Optional[np.ndarray] = None
         self._sentence_meta: List[dict] = []
+        self._sentence_unit_count = 0
 
         # Stage 2: cross-encoder (lazy — loaded alongside bi-encoder)
         self._cross_encoder = None
@@ -280,18 +289,25 @@ class RetrievalEngine:
         self._en_queries = sorted(self._en_precomputed.keys())
         logger.info("Loaded %d English pre-computed queries", len(self._en_queries))
 
-        # Build sentence meta — filter short/uninformative sentences
-        seen_ids: set = set()
-        for row in _load_csv(ev_path):
-            uid  = row.get("unit_id", "")
-            text = row.get("text", "").strip()
-            if uid and uid not in seen_ids and len(text.split()) >= MIN_SENTENCE_WORDS:
-                self._sentence_meta.append({
-                    "unit_id":       uid,
-                    "restaurant_id": row["restaurant_id"],
-                    "text":          text,
-                })
-                seen_ids.add(uid)
+        # Reconstruct the full sentence corpus in the same order used to
+        # generate the embedding matrix. Evidence CSV rows are only a pooled
+        # subset, so using them positionally would pair the wrong text with
+        # each embedding.
+        rev_path = DATA / "reviews" / "50_restaurants_all_rates.csv"
+        if rev_path.exists():
+            unit_id = 0
+            for row in _load_csv(rev_path):
+                for text in _split_sentences(row.get("review_text", "")):
+                    if len(text.split()) >= MIN_SENTENCE_WORDS:
+                        self._sentence_meta.append({
+                            "unit_id": unit_id,
+                            "restaurant_id": row["business_id"],
+                            "text": text,
+                        })
+                    unit_id += 1
+            self._sentence_unit_count = unit_id
+        else:
+            logger.warning("Reviews CSV not found — live sentence metadata unavailable")
         logger.info("Sentence meta loaded: %d sentences (≥%d words)",
                     len(self._sentence_meta), MIN_SENTENCE_WORDS)
 
@@ -347,6 +363,12 @@ class RetrievalEngine:
                 "Live pipeline ready | embeddings: %s | meta: %d sentences",
                 self._sentence_embs.shape, len(self._sentence_meta),
             )
+            if self._sentence_embs.shape[0] != self._sentence_unit_count:
+                raise ValueError(
+                    "Sentence embedding and corpus sizes do not match: "
+                    f"{self._sentence_embs.shape[0]} embeddings vs "
+                    f"{self._sentence_unit_count} sentence units"
+                )
         except Exception as e:
             logger.warning("Could not initialise live pipeline: %s", e)
             self._embedder       = None
@@ -424,14 +446,12 @@ class RetrievalEngine:
 
         # Group by restaurant
         rest_candidates: Dict[str, List[Tuple[float, str]]] = defaultdict(list)
-        for idx, meta in enumerate(self._sentence_meta):
+        for meta in self._sentence_meta:
             rest_candidates[meta["restaurant_id"]].append(
-                (float(sims[idx]), meta["text"])
+                (float(sims[meta["unit_id"]]), meta["text"])
             )
 
         # Keep top-20 bi-encoder candidates per restaurant for cross-encoder input
-        CE_INPUT_K = 20
-
         # Only apply CE for negation/exclusion queries — for plain queries bi-encoder wins
         use_ce = self._cross_encoder is not None and self._needs_cross_encoder(original_query, rewritten_query)
         logger.info("Query %r: cross-encoder %s", original_query[:40], "ON" if use_ce else "OFF (bi-encoder only)")

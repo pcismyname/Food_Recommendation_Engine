@@ -82,7 +82,8 @@ Papers the professor pointed to:
   correlation drops to near zero (Pearson −0.009 to +0.019) after control; effect on nDCG@10 ≤ 0.011.
 - **A4 complete:** 50,000 ranking rows + 500,000 evidence rows exported (query, model, aggregation,
   rank/score, source review row ID and text).
-- **Still to do:** paired review-vs-sentence significance test (A5).
+- **A5 complete:** paired review-vs-sentence significance test is in
+  `cache/a5_review_vs_sentence_test.csv` with its forest plot.
 
 ### Track C — Thai (Wongnai)
 
@@ -150,7 +151,7 @@ The sentence-level evidence output from A4 is the direct input for B1 and B2.
 |---|---|---|---|---|
 | B1 | `[x]` **Faithfulness (automatic):** [b1_faithfulness.ipynb](baselines/b1_faithfulness.ipynb) executed. **Result: mean faithfulness gap = 0.000, p=1.0 (n.s.).** Shown and random deletions hurt rank equally (both mean rank drop = 48). nDCG@10 drops from 0.682 to 0.379 under either deletion — deletion is very destructive but not differentially so. Interpretation: the pooled evidence store is small (top-10 per restaurant) so random and shown deletions always hit the same sentences. See `cache/b1_faithfulness_summary.csv` and `cache/b1_faithfulness_plot.png`. | **High** | No | A4 ✅ |
 | B2 | `[/]` **Support (human):** [b2_export_support_sheet.py](baselines/b2_export_support_sheet.py) run. Sheets generated: `cache/b2_support_sheet.csv` (full, Sam labels), `cache/b2_support_sheet_ann2.csv` (40-pair subset, Ton labels), `cache/b2_support_key.csv` (hidden key). **Next: Sam fills `label` column (0/1/2) in `b2_support_sheet.csv`; Ton fills `b2_support_sheet_ann2.csv`. Then run [b2_score_agreement.py](baselines/b2_score_agreement.py).** | **High** | No | A4 ✅, E1 |
-| B3 | `[/]` **Improved retrieval** — fully integrated into [app/retrieval.py](app/retrieval.py) and [b3_improved_retrieval.ipynb](baselines/b3_improved_retrieval.ipynb). Three-stage improvement over Dense\|top-10 mean baseline. **Execute notebook, then restart server.** | **High** | No | B2, A4 ✅ |
+| B3 | `[/]` **Improved retrieval** — notebook executed and integrated into [app/retrieval.py](app/retrieval.py). The live system uses selective CE because applying CE to every query reduced nDCG@10 from 0.682 to 0.658 and MAP from 0.618 to 0.586. Remaining work is end-to-end demo validation. | **High** | No | B2, A4 ✅ |
 | B3a | `[x]` **LLM query rewriting (Groq / qwen3.8-27b):** B2 labelling found two failure modes: (1) *negation blindness* — "no waitline" retrieves sentences about busy restaurants because the bi-encoder sees same-topic embeddings regardless of negation; (2) *idiomatic query failure* — "cheat meal", "I feel chubby" land in undefined embedding regions. Fix: call Groq API to rewrite query into explicit positive reviewer-language keywords before encoding. "No waitline" → "quick seating walk-in no queue no reservation". Results cached in-memory (second call instant). **Reason for PPT:** addresses a fundamental bi-encoder limitation; shows LLM integration for IR. | **High** | No | B2 |
 | B3b | `[x]` **Cross-encoder re-ranking (ms-marco-MiniLM-L-6-v2):** bi-encoder encodes query and sentence *independently* (no joint attention), so negation mismatch is invisible. Cross-encoder reads (rewritten_query, sentence) together with full transformer attention — detects semantic mismatch. Only top-20 bi-encoder restaurants are sent to CE (pre-filter), and only top-15 bi-encoder sentences per restaurant (300 CE calls total vs. 1,500 in naive approach = **5× faster**). **Reason for PPT:** higher precision evidence; cross-encoder is the standard IR "re-ranker" pattern. | **High** | No | B3a |
 | B3c | `[x]` **Evidence quality filtering:** B2 also showed very short sentences ("Solid meal!", "No consistency.") scoring high due to embedding length bias. Fix: `MIN_SENTENCE_WORDS=10` filter applied at load time removes sub-10-word sentences from the live retrieval corpus. `CE_DISPLAY_THRESH=0.0` hides CE-scored sentences below the threshold (fallback: always show ≥2). **Reason for PPT:** improves faithfulness of shown evidence; directly motivated by B2 labelling observations. | **High** | No | B3b |
@@ -211,13 +212,34 @@ FastAPI backend + single-page HTML/JS frontend, Dockerized for EC2. English tab:
 
 | ID | Task | Priority | Depends on |
 |---|---|---|---|
-| G1 | `[/]` **Backend API** — [app/main.py](app/main.py) (FastAPI) + [app/retrieval.py](app/retrieval.py) (engine loads evidence_sentence.csv + topk_n10000_s42.csv at startup). Endpoints: `GET /`, `GET /api/queries?lang=`, `POST /api/query`, `GET /api/health`. **Code written; needs local test run.** | **High** | A4 ✅, C3 ✅ |
-| G2 | `[/]` **Frontend UI** — [app/static/index.html](app/static/index.html). Dark-mode single-page app: English tab shows ranked restaurant cards with expandable explanation sentences; Thai tab shows pooled sentence results. Chip autocomplete from known queries. **Code written; test with G1.** | **High** | G1 |
+| G1 | `[/]` **Backend API** — [app/main.py](app/main.py) (FastAPI) + [app/retrieval.py](app/retrieval.py). Endpoints are implemented; validate health, query validation, precomputed lookup, live routing, and response schemas. | **High** | A4 ✅, C3 ✅ |
+| G2 | `[/]` **Frontend UI** — [app/static/index.html](app/static/index.html). English and Thai result cards, explanations, and query chips are implemented; browser smoke-test remains. | **High** | G1 |
 | G3 | `[ ]` **Local Docker test** — `docker compose up --build`, verify both tabs work, check `/api/health`. Fix any import/path issues. | **High** | G1, G2 |
 | G4 | `[ ]` **EC2 deployment** — once professor provides instance ID/IP: SSH in, install Docker, `rsync` or `git clone` project, `docker build -t food-recommender . && docker run ...`. Open port 8000 in security group. Follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). | **High** | G3, professor provides EC2 access |
 | G5 | `[ ]` **Live inference (optional)** — uncomment the embeddings `COPY` line in [Dockerfile](Dockerfile) to enable arbitrary English query inference (requires t2.large, ~750 MB extra). Only do this if EC2 instance has ≥ 8 GB RAM. | Low | G4 |
 
 ---
+
+### H. Engineering validation and additional metrics · Owner: Sam
+
+These are the remaining code-facing checks beyond the existing ranking notebook results.
+
+| ID | Task | Priority | Depends on |
+|---|---|---|---|
+| H1 | `[ ]` **API and retrieval smoke tests** — test health, query listing, precomputed English/Thai queries, unknown English fallback, negation routing, empty/oversized requests, and response schema. | High | G1 |
+| H2 | `[ ]` **Live-pipeline regression checks** — assert the reconstructed corpus has 240,660 units, embeddings align by unit ID, all 50 restaurants are represented, and explanations contain at most 5 sentences. | High | B3, G1 |
+| H3 | `[ ]` **B3 subgroup analysis** — report nDCG@10/MAP separately for explicit negation/exclusion queries and plain positive queries, plus query rewrite change rate and per-query deltas. This verifies that selective CE is justified rather than relying only on the overall average. | High | B3 |
+| H4 | `[ ]` **Operational metrics** — measure cold-start time, precomputed latency, live-query p50/p95 latency, CE-vs-bi-encoder latency, and cache-hit latency; record peak memory during startup. | Medium | G1, G3 |
+| H5 | `[ ]` **Robustness checks** — verify behavior with no Groq key, Groq timeout/error, missing optional embeddings, malformed CSV rows, and repeated/case-variant queries. | Medium | H1, H2 |
+| H6 | `[ ]` **Automated test suite** — add focused tests for helpers, routing, corpus alignment, API validation, and result contracts; run them before final packaging. | Medium | H1, H2 |
+
+### Metrics to report
+
+- **Ranking:** nDCG@5/@10, MAP, MRR, Recall@5/@10, P@5/@10, bootstrap 95% CIs, and paired per-query significance tests.
+- **B3 diagnosis:** rewrite rate, selective-CE subgroup scores, improved/degraded query counts, and delta distributions.
+- **Explanations:** percentage of evidence labelled supporting, mean label, support precision at 1/5, and inter-annotator Cohen's kappa or Krippendorff's alpha.
+- **Thai track:** nDCG@10/P@10 (and MAP only if the annotation design supports it), per-query variance, and annotator agreement.
+- **System quality:** cold start, p50/p95 latency, cache-hit latency, peak memory, and graceful-degradation behavior.
 
 ## 4. Plan (now → December 1)
 
@@ -226,8 +248,8 @@ FastAPI backend + single-page HTML/JS frontend, Dockerized for EC2. English tab:
 ```
 Start immediately (unblocked or nearly so):
   1. E1   — Ton: finalize annotation guidelines → unblocks C4 and B2
-  2. B1   — Sam: faithfulness test on sentence evidence (fully unblocked)
-  3. B2   — Sam: prepare blind sheet; label once E1 is signed off
+  2. B2   — Sam/Ton: complete human support labels and agreement
+  3. H1/H2 — Sam: validate API and live corpus alignment
 
 After E1:
   4. C4   — Ton: label Thai pool (pilot 30 pairs first, then continue)
@@ -236,16 +258,13 @@ After E1:
 After C4 + C5:
   6. C7   — Ton: score labels, compute Thai nDCG@10 / P@10 + kappa
 
-Anytime after A2:
-  7. A5   — Sam: add paired review-vs-sentence test to sentence notebook
-
-After B1, B2, C7:
-  8. D2   — Both: rewrite title / claims / limitations
-  9. F4   — Both: baseline comparison write-up
-  10. F1  — Both: final report (AIT thesis template)
-  11. F2  — Both: final slides
-  12. F3  — Sam: repository / notebook cleanup
-  13. F5  — Both: video (if required)
+After B2, C7, and H1–H3:
+  7. D2  — Both: rewrite title / claims / limitations
+  8. F4  — Both: baseline comparison write-up
+  9. F1  — Both: final report (AIT thesis template)
+  10. F2 — Both: final slides
+  11. F3 — Sam: repository / notebook cleanup
+  12. F5 — Both: video (if required)
 ```
 
 ### Owner summary

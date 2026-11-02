@@ -152,7 +152,7 @@ Notebooks in [`eda/`](eda/):
 |---|---|---|---|---|
 | BM25 (baseline v1) | Review (concat) | — | 0.621 | — |
 | Dense (proposed) | Sentence | Top-10 mean | **0.682** | **0.618** |
-| Dense + rewrite + CE (B3) | Sentence | Top-10 mean + cross-encoder | *TBD after B3 run* | *TBD* |
+| Dense + rewrite + selective CE (B3) | Sentence | Top-10 mean + CE for exclusion queries | 0.658 | 0.586 |
 | RIRD fine-tuned (external ref) | — | — | — | 0.626 |
 
 **A5 (review vs. sentence):** No variant significantly improves by switching units after Holm
@@ -280,7 +280,7 @@ open **http://localhost:8000** in your browser.
 | Query type | Path | Latency |
 |---|---|---|
 | One of the 100 RIRD queries (exact/case-insensitive match) | Instant pre-computed lookup → no models touched | <1ms |
-| New English query (anything else) | Stage 0: Groq rewrites → Stage 1: bi-encoder → Stage 2: cross-encoder → Stage 3: aggregate | ~3–8s |
+| New English query (anything else) | Stage 0: Groq rewrites → Stage 1: bi-encoder → selective Stage 2 CE → Stage 3 aggregate | ~2–4s |
 | One of the 24 Thai queries | Instant pre-computed lookup | <1ms |
 | New Thai query | Not supported (error shown) | — |
 
@@ -362,7 +362,14 @@ Pre-computed queries (100 RIRD + 24 Thai) still bypass all models entirely (<1ms
 
 ---
 
-### Why the cross-encoder (Stage 2) is better than bi-encoder alone (Stage 1)
+### Selective cross-encoder use
+
+B3 evaluation showed that applying the cross-encoder to every query reduced overall
+nDCG@10 from 0.682 to 0.658 and MAP from 0.618 to 0.586. It improved 44 queries
+but degraded 53, so the live demo only enables it for explicit exclusion or
+negation queries. Plain positive queries use the bi-encoder ranking.
+
+### Why the cross-encoder (Stage 2) is useful for selected queries
 
 | | Bi-encoder (Stage 1) | Cross-encoder (Stage 2) |
 |---|---|---|
