@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Explainable Food Recommender — Group Flower</title>
+  <meta name="description" content="Dense retrieval-based restaurant recommender with sentence-level explanations. English RIRD evaluation + Thai Wongnai taste case study." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & tokens ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0d0f14;
+      --bg-card:     #13161f;
+      --bg-card2:    #1a1d29;
+      --bg-input:    #1e2130;
+      --border:      #2a2e42;
+      --border-hi:   #3d4260;
+      --accent:      #6c63ff;
+      --accent-glow: #6c63ff44;
+      --accent2:     #00d4aa;
+      --accent3:     #ff6b6b;
+      --text:        #e8eaf2;
+      --text-muted:  #7b82a0;
+      --text-dim:    #4a5070;
+      --rank1:       #ffd700;
+      --rank2:       #c0c0c0;
+      --rank3:       #cd7f32;
+      --radius:      14px;
+      --radius-sm:   8px;
+      --shadow:      0 8px 32px #00000066;
+      --transition:  0.2s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── Background mesh ────────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 0%, #6c63ff18 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, #00d4aa12 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Layout ─────────────────────────────────────────────────────── */
+    .page { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 0 20px 80px; }
+
+    /* ── Header ─────────────────────────────────────────────────────── */
+    header {
+      padding: 48px 0 32px;
+      text-align: center;
+    }
+
+    .logo-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--accent)22, var(--accent2)22);
+      border: 1px solid var(--accent)44;
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 12px; font-weight: 600;
+      color: var(--accent2);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #e8eaf2 30%, var(--accent) 70%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 36px;
+    }
+
+    /* ── Language tabs ──────────────────────────────────────────────── */
+    .tabs {
+      display: inline-flex;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 4px;
+      gap: 4px;
+      margin-bottom: 28px;
+    }
+
+    .tab {
+      padding: 8px 24px;
+      border-radius: 100px;
+      font-size: 14px; font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+    .tab:not(.active):hover { color: var(--text); }
+
+    /* ── Search box ─────────────────────────────────────────────────── */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .search-icon {
+      position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+      color: var(--text-dim); font-size: 18px; pointer-events: none;
+    }
+
+    #query-input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      padding: 18px 130px 18px 50px;
+      outline: none;
+      transition: var(--transition);
+    }
+    #query-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    #query-input::placeholder { color: var(--text-dim); }
+
+    #search-btn {
+      position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 22px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    #search-btn:hover { filter: brightness(1.15); transform: translateY(-50%) scale(1.02); }
+    #search-btn:active { transform: translateY(-50%) scale(0.98); }
+    #search-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: translateY(-50%); }
+
+    /* ── Suggestions ────────────────────────────────────────────────── */
+    .suggestions-label {
+      font-size: 12px; font-weight: 500;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    .chip {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+    }
+    .chip:hover { border-color: var(--accent); color: var(--text); background: var(--bg-card2); }
+
+    /* ── Status bar ─────────────────────────────────────────────────── */
+    #status-bar {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+    #status-bar.info  { background: #1a2440; border: 1px solid #2a3a60; color: #6fa3e8; display: flex; }
+    #status-bar.warn  { background: #241a14; border: 1px solid #4a2e18; color: #e8a06f; display: flex; }
+    #status-bar.error { background: #241414; border: 1px solid #4a1818; color: #e87070; display: flex; }
+
+    /* ── Spinner ────────────────────────────────────────────────────── */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Results header ─────────────────────────────────────────────── */
+    #results-header {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .results-count { font-size: 13px; color: var(--text-muted); }
+    .badge-precomp {
+      background: var(--accent2)22;
+      border: 1px solid var(--accent2)44;
+      color: var(--accent2);
+      font-size: 11px; font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 100px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Restaurant cards ───────────────────────────────────────────── */
+    #results { display: flex; flex-direction: column; gap: 14px; }
+
+    .rest-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: var(--transition);
+      animation: fadeUp 0.35s ease both;
+    }
+    .rest-card:hover { border-color: var(--border-hi); box-shadow: var(--shadow); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px 14px;
+      cursor: pointer;
+    }
+
+    .rank-badge {
+      min-width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .rank-1 { background: #ffd70022; border: 1px solid #ffd70055; color: var(--rank1); }
+    .rank-2 { background: #c0c0c022; border: 1px solid #c0c0c055; color: var(--rank2); }
+    .rank-3 { background: #cd7f3222; border: 1px solid #cd7f3255; color: var(--rank3); }
+    .rank-n { background: var(--bg-card2); border: 1px solid var(--border); color: var(--text-muted); font-size: 13px; }
+
+    .rest-info { flex: 1; min-width: 0; }
+
+    .rest-name {
+      font-size: 16px; font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+
+    .rest-cats {
+      font-size: 12px; color: var(--text-muted);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .score-col {
+      text-align: right; flex-shrink: 0;
+    }
+
+    .score-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px; font-weight: 500;
+      color: var(--accent2);
+    }
+
+    .score-label { font-size: 10px; color: var(--text-dim); letter-spacing: 0.05em; text-transform: uppercase; }
+
+    .score-bar-wrap {
+      width: 80px; height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      transition: width 0.6s ease;
+    }
+
+    .expand-icon {
+      color: var(--text-dim);
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: transform var(--transition);
+    }
+    .rest-card.open .expand-icon { transform: rotate(180deg); }
+
+    /* ── Explanation panel ──────────────────────────────────────────── */
+    .explanation {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+    .rest-card.open .explanation { max-height: 800px; }
+
+    .explanation-inner {
+      padding: 0 20px 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .ev-label {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 12px 0 10px;
+    }
+
+    .sentence-item {
+      display: flex;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      transition: var(--transition);
+    }
+    .sentence-item:hover { border-color: var(--border-hi); }
+    .sentence-item:last-child { margin-bottom: 0; }
+
+    .ev-rank {
+      min-width: 22px; height: 22px;
+      border-radius: 6px;
+      background: var(--accent)22;
+      border: 1px solid var(--accent)44;
+      color: var(--accent);
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .sentence-text {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .ev-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    /* ── Thai sentence items (no restaurant grouping) ────────────────── */
+    .thai-item {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+      transition: var(--transition);
+      animation: fadeUp 0.3s ease both;
+    }
+    .thai-item:hover { border-color: var(--border-hi); box-shadow: var(--shadow); }
+
+    .thai-rank {
+      min-width: 32px; height: 32px;
+      border-radius: 9px;
+      background: var(--accent2)22;
+      border: 1px solid var(--accent2)44;
+      color: var(--accent2);
+      font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .thai-content { flex: 1; }
+
+    .thai-text {
+      font-size: 15px;
+      line-height: 1.7;
+      margin-bottom: 6px;
+    }
+
+    .thai-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .meta-pill {
+      font-size: 11px; font-weight: 500;
+      padding: 2px 9px;
+      border-radius: 100px;
+    }
+    .pill-sys  { background: var(--accent)22;  border: 1px solid var(--accent)44;  color: var(--accent); }
+    .pill-star { background: #ffd70022;         border: 1px solid #ffd70044;        color: var(--rank1); }
+    .pill-score { background: var(--accent2)22; border: 1px solid var(--accent2)44; color: var(--accent2); }
+
+    /* ── Empty state ────────────────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-dim);
+      display: none;
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-msg  { font-size: 15px; line-height: 1.6; max-width: 360px; margin: 0 auto; }
+
+    /* ── Footer ─────────────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 40px 20px 20px;
+      color: var(--text-dim);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    /* ── Responsive ─────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .score-bar-wrap { display: none; }
+      .score-val { font-size: 15px; }
+      .rest-name { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-badge">🌸 Group Flower · AIT DSAI</div>
+    <h1>Explainable Food Recommender</h1>
+    <p class="subtitle">
+      Dense sentence retrieval ranked by top-10 mean aggregation,
+      with review-sentence explanations. English evaluation on RIRD;
+      Thai taste case study on Wongnai.
+    </p>
+
+    <!-- Language tabs -->
+    <div class="tabs">
+      <button class="tab active" data-lang="en" onclick="switchLang('en')">🇺🇸 English (RIRD)</button>
+      <button class="tab" data-lang="th" onclick="switchLang('th')">🇹🇭 Thai (Wongnai)</button>
+    </div>
+  </header>
+
+  <!-- Search -->
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input id="query-input" type="text"
+      placeholder="e.g. I want a cozy place with good cocktails"
+      autocomplete="off"
+      spellcheck="false"
+      aria-label="Search query" />
+    <button id="search-btn" onclick="submitQuery()">Search</button>
+  </div>
+
+  <div class="suggestions-label" id="sugg-label">Try a query</div>
+  <div class="suggestions" id="suggestions"></div>
+
+  <!-- Status bar -->
+  <div id="status-bar" role="status"></div>
+
+  <!-- Results header -->
+  <div id="results-header">
+    <span class="results-count" id="results-count"></span>
+    <span class="badge-precomp" id="precomp-badge" style="display:none">⚡ Pre-computed</span>
+  </div>
+
+  <!-- Results container -->
+  <div id="results"></div>
+
+  <!-- Empty state -->
+  <div class="empty-state" id="empty-state">
+    <div class="empty-icon">🍽️</div>
+    <p class="empty-msg">Type a query above and hit Search to get restaurant recommendations with explanation sentences.</p>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>Explainable Reviewed-Item Retrieval · Group Flower · AIT DSAI 2026</p>
+  <p>Model: <code>paraphrase-multilingual-mpnet-base-v2</code> · Dataset: RIRD (English), Wongnai (Thai)</p>
+</footer>
+
+<script>
+  // ── State ──────────────────────────────────────────────────────────────
+  let currentLang = 'en';
+  let allSuggestions = { en: [], th: [] };
+
+  // ── Init ───────────────────────────────────────────────────────────────
+  async function init() {
+    await loadSuggestions('en');
+    await loadSuggestions('th');
+    renderSuggestions(currentLang);
+
+    document.getElementById('query-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitQuery();
+    });
+  }
+
+  async function loadSuggestions(lang) {
+    try {
+      const res = await fetch(`/api/queries?lang=${lang}`);
+      const data = await res.json();
+      allSuggestions[lang] = data.queries || [];
+    } catch (err) {
+      console.warn('Could not load suggestions for', lang, err);
+    }
+  }
+
+  function renderSuggestions(lang) {
+    const wrap  = document.getElementById('suggestions');
+    const label = document.getElementById('sugg-label');
+    const qs    = allSuggestions[lang];
+    // Show up to 8 suggestions
+    const shown = qs.length > 8 ? qs.sort(() => Math.random() - 0.5).slice(0, 8) : qs;
+
+    label.textContent = lang === 'th'
+      ? 'เลือกจากคำค้นหาที่มีให้'
+      : 'Try a query';
+
+    wrap.innerHTML = shown.map(q =>
+      `<div class="chip" onclick="useChip(this.dataset.q)" data-q="${escHtml(q)}">${escHtml(q)}</div>`
+    ).join('');
+  }
+
+  function useChip(q) {
+    document.getElementById('query-input').value = q;
+    submitQuery();
+  }
+
+  // ── Language switch ────────────────────────────────────────────────────
+  function switchLang(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.lang === lang);
+    });
+    const input = document.getElementById('query-input');
+    input.value = '';
+    input.placeholder = lang === 'th'
+      ? 'เช่น อยากกินอะไรเปรี้ยวๆ หรือของหวานถูกๆ'
+      : 'e.g. A bar with a patio and good beer';
+    clearResults();
+    renderSuggestions(lang);
+  }
+
+  // ── Query ──────────────────────────────────────────────────────────────
+  async function submitQuery() {
+    const query = document.getElementById('query-input').value.trim();
+    if (!query) return;
+
+    setLoading(true);
+    clearResults();
+    showStatus('info', '<div class="spinner"></div> Retrieving restaurants…');
+
+    try {
+      const res = await fetch('/api/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, lang: currentLang, n_results: 10 }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showStatus('error', '⚠ ' + (data.detail || 'Request failed'));
+        return;
+      }
+
+      if (data.error) {
+        showStatus('warn', '⚠ ' + data.error + (data.hint ? ' — ' + data.hint : ''));
+        return;
+      }
+
+      hideStatus();
+
+      if (data.matched_query) {
+        showStatus('info', `ℹ Matched to: <em>"${escHtml(data.matched_query)}"</em>`);
+      }
+
+      if (currentLang === 'th') {
+        renderThaiResults(data);
+      } else {
+        renderEnResults(data);
+      }
+    } catch (err) {
+      showStatus('error', '⚠ Network error: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ── English results ────────────────────────────────────────────────────
+  function renderEnResults(data) {
+    const wrap    = document.getElementById('results');
+    const header  = document.getElementById('results-header');
+    const count   = document.getElementById('results-count');
+    const badge   = document.getElementById('precomp-badge');
+    const empty   = document.getElementById('empty-state');
+
+    if (!data.results || data.results.length === 0) {
+      empty.style.display = 'block';
+      return;
+    }
+
+    header.style.display = 'flex';
+    count.textContent = `${data.results.length} restaurants ranked`;
+    badge.style.display = data.is_precomputed ? 'inline-block' : 'none';
+
+    const maxScore = Math.max(...data.results.map(r => r.score));
+
+    data.results.forEach((r, idx) => {
+      const rankClass  = idx < 3 ? `rank-${idx + 1}` : 'rank-n';
+      const rankLabel  = idx < 3
+        ? ['🥇','🥈','🥉'][idx]
+        : `#${r.rank}`;
+      const fillPct    = Math.round((r.score / (maxScore || 1)) * 100);
+      const sentences  = r.explanation.map((s, si) => `
+        <div class="sentence-item">
+          <div class="ev-rank">${si + 1}</div>
+          <div class="sentence-text">${escHtml(s.text)}</div>
+          <div class="ev-score">${s.score.toFixed(3)}</div>
+        </div>`).join('');
+
+      const card = document.createElement('div');
+      card.className = 'rest-card';
+      card.style.animationDelay = `${idx * 55}ms`;
+      card.innerHTML = `
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <div class="rank-badge ${rankClass}">${rankLabel}</div>
+          <div class="rest-info">
+            <div class="rest-name">${escHtml(r.restaurant_name)}</div>
+            <div class="rest-cats">${escHtml(r.categories || 'Restaurant')}</div>
+          </div>
+          <div class="score-col">
+            <div class="score-val">${r.score.toFixed(3)}</div>
+            <div class="score-label">Score</div>
+            <div class="score-bar-wrap">
+              <div class="score-bar-fill" style="width:${fillPct}%"></div>
+            </div>
+          </div>
+          <div class="expand-icon">▾</div>
+        </div>
+        <div class="explanation">
+          <div class="explanation-inner">
+            <div class="ev-label">🗨 Supporting Review Sentences</div>
+            ${sentences}
+          </div>
+        </div>`;
+      wrap.appendChild(card);
+
+      // Auto-open top-3
+      if (idx < 3) toggleCard(card);
+    });
+  }
+
+  function toggleCard(card) {
+    card.classList.toggle('open');
+  }
+
+  // ── Thai results ───────────────────────────────────────────────────────
+  function renderThaiResults(data) {
+    const wrap  = document.getElementById('results');
+    const header = document.getElementById('results-header');
+    const count  = document.getElementById('results-count');
+    const badge  = document.getElementById('precomp-badge');
+    const empty  = document.getElementById('empty-state');
+
+    if (!data.results || data.results.length === 0) {
+      empty.style.display = 'block';
+      return;
+    }
+
+    header.style.display = 'flex';
+    count.textContent = `${data.results.length} sentences retrieved`;
+    badge.style.display = 'inline-block';
+
+    data.results.forEach((r, idx) => {
+      // Thai results are flat sentence objects from retrieval.py
+      const item = document.createElement('div');
+      item.className = 'thai-item';
+      item.style.animationDelay = `${idx * 40}ms`;
+
+      const sys   = r.system  || '';
+      const star  = r.star !== undefined && r.star !== '' ? `${r.star}★` : '';
+      const score = typeof r.score === 'number' ? r.score.toFixed(3) : '';
+      const text  = r.text || '';
+
+      item.innerHTML = `
+        <div class="thai-rank">${idx + 1}</div>
+        <div class="thai-content">
+          <div class="thai-text">${escHtml(text)}</div>
+          <div class="thai-meta">
+            ${sys   ? `<span class="meta-pill pill-sys">${escHtml(sys)}</span>` : ''}
+            ${star  ? `<span class="meta-pill pill-star">${star}</span>` : ''}
+            ${score ? `<span class="meta-pill pill-score">${score}</span>` : ''}
+          </div>
+        </div>`;
+      wrap.appendChild(item);
+    });
+  }
+
+  // ── UI helpers ─────────────────────────────────────────────────────────
+  function setLoading(on) {
+    const btn = document.getElementById('search-btn');
+    btn.disabled = on;
+    btn.textContent = on ? '…' : 'Search';
+  }
+
+  function showStatus(type, html) {
+    const bar = document.getElementById('status-bar');
+    bar.className = type;
+    bar.innerHTML = html;
+  }
+
+  function hideStatus() {
+    const bar = document.getElementById('status-bar');
+    bar.className = '';
+    bar.innerHTML = '';
+    bar.style.display = 'none';
+  }
+
+  function clearResults() {
+    document.getElementById('results').innerHTML = '';
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('results-header').style.display = 'none';
+    document.getElementById('precomp-badge').style.display = 'none';
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // ── Boot ───────────────────────────────────────────────────────────────
+  init();
+</script>
+</body>
+</html>

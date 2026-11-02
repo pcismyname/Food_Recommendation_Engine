@@ -1,0 +1,2 @@
+n_pairs,mean_drop_shown,mean_drop_random,mean_gap,CI_lo,CI_hi,p_onetail,baseline_ndcg10,ndcg10_after_shown,ndcg10_after_rand,delta_ndcg10_shown,delta_ndcg10_rand
+300,48.0,48.0,0.0,0.0,0.0,1.0,0.6815,0.3793,0.3793,-0.3023,-0.3023

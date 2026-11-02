@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: food-recommender:latest
+    container_name: food_recommender
+    ports:
+      - "8000:8000"
+    # In local dev, mount data directories as volumes so you don't need to
+    # rebuild the image every time a CSV changes.
+    volumes:
+      - ./baselines/cache:/app_root/baselines/cache:ro
+      - ./thai/results:/app_root/thai/results:ro
+      - ./datasets:/app_root/datasets:ro
+      - model_cache:/model_cache
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TRANSFORMERS_CACHE=/model_cache
+      - HF_HOME=/model_cache
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 15s
+      timeout: 5s
+      start_period: 40s
+      retries: 3
+
+volumes:
+  model_cache:
+    driver: local

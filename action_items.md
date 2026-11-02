@@ -1,9 +1,11 @@
 # Action Items — Group Flower
 
-Last updated 2026-10-19.
+Last updated 2026-11-02.
 
-**Next deadline: Monday 2026-10-19, 11:59 PM** — updated report (PDF) and slides (PDF).
-Progress presentation on Tuesday 2026-10-20: 10 minutes plus 5 minutes Q&A.
+**Progress presentation:** ✅ Completed 2026-10-20.
+**Next deadline: Final submission — December 1** — report (PDF, AIT thesis template), slides (PDF), and code.
+Presentation: 10 minutes plus 5 minutes Q&A. Focus on bullets 5–8 (methodology through conclusions);
+bullets 1–4 were covered in the proposal/progress presentations.
 
 ---
 
@@ -20,9 +22,9 @@ measured English results and a qualitative Thai demo; coherent report and slides
 | # | Concern | What it means for us | Tasks |
 |---|---|---|---|
 | F1 | Application claims don't match the evaluation | RIRD tests broad restaurant preferences in English, not Thai taste. Wongnai has no restaurant ids, so it can't support restaurant-level evaluation. Our "Thai food" claims are unmeasured. | C1–C7, D2 |
-| F2 | BM25 and dense use different units; fusion biased by review volume | v1 BM25 scored one concatenated document per restaurant, dense scored mean-pooled reviews. Max / top-k fusion favours restaurants with more reviews (406 to 2,281 reviews per restaurant in RIRD). | A1–A4 |
+| F2 | BM25 and dense use different units; fusion biased by review volume | v1 BM25 scored one concatenated document per restaurant, dense scored mean-pooled reviews. Max / top-k fusion favours restaurants with more reviews (406 to 2,281 reviews per restaurant in RIRD). | A1–A4 ✅ |
 | F3 | No evidence for explainability | A top-scoring sentence can be relevant without being a complete or faithful explanation. Explanation quality has not been evaluated. | B1, B2 |
-| F4 | Check more literature | Read and cite the three papers below. | D1 |
+| F4 | Check more literature | Read and cite the three papers below. | D1 ✅ |
 
 Papers the professor pointed to:
 
@@ -38,73 +40,74 @@ Papers the professor pointed to:
 - First half → B1 (faithfulness) and B2 (human support rating).
 - Second half → C1–C7 (Thai taste test set). Expect a partial answer: sentence level on Thai, not restaurant level.
 
-### 1.2 Requirements for the progress submission (due 2026-10-19)
+### 1.2 Requirements for the final submission (December 1)
 
-**Presentation (10 min) must cover:**
+**Presentation (10 min) must cover (focus on bullets 5–8):**
 
-1. Project overview — problem, objectives, datasets, methodology (brief).
-2. Responses to previous feedback — how each comment above was addressed.
-3. Progress and preliminary results — experiments done, findings, challenges.
-4. Next steps — remaining tasks and plan.
+1. ~~Project overview — problem, objectives, datasets, methodology (brief).~~ (covered in proposal)
+2. ~~Responses to previous feedback.~~ (covered in progress presentation)
+3. ~~Progress and preliminary results.~~ (covered in progress presentation)
+4. ~~Next steps.~~ (covered in progress presentation)
+5. **Methodology** — full pipeline: EDA, preprocessing, BM25 vs. dense, aggregation, explanation extraction.
+6. **Model evaluation results** — nDCG@10, MAP with CIs; B1 faithfulness; B2 human support kappa; Thai nDCG@10 / P@10.
+7. **Discussions** — comparison with RIRD fine-tuned baseline (MAP 0.626); performance / interpretability / complexity trade-offs vs. competing systems.
+8. **Conclusions** — summary of contributions; limitations; future work.
 
-**Updated report must:**
+**Final report must:**
 
-- Include a **dedicated feedback summary page** addressing each comment: action taken, revision made, or reason for not implementing it.
-- Update methodology, experimental results and remaining work.
-
-**Grading notes:** worth 5%. Show meaningful progress, not a repeat of the proposal. Preliminary
-results must be backed by experiments and analysis. Negative or inconclusive findings are fine if
-properly investigated and explained.
+- Use the **AIT thesis template** from the AIT Language Center.
+- Include a detailed explanation of how the system **outperforms others on Kaggle/HuggingFace**, highlighting unique features, advantages, and user benefits.
+- Describe the **baseline model** (BM25 review-level, concatenated document) vs. the **proposed model** (dense sentence-level, top-10 mean aggregation).
+- Properly cite all figures and datasets obtained from the internet.
+- Submit both **report PDF** and **slides PDF**.
 
 ---
 
 ## 2. Progress so far
 
-[baselines/baseline_models_v2.ipynb](baselines/baseline_models_v2.ipynb) has been run at **review level**:
+### Track A — Fair fusion (English / RIRD) ✅ all done
 
-- BM25 and dense now score the **same unit** (review) with the **same aggregation** (max, mean, top-3/5/10 mean). This addresses the unit half of F2.
-- Added bootstrap 95% CIs, paired randomization tests with Holm correction, and three query-independent floors (random, review count, popularity).
-- **Dense beats BM25 under every aggregation**, all significant after Holm correction (nDCG@10 gap +0.03 to +0.09).
-- **Best model:** Dense, top-10 mean — nDCG@10 0.668 [0.625, 0.711], MAP 0.608. The RIRD paper's fine-tuned best is MAP 0.626, so off-the-shelf dense is already close.
-- **Top-k mean beats max and mean** for both models; max is the weakest dense variant.
-- All models beat the popularity floor except BM25 mean (not significant).
-- **Sentence-level run (A1/A2) done 2026-10-18** by Sam on Colab
-  ([baselines/baseline_models_v2_sentence.ipynb](baselines/baseline_models_v2_sentence.ipynb)). Same
-  pipeline with `UNIT = 'sentence'`:
-  - **Best model:** Dense, top-10 mean — nDCG@10 0.682, MAP 0.618 (review level: 0.668 / 0.608).
-  - **Dense beats BM25** under max and all top-k means (+0.065 to +0.077 nDCG@10, Holm p ≤ 0.004);
-    under mean the gap (+0.039) is **not significant** (p = 0.072).
-  - **BM25 gets worse with sentences** (top-10 mean 0.609 vs 0.634 at review level); dense mean also
-    drops (0.587 vs 0.642). Sentence units help dense top-k only.
-  - Dense top-k beat the pooled-vector baseline (top-10 mean +0.067, Holm p = 0.009); BM25 max and
-    mean are significantly worse than the concatenated-document baseline.
-  - BM25 max and BM25 mean no longer beat the popularity floor (Holm p = 0.076).
-  - No sentence exceeds the 256-token limit (review level: 19.9%).
-  - Not done yet: a paired review-vs-sentence test, and A3 at sentence level (A3 is defined for
-    reviews only).
-  - The result CSVs (`results_sentence.csv`, `per_query_sentence.csv`, `rankings_sentence.csv`,
-    `evidence_sentence.csv`) are gitignored, so they exist only in local `baselines/cache/` copies.
-- **Monday 2026-10-19 submission:** the sentence-level results are **not** in the progress report or
-  slides. They are presented as **future work / next step**, since they arrived after the report was
-  written. They go into the final report.
-- **Thai 10k retrieval run (C3) done 2026-10-19** by Ton on Colab (T4 GPU,
-  [thai/thai_retrieval_10k_colab.ipynb](thai/thai_retrieval_10k_colab.ipynb)): 10,000 Wongnai reviews
-  (seed 42) → 93,810 sentences (9.4 per review); BM25 and dense
-  (`paraphrase-multilingual-mpnet-base-v2`) top 10 for all 24 frozen queries. Output:
-  [thai/results/topk_n10000_s42.csv](thai/results/topk_n10000_s42.csv) (480 rows, query text matches
-  the frozen `thai_queries.csv`). The two systems barely overlap: mean 1.2 shared sentences in the
-  top 10 (combo 0.9, negation 1.2, single 1.4; T09 is the outlier with 7). So the pool is 452
-  (query, sentence) pairs, mean 18.8 per query. No BM25 zero-score hits in any top 10.
-- **A3 completed:** every restaurant was sampled to 400 reviews with `SEED = 42`, reusing the
-  review-level score matrices and cached embeddings. The controlled best run was Dense top-10 mean:
-  nDCG@10 0.672, MAP 0.611, compared with 0.668 and 0.608 before control. Pooled uncontrolled
-  score/count Pearson correlations were 0.054–0.118 for BM25/dense max and top-k variants; after
-  control, correlation with original uncapped counts fell to -0.009–0.019 (Pearson) and
-  -0.021–0.001 (Spearman). Correlation with the controlled count is correctly undefined because
-  every restaurant has exactly 400 reviews.
-- **A4 completed:** the executed notebook saved 50,000 restaurant-ranking rows and 500,000 evidence
-  rows for the 10 BM25/dense review-level aggregation runs. The exports include query, model,
-  aggregation, restaurant rank/score, evidence rank/score, source review row ID and text.
+- **A1/A2 complete** at review level and sentence level. BM25 and dense now score the same unit with the
+  same aggregation variants (max, mean, top-3/5/10 mean), with bootstrap 95% CIs and Holm-corrected
+  paired tests. [baseline_models_v2.ipynb](baselines/baseline_models_v2.ipynb) (review),
+  [baseline_models_v2_sentence.ipynb](baselines/baseline_models_v2_sentence.ipynb) (sentence).
+  - **Best result:** Dense top-10 mean — nDCG@10 **0.682**, MAP **0.618** (sentence level).
+    Review level: 0.668 / 0.608. RIRD fine-tuned reference: MAP 0.626.
+  - Dense beats BM25 under all aggregations at review level (all Holm-significant). At sentence level,
+    dense beats BM25 for max and top-k means (Holm p ≤ 0.004); mean gap not significant (p = 0.072).
+  - BM25 gets worse with sentences (top-10 mean 0.609 vs 0.634 at review level); dense mean also drops
+    (0.587 vs 0.642). Sentence units help dense top-k only.
+  - Sentence result CSVs are gitignored; exist only in local `baselines/cache/` copies.
+- **A3 complete:** volume control — every restaurant sampled to 400 reviews (SEED=42). Score/count
+  correlation drops to near zero (Pearson −0.009 to +0.019) after control; effect on nDCG@10 ≤ 0.011.
+- **A4 complete:** 50,000 ranking rows + 500,000 evidence rows exported (query, model, aggregation,
+  rank/score, source review row ID and text).
+- **Still to do:** paired review-vs-sentence significance test (A5).
+
+### Track C — Thai (Wongnai)
+
+- **C1/C1b complete:** 24 Thai taste queries frozen 2026-10-17 ([thai/thai_queries.csv](thai/thai_queries.csv)).
+- **C2 complete:** PyThaiNLP sentence pipeline on 2,000-review subsample; segmentation spot-check done;
+  qualitative T02/T11/T20 examples documented.
+- **C3 complete (2026-10-19):** Ton ran 10k Colab notebook on T4 GPU
+  ([thai/thai_retrieval_10k_colab.ipynb](thai/thai_retrieval_10k_colab.ipynb)).
+  - 10,000 Wongnai reviews (seed 42) → 93,810 sentences (9.4 per review).
+  - BM25 and dense (`paraphrase-multilingual-mpnet-base-v2`) top-10 for all 24 frozen queries.
+  - Output: [thai/results/topk_n10000_s42.csv](thai/results/topk_n10000_s42.csv) (480 rows).
+  - Pool built with [thai/build_label_pool.py](thai/build_label_pool.py): **452 blind pairs**, mean 18.8
+    per query (range 13–20). Two systems barely overlap: mean 1.2 shared sentences in top 10. No BM25
+    zero-score hits in any top 10.
+  - Files committed: [thai/labels/label_sheet.csv](thai/labels/label_sheet.csv) (452 pairs, to be
+    labelled by Ton), [thai/labels/label_sheet_annotator2.csv](thai/labels/label_sheet_annotator2.csv)
+    (60 pairs for second annotator / C5), [thai/labels/pool_key.csv](thai/labels/pool_key.csv) (hidden
+    key; annotators must not open it).
+
+### Writing / Report
+
+- **D1 complete:** three professor-assigned papers added to related work.
+- **D3 complete:** feedback summary page in [report/progress/main.pdf](report/progress/main.pdf).
+- **D4 complete:** progress report PDF and slides PDF submitted (2026-10-19).
+- **E1 in progress:** annotation guidelines drafted in [thai/annotation_guidelines.md](thai/annotation_guidelines.md); Ton to recheck using its own checklist before labelling starts.
 
 ---
 
@@ -112,136 +115,193 @@ properly investigated and explained.
 
 Status: `[ ]` not started, `[/]` in progress, `[x]` done.
 **Thai?** marks tasks that need someone who reads Thai.
-**Phase:** 1 = due for the progress submission (Monday 2026-10-19), 2 = after the presentation.
-**Priority:** High / Medium / Low within that phase.
+**Priority:** High / Medium / Low for the final submission.
 
 ### Owners
 
-| Area | Owner | Focus until Monday |
-|---|---|---|
-| A. Fair fusion study (English) | **Sam** | **Main focus.** A3 first, then the sentence-level rerun |
-| B. Explanation evaluation (English) | **Sam** | Not before Monday; starts in Phase 2 |
-| C. Thai taste test set | **Ton** | C1 and a first Thai example; continues in Phase 2 |
-| D. Writing, E. Guidelines | Not assigned yet | D1, D3, D4 are due Monday |
-
-### A. Fair fusion study on RIRD (English) — answers F2 · Owner: Sam
-
-| ID | Task | Phase · Priority | Thai? | Depends on |
-|---|---|---|---|---|
-| A3 | `[x]` Volume control completed: every restaurant sampled to 400 reviews with `SEED = 42`; all aggregations rerun and score/count correlations plus controlled metrics reported | **1 · High** (do first) | No | Can run now on the review-level cache |
-| A1 | `[x]` Shared retrieval unit for BM25 and dense. Done at review level (v2) and at sentence level (2026-10-18, [baseline_models_v2_sentence.ipynb](baselines/baseline_models_v2_sentence.ipynb)) | **1 · High** | No | — |
-| A2 | `[x]` Same fusion variants on both models, with CIs and significance tests. Done at review and sentence level (results in §2). Still to add: paired review-vs-sentence test. **Sentence run complete 2026-10-18:** 240,660 sentences; Dense top-10 mean nDCG@10 0.682, MAP 0.618; Dense beats BM25 for max and top-k mean after Holm correction, but not for mean | **1 · High** | No | A1 |
-| A4 | `[x]` Saved per-query restaurant rankings and top-10 selected source units, including source row IDs and text; executed output contains 50,000 ranking rows and 500,000 evidence rows | 1 · Medium | No | — |
-
-The sentence-level run finished on 2026-10-18 after the progress report was written. Its results
-belong in the final report and provide the prerequisite outputs for B1 and B2.
-
-### B. Explanation evaluation on RIRD (English) — answers F3 · Owner: Sam
-
-| ID | Task | Phase · Priority | Thai? | Depends on |
-|---|---|---|---|---|
-| B1 | `[ ]` Faithfulness (automatic): delete the top-k shown sentences, re-score, compare the rank drop against deleting k random sentences | 2 · High | No | A2 at sentence level |
-| B2 | `[ ]` Support (human): export shown sentences for ~15–30 queries × top 3 restaurants; two people label 0/1/2 separately; report kappa and % rated as supporting. Sam prepares the sheet; Sam and Ton both label | 2 · High | No | A2 at sentence level, E1 |
-
-### C. Thai taste test set on Wongnai — answers F1 · Owner: Ton
-
-| ID | Task | Phase · Priority | Thai? | Depends on |
-|---|---|---|---|---|
-| C1 | `[x]` Write 15–30 Thai taste queries (sour, spicy, sweet, rich, cheap, combinations, a few negations). 24 queries in [thai/thai_queries.csv](thai/thai_queries.csv): drafted by an LLM, then revised by an LLM against the rules in [thai/query_guidelines.md](thai/query_guidelines.md). The original draft is kept in [thai/thai_queries_ai_draft.csv](thai/thai_queries_ai_draft.csv) | **1 · High** | **Yes** | — |
-| C1b | `[x]` Ton reviews and rewords the revised queries in natural Thai using the checklist in [thai/query_guidelines.md](thai/query_guidelines.md), **without opening the notebook outputs**, then signs off and freezes the file. After that, rerun [thai/thai_retrieval.ipynb](thai/thai_retrieval.ipynb). **Signed off by Ton 2026-10-17 with no changes; queries frozen; notebook rerun on the frozen queries** | **1 · High** | **Yes** | C1 |
-| C2 | `[x]` Split Wongnai reviews into sentences with PyThaiNLP, build a Thai BM25 index, encode and cache sentences. Spot-check the segmentation. For Monday, one qualitative Thai query → top sentences example is enough. Pipeline built and run on a 2,000-review subsample (19,294 sentences, [thai/thai_retrieval.ipynb](thai/thai_retrieval.ipynb)). Spot-check done (§2a–2b): good enough for retrieval; ~0.7% of sentences cut at abbreviation dots, ~1.6% merged long sentences. Qualitative T02/T11/T20 notes and takeaways written (§6a, §8). Notes drafted by Claude, confirmed by Ton 2026-10-17 | 1 · Medium | Code: no. Spot-check: **yes** | — |
-| C3 | `[x]` For each query, pool the top sentences from BM25 and dense into one shuffled sheet that doesn't show which system found each sentence. **Corpus fixed at 10,000 reviews (decided 2026-10-18); do not change it once labelling starts.** **Retrieval run done 2026-10-19** on Colab ([thai/thai_retrieval_10k_colab.ipynb](thai/thai_retrieval_10k_colab.ipynb)) → [thai/results/topk_n10000_s42.csv](thai/results/topk_n10000_s42.csv), uploaded and checked (results in §2). **Label pool built 2026-10-19** with [thai/build_label_pool.py](thai/build_label_pool.py): [thai/labels/label_sheet.csv](thai/labels/label_sheet.csv) (452 blind pairs, 13–20 per query), `pool_key.csv` (hidden key; annotators must not open it) and `label_sheet_annotator2.csv` (60 pairs over all 24 queries for C5) | 2 · High | No | C1b, C2 |
-| C4 | `[ ]` Hand-label the sampled pairs 0/1/2 | 2 · High | **Yes** | C3, E1 |
-| C5 | `[ ]` Second opinion: a second Thai speaker labels 50–80 of the same pairs. Fallback: re-label 50 of your own pairs at least a week later. Start looking for a second Thai speaker now | 2 · Medium | **Yes** | C4 |
-| C6 | `[ ]` *Optional:* two LLMs from different providers label the full pool. Skip if the pool is small enough to label by hand | 2 · Low | No (but checking their output: **yes**) | C3, E1 |
-| C7 | `[/]` Agreement figures, then Thai nDCG@10 / P@10 for BM25 vs. dense. Script ready and tested on synthetic labels: [thai/score_labels.py](thai/score_labels.py) (`--partial` scores a pilot subset) | 2 · High | No | C4, C5 (C6 if used) |
-
-### D. Writing · Owner: not assigned yet
-
-| ID | Task | Phase · Priority | Thai? | Depends on |
-|---|---|---|---|---|
-| D3 | `[x]` **Feedback summary page** (Chapter 1 of [report/progress/main.pdf](report/progress/main.pdf)) for the progress report (one row per comment in 1.1: action taken / revision / reason not done) | **1 · High** | No | — |
-| D4 | `[/]` Progress report PDF and slides PDF, following the four sections in 1.2. **Report drafted** in [report/progress/](report/progress/) (Ton revising); **slides not started** | **1 · High** | No | D3, plus whatever of A is finished |
-| D1 | `[x]` Related work: add the three papers in 1.1 (Chapter 3 of the progress report) | **1 · High** | No | — |
-| D2 | `[ ]` Rewrite title, claims and limitations. Working title: "Explainable reviewed-item retrieval, with a Thai taste case study" | Draft: 1 · Medium. Final: 2 · High | No | Final after A3, B2, C7 |
-| D5 | `[ ]` Final report, slides and video | 2 · High | No | everything above |
-
-### E. Shared setup · Owner: not assigned yet
-
-| ID | Task | Phase · Priority | Thai? | Depends on |
-|---|---|---|---|---|
-| E1 | `[/]` Annotation guidelines in English: 0/1/2 scale, worked examples, decided edge-case rules, for both the Thai sheet and the explanation sheet. Drafted in [thai/annotation_guidelines.md](thai/annotation_guidelines.md) (real Wongnai examples, per-query rules, B2 appendix); Ton to recheck using its checklist | 2 · High (blocks all labelling; finish early in Phase 2) | Thai examples: **yes** | — |
+| Area | Owner |
+|---|---|
+| A. Fair fusion study (English) | **Sam** |
+| B. Explanation evaluation (English) | **Sam** |
+| C. Thai taste test set | **Ton** |
+| D. Writing | **Both** |
+| E. Annotation guidelines | **Ton** (finalize), **Sam** (B2 sheet prep) |
+| F. Final deliverables | **Both** |
 
 ---
 
-## 4. Plan
+### A. Fair fusion study on RIRD (English) — answers F2 · Owner: Sam
 
-### Phase 1 — before the progress submission (2026-10-15 to 10-19)
+| ID | Task | Priority | Thai? | Depends on |
+|---|---|---|---|---|
+| A1 | `[x]` Shared retrieval unit for BM25 and dense — review and sentence level | — | No | — |
+| A2 | `[x]` Same aggregation variants (max, mean, top-k) with CIs and Holm tests — review and sentence level | — | No | A1 |
+| A3 | `[x]` Volume control: every restaurant sampled to 400 reviews; score/count correlation near zero after control | — | No | A1 |
+| A4 | `[x]` Per-query ranking and evidence export (50k ranking rows + 500k evidence rows) | — | No | A2 |
+| A5 | `[x]` Paired review-vs-sentence test. Results in `cache/a5_review_vs_sentence_test.csv`, forest plot in `cache/a5_forest_plot.png`. **Key finding:** no variant shows a Holm-significant improvement from switching to sentences. Dense\|mean is significantly *worse* at sentence level (Holm p=0.0, Δ=−0.055). Only Dense\|top-10 mean shows a positive but non-significant gap (Δ=+0.013, Holm p=1.0). | Medium | No | A2 |
 
-Aim: show the fixed baselines, an honest answer to each comment, and a concrete plan.
+The sentence-level evidence output from A4 is the direct input for B1 and B2.
 
-| Order | Sam | Ton | Not assigned yet |
+---
+
+### B. Explanation evaluation on RIRD (English) — answers F3 · Owner: Sam
+
+| ID | Task | Priority | Thai? | Depends on |
+|---|---|---|---|---|
+| B1 | `[x]` **Faithfulness (automatic):** [b1_faithfulness.ipynb](baselines/b1_faithfulness.ipynb) executed. **Result: mean faithfulness gap = 0.000, p=1.0 (n.s.).** Shown and random deletions hurt rank equally (both mean rank drop = 48). nDCG@10 drops from 0.682 to 0.379 under either deletion — deletion is very destructive but not differentially so. Interpretation: the pooled evidence store is small (top-10 per restaurant) so random and shown deletions always hit the same sentences. See `cache/b1_faithfulness_summary.csv` and `cache/b1_faithfulness_plot.png`. | **High** | No | A4 ✅ |
+| B2 | `[/]` **Support (human):** [b2_export_support_sheet.py](baselines/b2_export_support_sheet.py) run. Sheets generated: `cache/b2_support_sheet.csv` (full, Sam labels), `cache/b2_support_sheet_ann2.csv` (40-pair subset, Ton labels), `cache/b2_support_key.csv` (hidden key). **Next: Sam fills `label` column (0/1/2) in `b2_support_sheet.csv`; Ton fills `b2_support_sheet_ann2.csv`. Then run [b2_score_agreement.py](baselines/b2_score_agreement.py).** | **High** | No | A4 ✅, E1 |
+
+---
+
+### C. Thai taste test set on Wongnai — answers F1 · Owner: Ton
+
+| ID | Task | Priority | Thai? | Depends on |
+|---|---|---|---|---|
+| C1 | `[x]` 24 frozen Thai taste queries in [thai/thai_queries.csv](thai/thai_queries.csv) | — | Yes | — |
+| C1b | `[x]` Ton review and sign-off 2026-10-17; queries frozen; notebook rerun | — | Yes | C1 |
+| C2 | `[x]` Sentence pipeline on 2,000-review subsample; segmentation spot-check done | — | Code: No. Spot-check: Yes | — |
+| C3 | `[x]` 10k Colab run → `topk_n10000_s42.csv` → blind label pool built. 452 pairs in [thai/labels/label_sheet.csv](thai/labels/label_sheet.csv). 60-pair annotator-2 subset in [thai/labels/label_sheet_annotator2.csv](thai/labels/label_sheet_annotator2.csv). Key in `pool_key.csv` (do not open). | — | No | C1b, C2 |
+| C4 | `[ ]` **Hand-label `label_sheet.csv`** — 0/1/2 per (query, sentence) pair following [thai/annotation_guidelines.md](thai/annotation_guidelines.md). Start with a pilot of ~30 pairs; check consistency before continuing. | **High** | **Yes** | C3, E1 |
+| C5 | `[ ]` **Second annotator** labels `label_sheet_annotator2.csv` (60 pairs). Find a second Thai speaker now; fallback is re-labelling 50 of your own pairs at least 1 week later. | **Medium** | **Yes** | C4 |
+| C6 | `[ ]` *Optional:* LLM labelling of the full pool. Skip if pool ≤ 300 pairs and hand-labelling is feasible. With 452 pairs this is borderline — decide after C4 pilot. | Low | No (output check: Yes) | C3, E1 |
+| C7 | `[/]` **Agreement + Thai metrics:** run [thai/score_labels.py](thai/score_labels.py) — exact %, Cohen's kappa, nDCG@10 and P@10 (BM25 vs. dense). Script ready and tested on synthetic labels; `--partial` flag scores pilot subset before all rows are labelled. | **High** | No | C4, C5 (C6 if used) |
+
+---
+
+### D. Writing · Owner: Both
+
+| ID | Task | Priority | Thai? | Depends on |
+|---|---|---|---|---|
+| D1 | `[x]` Related work — three professor-assigned papers added to progress report | — | No | — |
+| D3 | `[x]` Feedback summary page (progress report) | — | No | — |
+| D4 | `[x]` Progress report PDF + progress slides PDF submitted | — | No | — |
+| D2 | `[ ]` **Rewrite title, claims, and limitations** to match actual scope. Working title: *"Explainable reviewed-item retrieval, with a Thai taste case study."* Write once B2 and C7 numbers are in hand. | **High** | No | B2, C7 |
+
+---
+
+### E. Annotation guidelines · Owner: Ton (finalize), Sam (B2 sheet)
+
+| ID | Task | Priority | Thai? | Depends on |
+|---|---|---|---|---|
+| E1 | `[/]` **Finalize annotation guidelines:** Ton rechecks [thai/annotation_guidelines.md](thai/annotation_guidelines.md) using its own checklist (real Wongnai examples, per-query rules, B2 appendix). Must be signed off before C4 or B2 labelling starts. | **High — do first** | Thai examples: **Yes** | — |
+
+---
+
+### F. Final deliverables · Owner: Both
+
+| ID | Task | Priority | Thai? | Depends on |
+|---|---|---|---|---|
+| F1 | `[ ]` **Final report** — AIT thesis template. Sections: Introduction, Problem, Related Work, Datasets (≥3), Methodology (EDA → pipeline → evaluation), Results (A2 + B1 + B2 + C7), Discussion (vs. RIRD fine-tuned MAP 0.626 + Kaggle/HF systems), Conclusions. Cite all figures and datasets. | **High** | No | B1, B2, C7, D2 |
+| F2 | `[ ]` **Final presentation slides** — 10 min covering bullets 5–8. Lead with evaluation results; frame dense top-10 mean as proposed vs. BM25 review-level as baseline. Include key results table and one qualitative Thai example. | **High** | No | F1 draft |
+| F3 | `[ ]` **Code / repository cleanup** — all notebooks fully executed with outputs saved, dead code removed, `requirements.txt` verified, top-level README section on how to reproduce every result table. | **High** | No | B1, B2, C7 |
+| F4 | `[ ]` **Baseline comparison write-up** (section inside F1): (a) v1 baseline — BM25 concatenated docs vs. dense mean-pooled reviews; (b) proposed — sentence-level dense, top-10 mean, volume-controlled; (c) external reference — RIRD fine-tuned MAP 0.626. Argue outperformance in terms of performance, interpretability, and complexity. | **High** | No | A2, B1, B2 |
+| F5 | `[ ]` **Video** (if required by submission portal) — screen-capture walkthrough of notebook demo and key results. | Medium | No | F2, F3 |
+
+---
+
+### G. Demo app & AWS deployment · Owner: Sam
+
+FastAPI backend + single-page HTML/JS frontend, Dockerized for EC2. English tab: live pre-computed lookup for 100 RIRD queries + optional live inference for new queries. Thai tab: pre-computed lookup for 24 frozen Wongnai queries.
+
+| ID | Task | Priority | Depends on |
 |---|---|---|---|
-| 1 | ~~Run and inspect A3 volume control (review-level cache)~~ (done) | ~~C1b review and freeze Thai queries~~ (done) | D3 feedback summary page |
-| 2 | ~~Implement/run A4 ranking export~~ (done); ~~A1/A2 sentence-level rerun~~ (done; future work for Monday) | ~~C2 one qualitative Thai example~~ (done) | ~~D1 related work~~ (done) |
-| 3 | Summarize A3 findings, then draft D2 claims after A1/A2 | Revise the progress report | D4 slides (report drafted) |
+| G1 | `[/]` **Backend API** — [app/main.py](app/main.py) (FastAPI) + [app/retrieval.py](app/retrieval.py) (engine loads evidence_sentence.csv + topk_n10000_s42.csv at startup). Endpoints: `GET /`, `GET /api/queries?lang=`, `POST /api/query`, `GET /api/health`. **Code written; needs local test run.** | **High** | A4 ✅, C3 ✅ |
+| G2 | `[/]` **Frontend UI** — [app/static/index.html](app/static/index.html). Dark-mode single-page app: English tab shows ranked restaurant cards with expandable explanation sentences; Thai tab shows pooled sentence results. Chip autocomplete from known queries. **Code written; test with G1.** | **High** | G1 |
+| G3 | `[ ]` **Local Docker test** — `docker compose up --build`, verify both tabs work, check `/api/health`. Fix any import/path issues. | **High** | G1, G2 |
+| G4 | `[ ]` **EC2 deployment** — once professor provides instance ID/IP: SSH in, install Docker, `rsync` or `git clone` project, `docker build -t food-recommender . && docker run ...`. Open port 8000 in security group. Follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). | **High** | G3, professor provides EC2 access |
+| G5 | `[ ]` **Live inference (optional)** — uncomment the embeddings `COPY` line in [Dockerfile](Dockerfile) to enable arbitrary English query inference (requires t2.large, ~750 MB extra). Only do this if EC2 instance has ≥ 8 GB RAM. | Low | G4 |
 
-If time is short, present the sentence-level run and the Thai work as next steps; the review-level
-results in section 2 plus A3 are enough to show progress.
+---
 
-### Phase 2 — after the presentation, to the final deadline
+## 4. Plan (now → December 1)
 
-| Priority | Sam | Ton | Not assigned yet |
-|---|---|---|---|
-| High | B1, B2 (sheet + labelling with Ton) | C3, C4, C7; B2 labelling | E1 (early, blocks labelling), D2 final, D5 |
-| Medium | Finish any Phase 1 leftovers in A | C5 | |
-| Low | | C6 (optional) | |
+### Priority order (dependency-aware)
+
+```
+Start immediately (unblocked or nearly so):
+  1. E1   — Ton: finalize annotation guidelines → unblocks C4 and B2
+  2. B1   — Sam: faithfulness test on sentence evidence (fully unblocked)
+  3. B2   — Sam: prepare blind sheet; label once E1 is signed off
+
+After E1:
+  4. C4   — Ton: label Thai pool (pilot 30 pairs first, then continue)
+  5. C5   — Ton: second annotator labels annotator2 sheet (find person now)
+
+After C4 + C5:
+  6. C7   — Ton: score labels, compute Thai nDCG@10 / P@10 + kappa
+
+Anytime after A2:
+  7. A5   — Sam: add paired review-vs-sentence test to sentence notebook
+
+After B1, B2, C7:
+  8. D2   — Both: rewrite title / claims / limitations
+  9. F4   — Both: baseline comparison write-up
+  10. F1  — Both: final report (AIT thesis template)
+  11. F2  — Both: final slides
+  12. F3  — Sam: repository / notebook cleanup
+  13. F5  — Both: video (if required)
+```
+
+### Owner summary
+
+| Priority | Sam | Ton |
+|---|---|---|
+| **Do now** | Fill `cache/b2_support_sheet.csv` with 0/1/2 labels (open in Excel/Numbers, fill `label` col) | E1 (finalize guidelines), label `cache/b2_support_sheet_ann2.csv`; C4 pilot labelling |
+| **After labelling** | Run `python3 baselines/b2_score_agreement.py` for kappa + % supporting | C5 (second annotator), C7 (score Thai labels) |
+| **Report / slides** | F4 baseline write-up (use A5 + B1 results now available), F1/F2 | F1/F2 together |
 
 ---
 
 ## 5. What can run in parallel
 
-Can start **now**, independently of each other:
-
-- **Sam:** A3, A4 and the A1/A2 sentence-level run are complete; next is B1 on the sentence-level evidence
-- **Ton:** C1, C1b, C2 and the 10k retrieval run done; C3 label sheet built; next: recheck E1 guidelines, label the pool (C4, a pilot first), find a second annotator (C5)
-- **Unassigned:** D1, D3 (writing, English)
+- **Sam:** B1 is fully unblocked — start now. B2 sheet can be prepared in parallel while waiting for E1.
+- **Ton:** E1 can be done independently; C4 labelling starts immediately after E1. C5 annotator should be found this week.
+- The RIRD track (A, B) and Thai track (C) are independent until the final report.
 
 Dependency chains:
 
 ```
-A1 ──► A2 ──┬──► A3
-            ├──► B1
-            └──► B2 ◄── E1
+A4 (evidence export) ──► B1
+A4 (evidence export) ──► B2 ◄── E1
 
-C1 ──► C1b ──┐
-              ├──► C3 ──┬──► C4 ──► C5 ──┐
-C2 ───────────┘         │                ├──► C7
-                        └──► C6 ─────────┘   (C6 optional)
-          E1 ──► C4, C6
+C3 (done ✅) ──► C4 ──► C5 ──┐
+E1 ──────────────────────────┤
+C3 ──► C6 (optional) ────────┴──► C7
 
-D3 + current results ──► D4 (progress, Oct 19)
-A3, B1, B2, C7 ──► D2 (final) ──► D5
+B1, B2, C7 ──► D2 ──► F1 (report) ──► F2 (slides) ──► F3 (repo) ──► F5 (video)
+                └──► F4 (baseline comparison, inside F1)
 ```
-
-- The RIRD track (A, B) and the Thai track (C) are independent until the report.
-- **A2 at sentence level is the main bottleneck** for the explanation work (B1, B2).
-- **E1 blocks all labelling** (B2, C4, C6).
-- **Thai tasks (C1b, C2 spot-check, C4, C5, E1 examples) all fall on Ton**, so Ton should not also
-  carry the English code tasks.
 
 ---
 
-## 6. If time runs short, cut in this order
+## 6. Key numbers for the final presentation
 
-1. Drop C6 (LLM labelling) and hand-label a pool of ≤ 300 pairs.
-2. Shrink C1 to 15 queries.
-3. Shrink B2 to 15 queries.
-4. Drop the subsampling rerun in A3 but keep the score vs. review-count correlation.
+| Model | Unit | Aggregation | nDCG@10 | MAP |
+|---|---|---|---|---|
+| Dense **(proposed)** | Sentence | Top-10 mean | **0.682** | **0.618** |
+| Dense | Review | Top-10 mean | 0.668 | 0.608 |
+| BM25 (baseline) | Sentence | Top-10 mean | 0.609 | — |
+| BM25 (baseline) | Review | Top-10 mean | 0.634 | — |
+| RIRD fine-tuned (external reference) | — | — | — | 0.626 |
 
-Do not cut A2 at sentence level or B1; without them there is no answer to the professor's question.
+Our off-the-shelf dense already approaches the fine-tuned external reference (MAP 0.618 vs 0.626),
+with no domain adaptation. B1 and B2 add the interpretability argument.
 
-## 7. Out of scope
+---
+
+## 7. If time runs short, cut in this order
+
+1. Drop C6 (LLM labelling) — pool is 452 pairs; hand-label all of them.
+2. Shrink B2 to 15 queries (minimum for meaningful kappa).
+3. Drop C5 (second annotator) and use self-relabelling fallback.
+4. Drop A5 (paired review-vs-sentence test) — informative but not blocking any deliverable.
+
+**Do not cut B1 or C4–C7.** Without B1 there is no faithfulness answer; without C7 there is no
+Thai result — both are required to answer the professor's central question.
+
+---
+
+## 8. Out of scope
 
 - Thai restaurant-level ranking (Wongnai has no restaurant ids) — future work.
 - Fine-tuning or contrastive training of the encoder.
@@ -252,8 +312,14 @@ Do not cut A2 at sentence level or B1; without them there is no answer to the pr
 - A polished demo app; a notebook cell is enough.
 - Machine-translating RIRD into Thai.
 
-## 8. Open questions
+---
 
-- **Final deadline** is not confirmed yet; Phase 2 should be scheduled once it is.
-- **Earlier proposal comments:** [docs/ton_5_paper.md](docs/ton_5_paper.md) lists other critiques (dish table too small, circular flavour vectors, Wongnai stars, M-ABSA alignment, Google Places licensing). If those came from the proposal presentation, the feedback page (D3) must answer them too.
-- **Per-category breakdown:** `PMD.csv` has no query-category column, so it would need hand-tagging of the 100 queries. Left out unless there is time.
+## 9. Open questions
+
+- **Final submission portal:** confirm whether a video is required and where to submit code.
+- **Second Thai annotator (C5):** Ton needs to identify this person before or during C4 labelling.
+- **AIT thesis template:** confirm which version/link to use for the final report (LaTeX vs Word).
+- **Earlier proposal comments:** [docs/ton_5_paper.md](docs/ton_5_paper.md) lists other critiques
+  (dish table too small, circular flavour vectors, Wongnai stars, M-ABSA alignment, Google Places
+  licensing). If any are still unaddressed, cover them in the final report's limitations section.
+- **Per-category breakdown:** `PMD.csv` has no query-category column; left out unless time permits.

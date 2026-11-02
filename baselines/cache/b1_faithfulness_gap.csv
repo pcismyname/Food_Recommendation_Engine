@@ -1,0 +1,301 @@
+query,restaurant_id,orig_rank,rank_drop_shown,rank_drop_random,gap,k_deleted,pool_size
+A bar with a patio,B70iTJjcPkuYn8ouUewWgw,1,49,49.0,0.0,10,10
+A bar with a patio,K6XIGkyk7-fuOQtA8i7p6A,2,48,48.0,0.0,10,10
+A bar with a patio,O-uIEuv7JLUHajkemx_sVw,3,47,47.0,0.0,10,10
+A bar with good music and reasonably priced beer,O-uIEuv7JLUHajkemx_sVw,1,49,49.0,0.0,10,10
+A bar with good music and reasonably priced beer,K6XIGkyk7-fuOQtA8i7p6A,2,48,48.0,0.0,10,10
+A bar with good music and reasonably priced beer,Qa4eXuZ1IFPwnVXJcpZWtw,3,47,47.0,0.0,10,10
+A cafe that also offers beer,5XVabANkehj7oH-Z7YZkwg,1,49,49.0,0.0,10,10
+A cafe that also offers beer,O-uIEuv7JLUHajkemx_sVw,2,48,48.0,0.0,10,10
+A cafe that also offers beer,K6XIGkyk7-fuOQtA8i7p6A,3,47,47.0,0.0,10,10
+A date place for valentines with affordable drinks and parking,4m_hApwQ054v3ue_OxFmGw,1,49,49.0,0.0,10,10
+A date place for valentines with affordable drinks and parking,e41TP5cXZqSrz50xCBJqZw,2,48,48.0,0.0,10,10
+A date place for valentines with affordable drinks and parking,B70iTJjcPkuYn8ouUewWgw,3,47,47.0,0.0,10,10
+A fancy place with an outdoor setting for a romantic date night,4m_hApwQ054v3ue_OxFmGw,1,49,49.0,0.0,10,10
+A fancy place with an outdoor setting for a romantic date night,Yl2TN9c23ZGLUBSD9ks5Uw,2,48,48.0,0.0,10,10
+A fancy place with an outdoor setting for a romantic date night,e41TP5cXZqSrz50xCBJqZw,3,47,47.0,0.0,10,10
+"A fancy, but affordable place",Fx5haZv9PP3E7Ljp-h7B1Q,1,49,49.0,0.0,10,10
+"A fancy, but affordable place",zgQHtqX0gqMw1nlBZl2VnQ,2,48,48.0,0.0,10,10
+"A fancy, but affordable place",r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+A good beer bar for a date with my girlfriend,O-uIEuv7JLUHajkemx_sVw,1,49,49.0,0.0,10,10
+A good beer bar for a date with my girlfriend,K6XIGkyk7-fuOQtA8i7p6A,2,48,48.0,0.0,10,10
+A good beer bar for a date with my girlfriend,Qa4eXuZ1IFPwnVXJcpZWtw,3,47,47.0,0.0,10,10
+"A place with great pizzas, serving alcohol, and having a good ambiance",KVpvE6pOPM9KMvak4HFsNg,1,49,49.0,0.0,10,10
+"A place with great pizzas, serving alcohol, and having a good ambiance",pSMK_FtULKiU-iuh7SMKwg,2,48,48.0,0.0,10,10
+"A place with great pizzas, serving alcohol, and having a good ambiance",B70iTJjcPkuYn8ouUewWgw,3,47,47.0,0.0,10,10
+Affordable gluten-free food,pSMK_FtULKiU-iuh7SMKwg,1,49,49.0,0.0,10,10
+Affordable gluten-free food,uAAWlLdsoUf872F1FKiX1A,2,48,48.0,0.0,10,10
+Affordable gluten-free food,hdZy_F-gcW9Ntt53Sh--aQ,3,47,47.0,0.0,10,10
+An ice cream shop with bubble tea,uAAWlLdsoUf872F1FKiX1A,1,49,49.0,0.0,10,10
+An ice cream shop with bubble tea,SGP1jf6k7spXkgwBlhiUVw,2,48,48.0,0.0,10,10
+An ice cream shop with bubble tea,hPXR-Bi8U-uz6TUViqmGpg,3,47,47.0,0.0,10,10
+Any restaurant that lets me explore interesting signature dishes,Yl2TN9c23ZGLUBSD9ks5Uw,1,49,49.0,0.0,10,10
+Any restaurant that lets me explore interesting signature dishes,htQgj-ANQpZGpIpkkrEmyQ,2,48,48.0,0.0,10,10
+Any restaurant that lets me explore interesting signature dishes,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+Can I have a cheat meal?,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+Can I have a cheat meal?,snw9iNNLpFYZeHotW00uVA,2,48,48.0,0.0,10,10
+Can I have a cheat meal?,kOFDVcnj-8fd3doIpCQ06A,3,47,47.0,0.0,10,10
+Can I have a place to chat with my business partner?,yY3jNsrpCyKTqQuRuLV8gw,1,49,49.0,0.0,10,10
+Can I have a place to chat with my business partner?,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+Can I have a place to chat with my business partner?,5XVabANkehj7oH-Z7YZkwg,3,47,47.0,0.0,10,10
+Can I have a place with a good ambiance but not outdoors?,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+Can I have a place with a good ambiance but not outdoors?,O-uIEuv7JLUHajkemx_sVw,2,48,48.0,0.0,10,10
+Can I have a place with a good ambiance but not outdoors?,trKyIRyjKqVSZmcU0AnICQ,3,47,47.0,0.0,10,10
+Can I not have oily food?,RUd_M7DPJq1I3DPq0oF--w,1,49,49.0,0.0,10,10
+Can I not have oily food?,fzHBvd0HZm1yB3UIMqZ3bA,2,48,48.0,0.0,10,10
+Can I not have oily food?,QGTqGNLZbBA1QD8L_fO9ZA,3,47,47.0,0.0,10,10
+Cheap Mexican food for take out,SW6ZQk22G1_CV81_gfnvNQ,1,49,49.0,0.0,10,10
+Cheap Mexican food for take out,O_UC_izJXcAmkm6HlEyGSA,2,48,48.0,0.0,10,10
+Cheap Mexican food for take out,HUYEadSbGSQNHXFmT2Ujjw,3,47,47.0,0.0,10,10
+Chinese seafood restaurants with live music,_xAJZOKBMPOe47p1MphB2w,1,49,49.0,0.0,10,10
+Chinese seafood restaurants with live music,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+Chinese seafood restaurants with live music,8YG7PRoZuHeKii0rtNvJFQ,3,47,47.0,0.0,10,10
+Downtown ramen restaurants,DE89UdHFMCN6DtYWZuer5A,1,49,49.0,0.0,10,10
+Downtown ramen restaurants,crstB-H5rOfbXhV8pX0e6g,2,48,48.0,0.0,10,10
+Downtown ramen restaurants,zgQHtqX0gqMw1nlBZl2VnQ,3,47,47.0,0.0,10,10
+Fast food for a date,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+Fast food for a date,hPXR-Bi8U-uz6TUViqmGpg,2,48,48.0,0.0,10,10
+Fast food for a date,aLcFhMe6DDJ430zelCpd2A,3,47,47.0,0.0,10,10
+Healthy fast food with delivery,HUYEadSbGSQNHXFmT2Ujjw,1,49,49.0,0.0,10,10
+Healthy fast food with delivery,aLcFhMe6DDJ430zelCpd2A,2,48,48.0,0.0,10,10
+Healthy fast food with delivery,nHFJtud7jWZhM9dHQ1eIRA,3,47,47.0,0.0,10,10
+How about a place with afternoon snacks?,zgQHtqX0gqMw1nlBZl2VnQ,1,49,49.0,0.0,10,10
+How about a place with afternoon snacks?,HUYEadSbGSQNHXFmT2Ujjw,2,48,48.0,0.0,10,10
+How about a place with afternoon snacks?,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+I am having a hard time finding restaurants offering halal food,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+I am having a hard time finding restaurants offering halal food,crstB-H5rOfbXhV8pX0e6g,2,48,48.0,0.0,10,10
+I am having a hard time finding restaurants offering halal food,aLcFhMe6DDJ430zelCpd2A,3,47,47.0,0.0,10,10
+I am in search of a fancy Pakistani restaurant with authentic food,RUd_M7DPJq1I3DPq0oF--w,1,49,49.0,0.0,10,10
+I am in search of a fancy Pakistani restaurant with authentic food,Yl2TN9c23ZGLUBSD9ks5Uw,2,48,48.0,0.0,10,10
+I am in search of a fancy Pakistani restaurant with authentic food,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+I am looking for a bar on the lakeshore,K6XIGkyk7-fuOQtA8i7p6A,1,49,49.0,0.0,10,10
+I am looking for a bar on the lakeshore,e41TP5cXZqSrz50xCBJqZw,2,48,48.0,0.0,10,10
+I am looking for a bar on the lakeshore,O-uIEuv7JLUHajkemx_sVw,3,47,47.0,0.0,10,10
+I am looking for a place to watch the world cup final with my friends,Qa4eXuZ1IFPwnVXJcpZWtw,1,49,49.0,0.0,10,10
+I am looking for a place to watch the world cup final with my friends,B70iTJjcPkuYn8ouUewWgw,2,48,48.0,0.0,10,10
+I am looking for a place to watch the world cup final with my friends,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+I am looking for a restaurant with no waiting line,QGTqGNLZbBA1QD8L_fO9ZA,1,49,49.0,0.0,10,10
+I am looking for a restaurant with no waiting line,htQgj-ANQpZGpIpkkrEmyQ,2,48,48.0,0.0,10,10
+I am looking for a restaurant with no waiting line,Yl2TN9c23ZGLUBSD9ks5Uw,3,47,47.0,0.0,10,10
+I am looking for an Asian restaurant downtown,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+I am looking for an Asian restaurant downtown,aLcFhMe6DDJ430zelCpd2A,2,48,48.0,0.0,10,10
+I am looking for an Asian restaurant downtown,0a2O150ytxrDjDzXNfRWkA,3,47,47.0,0.0,10,10
+I am looking for an authentic wine restaurant that fits a large group of people,4m_hApwQ054v3ue_OxFmGw,1,49,49.0,0.0,10,10
+I am looking for an authentic wine restaurant that fits a large group of people,UxWH8zRYIBgs6Q2oykvRdw,2,48,48.0,0.0,10,10
+I am looking for an authentic wine restaurant that fits a large group of people,B70iTJjcPkuYn8ouUewWgw,3,47,47.0,0.0,10,10
+I am on a budget,HUYEadSbGSQNHXFmT2Ujjw,1,49,49.0,0.0,10,10
+I am on a budget,_xAJZOKBMPOe47p1MphB2w,2,48,48.0,0.0,10,10
+I am on a budget,DE89UdHFMCN6DtYWZuer5A,3,47,47.0,0.0,10,10
+I am taking my family to celebrate my daughter's birthday,_xAJZOKBMPOe47p1MphB2w,1,49,49.0,0.0,10,10
+I am taking my family to celebrate my daughter's birthday,Yl2TN9c23ZGLUBSD9ks5Uw,2,48,48.0,0.0,10,10
+I am taking my family to celebrate my daughter's birthday,Qmwfg-PtYuCo5Q_IwcA_HQ,3,47,47.0,0.0,10,10
+"I am tired of sushi, I crave for a restaurant with a diverse set of seafoods",0a2O150ytxrDjDzXNfRWkA,1,49,49.0,0.0,10,10
+"I am tired of sushi, I crave for a restaurant with a diverse set of seafoods",QGTqGNLZbBA1QD8L_fO9ZA,2,48,48.0,0.0,10,10
+"I am tired of sushi, I crave for a restaurant with a diverse set of seafoods",Qmwfg-PtYuCo5Q_IwcA_HQ,3,47,47.0,0.0,10,10
+I am tired so I don't want to wait for seats,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+I am tired so I don't want to wait for seats,5XVabANkehj7oH-Z7YZkwg,2,48,48.0,0.0,10,10
+I am tired so I don't want to wait for seats,8YG7PRoZuHeKii0rtNvJFQ,3,47,47.0,0.0,10,10
+I am treating my friends from China,fGurvC5BdOfd5MIuLUQYVA,1,49,49.0,0.0,10,10
+I am treating my friends from China,_xAJZOKBMPOe47p1MphB2w,2,48,48.0,0.0,10,10
+I am treating my friends from China,BUcTdN-rNE8urCCQuxSOQA,3,47,47.0,0.0,10,10
+I am vegan but my friends want good steaks,yY3jNsrpCyKTqQuRuLV8gw,1,49,49.0,0.0,10,10
+I am vegan but my friends want good steaks,wSojc-y-d7MWiGWdy8deCg,2,48,48.0,0.0,10,10
+I am vegan but my friends want good steaks,aLcFhMe6DDJ430zelCpd2A,3,47,47.0,0.0,10,10
+"I don't have time to cook, I want to order a pizza",KVpvE6pOPM9KMvak4HFsNg,1,49,49.0,0.0,10,10
+"I don't have time to cook, I want to order a pizza",pSMK_FtULKiU-iuh7SMKwg,2,48,48.0,0.0,10,10
+"I don't have time to cook, I want to order a pizza",B70iTJjcPkuYn8ouUewWgw,3,47,47.0,0.0,10,10
+I don't mind waiting a lot of time for a decent meal,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+I don't mind waiting a lot of time for a decent meal,aLcFhMe6DDJ430zelCpd2A,2,48,48.0,0.0,10,10
+I don't mind waiting a lot of time for a decent meal,crstB-H5rOfbXhV8pX0e6g,3,47,47.0,0.0,10,10
+I don't mind waiting but can I have some good quality food?,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+I don't mind waiting but can I have some good quality food?,aLcFhMe6DDJ430zelCpd2A,2,48,48.0,0.0,10,10
+I don't mind waiting but can I have some good quality food?,kOFDVcnj-8fd3doIpCQ06A,3,47,47.0,0.0,10,10
+I don't want to waste money on cheap food,_xAJZOKBMPOe47p1MphB2w,1,49,49.0,0.0,10,10
+I don't want to waste money on cheap food,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+I don't want to waste money on cheap food,aLcFhMe6DDJ430zelCpd2A,3,47,47.0,0.0,10,10
+I feel chubby and need to lose weight,_xAJZOKBMPOe47p1MphB2w,1,49,49.0,0.0,10,10
+I feel chubby and need to lose weight,HkHTdTvzbn-bmeQv_-2u0Q,2,48,48.0,0.0,10,10
+I feel chubby and need to lose weight,snw9iNNLpFYZeHotW00uVA,3,47,47.0,0.0,10,10
+I have a car but I don't want to pay for parking,8YG7PRoZuHeKii0rtNvJFQ,1,49,49.0,0.0,10,10
+I have a car but I don't want to pay for parking,hPXR-Bi8U-uz6TUViqmGpg,2,48,48.0,0.0,10,10
+I have a car but I don't want to pay for parking,SjgeuBlgKER9yegpoxT99w,3,47,47.0,0.0,10,10
+I have a tight schedule and I need to grab lunch between classes,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+I have a tight schedule and I need to grab lunch between classes,aLcFhMe6DDJ430zelCpd2A,2,48,48.0,0.0,10,10
+I have a tight schedule and I need to grab lunch between classes,zgQHtqX0gqMw1nlBZl2VnQ,3,47,47.0,0.0,10,10
+"I have been eating stuff like McDonald's for lunch for a week, need something new",hPXR-Bi8U-uz6TUViqmGpg,1,49,49.0,0.0,10,10
+"I have been eating stuff like McDonald's for lunch for a week, need something new",r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+"I have been eating stuff like McDonald's for lunch for a week, need something new",MhiBpIBNTCAm1Xd3WzRzjQ,3,47,47.0,0.0,10,10
+I have been saving up to celebrate tonight,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+I have been saving up to celebrate tonight,Yl2TN9c23ZGLUBSD9ks5Uw,2,48,48.0,0.0,10,10
+I have been saving up to celebrate tonight,B70iTJjcPkuYn8ouUewWgw,3,47,47.0,0.0,10,10
+I just got my paycheque and I can finally afford some decent food,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+I just got my paycheque and I can finally afford some decent food,HUYEadSbGSQNHXFmT2Ujjw,2,48,48.0,0.0,10,10
+I just got my paycheque and I can finally afford some decent food,aLcFhMe6DDJ430zelCpd2A,3,47,47.0,0.0,10,10
+I just need to get some food and don't want to dine in,aLcFhMe6DDJ430zelCpd2A,1,49,49.0,0.0,10,10
+I just need to get some food and don't want to dine in,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+I just need to get some food and don't want to dine in,MhiBpIBNTCAm1Xd3WzRzjQ,3,47,47.0,0.0,10,10
+I like to have some tasty spaghetti,B70iTJjcPkuYn8ouUewWgw,1,49,49.0,0.0,10,10
+I like to have some tasty spaghetti,e41TP5cXZqSrz50xCBJqZw,2,48,48.0,0.0,10,10
+I like to have some tasty spaghetti,XYIPXJ9parr9FtvvcGI1SA,3,47,47.0,0.0,10,10
+I miss healthy food so much,Yl2TN9c23ZGLUBSD9ks5Uw,1,49,49.0,0.0,10,10
+I miss healthy food so much,HkHTdTvzbn-bmeQv_-2u0Q,2,48,48.0,0.0,10,10
+I miss healthy food so much,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+I need a date night idea but I can't spend too much,B70iTJjcPkuYn8ouUewWgw,1,49,49.0,0.0,10,10
+I need a date night idea but I can't spend too much,4m_hApwQ054v3ue_OxFmGw,2,48,48.0,0.0,10,10
+I need a date night idea but I can't spend too much,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+I need a meal and I need it quick,XYIPXJ9parr9FtvvcGI1SA,1,49,49.0,0.0,10,10
+I need a meal and I need it quick,Cp3YRVZojrCGeQS41Hf1pw,2,48,48.0,0.0,10,10
+I need a meal and I need it quick,HUYEadSbGSQNHXFmT2Ujjw,3,47,47.0,0.0,10,10
+I need a place where I can drive my father-in-law for a big meal,_xAJZOKBMPOe47p1MphB2w,1,49,49.0,0.0,10,10
+I need a place where I can drive my father-in-law for a big meal,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+I need a place where I can drive my father-in-law for a big meal,O-uIEuv7JLUHajkemx_sVw,3,47,47.0,0.0,10,10
+I need an affordable place with good service,nHFJtud7jWZhM9dHQ1eIRA,1,49,49.0,0.0,10,10
+I need an affordable place with good service,Fx5haZv9PP3E7Ljp-h7B1Q,2,48,48.0,0.0,10,10
+I need an affordable place with good service,HUYEadSbGSQNHXFmT2Ujjw,3,47,47.0,0.0,10,10
+I prefer a place that offers cash discounts,fGurvC5BdOfd5MIuLUQYVA,1,49,49.0,0.0,10,10
+I prefer a place that offers cash discounts,nHFJtud7jWZhM9dHQ1eIRA,2,48,48.0,0.0,10,10
+I prefer a place that offers cash discounts,HUYEadSbGSQNHXFmT2Ujjw,3,47,47.0,0.0,10,10
+I want a bar with live music and a chill ambiance,e41TP5cXZqSrz50xCBJqZw,1,49,49.0,0.0,10,10
+I want a bar with live music and a chill ambiance,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+I want a bar with live music and a chill ambiance,SjgeuBlgKER9yegpoxT99w,3,47,47.0,0.0,10,10
+I want a place to hang out on Sunday morning where the service is not slow,B70iTJjcPkuYn8ouUewWgw,1,49,49.0,0.0,10,10
+I want a place to hang out on Sunday morning where the service is not slow,5XVabANkehj7oH-Z7YZkwg,2,48,48.0,0.0,10,10
+I want a place to hang out on Sunday morning where the service is not slow,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+I want a place to hang out with my work friends,yY3jNsrpCyKTqQuRuLV8gw,1,49,49.0,0.0,10,10
+I want a place to hang out with my work friends,B70iTJjcPkuYn8ouUewWgw,2,48,48.0,0.0,10,10
+I want a place to hang out with my work friends,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+I want a place with good food where drinks are not that bad,e41TP5cXZqSrz50xCBJqZw,1,49,49.0,0.0,10,10
+I want a place with good food where drinks are not that bad,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+I want a place with good food where drinks are not that bad,SjgeuBlgKER9yegpoxT99w,3,47,47.0,0.0,10,10
+I want a restaurant with good drinks,Yl2TN9c23ZGLUBSD9ks5Uw,1,49,49.0,0.0,10,10
+I want a restaurant with good drinks,e41TP5cXZqSrz50xCBJqZw,2,48,48.0,0.0,10,10
+I want a restaurant with good drinks,yY3jNsrpCyKTqQuRuLV8gw,3,47,47.0,0.0,10,10
+I want an outdoor place but not on the rooftop,B70iTJjcPkuYn8ouUewWgw,1,49,49.0,0.0,10,10
+I want an outdoor place but not on the rooftop,yY3jNsrpCyKTqQuRuLV8gw,2,48,48.0,0.0,10,10
+I want an outdoor place but not on the rooftop,kOFDVcnj-8fd3doIpCQ06A,3,47,47.0,0.0,10,10
+I want good music with any kind of food,SjgeuBlgKER9yegpoxT99w,1,49,49.0,0.0,10,10
+I want good music with any kind of food,yY3jNsrpCyKTqQuRuLV8gw,2,48,48.0,0.0,10,10
+I want good music with any kind of food,SW6ZQk22G1_CV81_gfnvNQ,3,47,47.0,0.0,10,10
+I want restaurants with good desserts such as ice cream,uAAWlLdsoUf872F1FKiX1A,1,49,49.0,0.0,10,10
+I want restaurants with good desserts such as ice cream,SGP1jf6k7spXkgwBlhiUVw,2,48,48.0,0.0,10,10
+I want restaurants with good desserts such as ice cream,QGTqGNLZbBA1QD8L_fO9ZA,3,47,47.0,0.0,10,10
+I want seafood but not Asian,QGTqGNLZbBA1QD8L_fO9ZA,1,49,49.0,0.0,10,10
+I want seafood but not Asian,_xAJZOKBMPOe47p1MphB2w,2,48,48.0,0.0,10,10
+I want seafood but not Asian,Qmwfg-PtYuCo5Q_IwcA_HQ,3,47,47.0,0.0,10,10
+I want someplace to eat and hang out with friends from school,B70iTJjcPkuYn8ouUewWgw,1,49,49.0,0.0,10,10
+I want someplace to eat and hang out with friends from school,SjgeuBlgKER9yegpoxT99w,2,48,48.0,0.0,10,10
+I want someplace to eat and hang out with friends from school,e41TP5cXZqSrz50xCBJqZw,3,47,47.0,0.0,10,10
+I want to eat lunch but I can't get away from the campus downtown,aLcFhMe6DDJ430zelCpd2A,1,49,49.0,0.0,10,10
+I want to eat lunch but I can't get away from the campus downtown,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+I want to eat lunch but I can't get away from the campus downtown,HkHTdTvzbn-bmeQv_-2u0Q,3,47,47.0,0.0,10,10
+I want to have a crazy night with my friends,SjgeuBlgKER9yegpoxT99w,1,49,49.0,0.0,10,10
+I want to have a crazy night with my friends,CN5nuUQod0f8g3oh99qq0w,2,48,48.0,0.0,10,10
+I want to have a crazy night with my friends,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+I want to show my friends the best restaurants in Toronto,Yl2TN9c23ZGLUBSD9ks5Uw,1,49,49.0,0.0,10,10
+I want to show my friends the best restaurants in Toronto,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+I want to show my friends the best restaurants in Toronto,snw9iNNLpFYZeHotW00uVA,3,47,47.0,0.0,10,10
+I'm okay with an expensive sushi place with great salmon avocado rolls,QGTqGNLZbBA1QD8L_fO9ZA,1,49,49.0,0.0,10,10
+I'm okay with an expensive sushi place with great salmon avocado rolls,0a2O150ytxrDjDzXNfRWkA,2,48,48.0,0.0,10,10
+I'm okay with an expensive sushi place with great salmon avocado rolls,Qmwfg-PtYuCo5Q_IwcA_HQ,3,47,47.0,0.0,10,10
+Italian place with a burger,B70iTJjcPkuYn8ouUewWgw,1,49,49.0,0.0,10,10
+Italian place with a burger,pSMK_FtULKiU-iuh7SMKwg,2,48,48.0,0.0,10,10
+Italian place with a burger,hPXR-Bi8U-uz6TUViqmGpg,3,47,47.0,0.0,10,10
+Italian restaurants with good service in downtown,B70iTJjcPkuYn8ouUewWgw,1,49,49.0,0.0,10,10
+Italian restaurants with good service in downtown,Yl2TN9c23ZGLUBSD9ks5Uw,2,48,48.0,0.0,10,10
+Italian restaurants with good service in downtown,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+Japanese restaurant with pasta,B70iTJjcPkuYn8ouUewWgw,1,49,49.0,0.0,10,10
+Japanese restaurant with pasta,XYIPXJ9parr9FtvvcGI1SA,2,48,48.0,0.0,10,10
+Japanese restaurant with pasta,HUYEadSbGSQNHXFmT2Ujjw,3,47,47.0,0.0,10,10
+Late for work and I need to fill up before leaving,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+Late for work and I need to fill up before leaving,aLcFhMe6DDJ430zelCpd2A,2,48,48.0,0.0,10,10
+Late for work and I need to fill up before leaving,5XVabANkehj7oH-Z7YZkwg,3,47,47.0,0.0,10,10
+Looking for a Thai restaurant around downtown with parking spots,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+Looking for a Thai restaurant around downtown with parking spots,aLcFhMe6DDJ430zelCpd2A,2,48,48.0,0.0,10,10
+Looking for a Thai restaurant around downtown with parking spots,8YG7PRoZuHeKii0rtNvJFQ,3,47,47.0,0.0,10,10
+My friend and I want to have some ice cream and my friend is lactose intolerant,uAAWlLdsoUf872F1FKiX1A,1,49,49.0,0.0,10,10
+My friend and I want to have some ice cream and my friend is lactose intolerant,SGP1jf6k7spXkgwBlhiUVw,2,48,48.0,0.0,10,10
+My friend and I want to have some ice cream and my friend is lactose intolerant,zgQHtqX0gqMw1nlBZl2VnQ,3,47,47.0,0.0,10,10
+My kid misses noodles,zgQHtqX0gqMw1nlBZl2VnQ,1,49,49.0,0.0,10,10
+My kid misses noodles,piZ4JqJI5WTljJuQV7yZHQ,2,48,48.0,0.0,10,10
+My kid misses noodles,DE89UdHFMCN6DtYWZuer5A,3,47,47.0,0.0,10,10
+Nice place with nice drinks,SjgeuBlgKER9yegpoxT99w,1,49,49.0,0.0,10,10
+Nice place with nice drinks,e41TP5cXZqSrz50xCBJqZw,2,48,48.0,0.0,10,10
+Nice place with nice drinks,yY3jNsrpCyKTqQuRuLV8gw,3,47,47.0,0.0,10,10
+Non-spicy Chinese meals,fzHBvd0HZm1yB3UIMqZ3bA,1,49,49.0,0.0,10,10
+Non-spicy Chinese meals,fGurvC5BdOfd5MIuLUQYVA,2,48,48.0,0.0,10,10
+Non-spicy Chinese meals,8YG7PRoZuHeKii0rtNvJFQ,3,47,47.0,0.0,10,10
+Sports bars with good food and big televisions,Qa4eXuZ1IFPwnVXJcpZWtw,1,49,49.0,0.0,10,10
+Sports bars with good food and big televisions,K6XIGkyk7-fuOQtA8i7p6A,2,48,48.0,0.0,10,10
+Sports bars with good food and big televisions,O-uIEuv7JLUHajkemx_sVw,3,47,47.0,0.0,10,10
+The ramen place I usually go to is closed and I need a substitute,piZ4JqJI5WTljJuQV7yZHQ,1,49,49.0,0.0,10,10
+The ramen place I usually go to is closed and I need a substitute,DE89UdHFMCN6DtYWZuer5A,2,48,48.0,0.0,10,10
+The ramen place I usually go to is closed and I need a substitute,crstB-H5rOfbXhV8pX0e6g,3,47,47.0,0.0,10,10
+Very busy restaurant with lots of empty spaces,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+Very busy restaurant with lots of empty spaces,Cp3YRVZojrCGeQS41Hf1pw,2,48,48.0,0.0,10,10
+Very busy restaurant with lots of empty spaces,_xAJZOKBMPOe47p1MphB2w,3,47,47.0,0.0,10,10
+Want a place to get over this depression with friends,B70iTJjcPkuYn8ouUewWgw,1,49,49.0,0.0,10,10
+Want a place to get over this depression with friends,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+Want a place to get over this depression with friends,CN5nuUQod0f8g3oh99qq0w,3,47,47.0,0.0,10,10
+We have a meeting and my boss does not eat cheap food,_xAJZOKBMPOe47p1MphB2w,1,49,49.0,0.0,10,10
+We have a meeting and my boss does not eat cheap food,aLcFhMe6DDJ430zelCpd2A,2,48,48.0,0.0,10,10
+We have a meeting and my boss does not eat cheap food,QGTqGNLZbBA1QD8L_fO9ZA,3,47,47.0,0.0,10,10
+What are some of the best restaurants in downtown Toronto?,Yl2TN9c23ZGLUBSD9ks5Uw,1,49,49.0,0.0,10,10
+What are some of the best restaurants in downtown Toronto?,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+What are some of the best restaurants in downtown Toronto?,snw9iNNLpFYZeHotW00uVA,3,47,47.0,0.0,10,10
+a breakfast place that serves dinner,Fx5haZv9PP3E7Ljp-h7B1Q,1,49,49.0,0.0,10,10
+a breakfast place that serves dinner,hdZy_F-gcW9Ntt53Sh--aQ,2,48,48.0,0.0,10,10
+a breakfast place that serves dinner,kOFDVcnj-8fd3doIpCQ06A,3,47,47.0,0.0,10,10
+a delightful place for a night out with family,SjgeuBlgKER9yegpoxT99w,1,49,49.0,0.0,10,10
+a delightful place for a night out with family,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+a delightful place for a night out with family,B70iTJjcPkuYn8ouUewWgw,3,47,47.0,0.0,10,10
+a place with good drinks without kids,e41TP5cXZqSrz50xCBJqZw,1,49,49.0,0.0,10,10
+a place with good drinks without kids,SjgeuBlgKER9yegpoxT99w,2,48,48.0,0.0,10,10
+a place with good drinks without kids,yY3jNsrpCyKTqQuRuLV8gw,3,47,47.0,0.0,10,10
+a sushi place with good burgers,Qmwfg-PtYuCo5Q_IwcA_HQ,1,49,49.0,0.0,10,10
+a sushi place with good burgers,QGTqGNLZbBA1QD8L_fO9ZA,2,48,48.0,0.0,10,10
+a sushi place with good burgers,0a2O150ytxrDjDzXNfRWkA,3,47,47.0,0.0,10,10
+any food quality and excellent service,Yl2TN9c23ZGLUBSD9ks5Uw,1,49,49.0,0.0,10,10
+any food quality and excellent service,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+any food quality and excellent service,0a2O150ytxrDjDzXNfRWkA,3,47,47.0,0.0,10,10
+bar without lots of music,e41TP5cXZqSrz50xCBJqZw,1,49,49.0,0.0,10,10
+bar without lots of music,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+bar without lots of music,yY3jNsrpCyKTqQuRuLV8gw,3,47,47.0,0.0,10,10
+delicious Italian food,B70iTJjcPkuYn8ouUewWgw,1,49,49.0,0.0,10,10
+delicious Italian food,KVpvE6pOPM9KMvak4HFsNg,2,48,48.0,0.0,10,10
+delicious Italian food,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+fancy and famous place,4m_hApwQ054v3ue_OxFmGw,1,49,49.0,0.0,10,10
+fancy and famous place,Yl2TN9c23ZGLUBSD9ks5Uw,2,48,48.0,0.0,10,10
+fancy and famous place,UxWH8zRYIBgs6Q2oykvRdw,3,47,47.0,0.0,10,10
+good food and good price,HUYEadSbGSQNHXFmT2Ujjw,1,49,49.0,0.0,10,10
+good food and good price,MhiBpIBNTCAm1Xd3WzRzjQ,2,48,48.0,0.0,10,10
+good food and good price,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+good food but not expensive,HUYEadSbGSQNHXFmT2Ujjw,1,49,49.0,0.0,10,10
+good food but not expensive,MhiBpIBNTCAm1Xd3WzRzjQ,2,48,48.0,0.0,10,10
+good food but not expensive,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+great ambiance and awesome burgers,hPXR-Bi8U-uz6TUViqmGpg,1,49,49.0,0.0,10,10
+great ambiance and awesome burgers,htQgj-ANQpZGpIpkkrEmyQ,2,48,48.0,0.0,10,10
+great ambiance and awesome burgers,B70iTJjcPkuYn8ouUewWgw,3,47,47.0,0.0,10,10
+great burger but average food,htQgj-ANQpZGpIpkkrEmyQ,1,49,49.0,0.0,10,10
+great burger but average food,trKyIRyjKqVSZmcU0AnICQ,2,48,48.0,0.0,10,10
+great burger but average food,hPXR-Bi8U-uz6TUViqmGpg,3,47,47.0,0.0,10,10
+great service plus serving alcohol,e41TP5cXZqSrz50xCBJqZw,1,49,49.0,0.0,10,10
+great service plus serving alcohol,O-uIEuv7JLUHajkemx_sVw,2,48,48.0,0.0,10,10
+great service plus serving alcohol,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+not Thai but Asian,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+not Thai but Asian,aLcFhMe6DDJ430zelCpd2A,2,48,48.0,0.0,10,10
+not Thai but Asian,BUcTdN-rNE8urCCQuxSOQA,3,47,47.0,0.0,10,10
+not sushi but Asian,0a2O150ytxrDjDzXNfRWkA,1,49,49.0,0.0,10,10
+not sushi but Asian,QGTqGNLZbBA1QD8L_fO9ZA,2,48,48.0,0.0,10,10
+not sushi but Asian,Qmwfg-PtYuCo5Q_IwcA_HQ,3,47,47.0,0.0,10,10
+outdoor bar but with good price,K6XIGkyk7-fuOQtA8i7p6A,1,49,49.0,0.0,10,10
+outdoor bar but with good price,r_BrIgzYcwo1NAuG9dLbpg,2,48,48.0,0.0,10,10
+outdoor bar but with good price,e41TP5cXZqSrz50xCBJqZw,3,47,47.0,0.0,10,10
+outdoor space without live music,r_BrIgzYcwo1NAuG9dLbpg,1,49,49.0,0.0,10,10
+outdoor space without live music,yY3jNsrpCyKTqQuRuLV8gw,2,48,48.0,0.0,10,10
+outdoor space without live music,O-uIEuv7JLUHajkemx_sVw,3,47,47.0,0.0,10,10
+restaurant for a business meeting that serves alcohol and is moderately priced,yY3jNsrpCyKTqQuRuLV8gw,1,49,49.0,0.0,10,10
+restaurant for a business meeting that serves alcohol and is moderately priced,B70iTJjcPkuYn8ouUewWgw,2,48,48.0,0.0,10,10
+restaurant for a business meeting that serves alcohol and is moderately priced,r_BrIgzYcwo1NAuG9dLbpg,3,47,47.0,0.0,10,10
+unhealthy salad,5XVabANkehj7oH-Z7YZkwg,1,49,49.0,0.0,10,10
+unhealthy salad,HkHTdTvzbn-bmeQv_-2u0Q,2,48,48.0,0.0,10,10
+unhealthy salad,hdZy_F-gcW9Ntt53Sh--aQ,3,47,47.0,0.0,10,10
