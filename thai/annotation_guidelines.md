@@ -191,18 +191,21 @@ All sentences below are real Wongnai sentences from `thai/cache/sentences_n2000_
 
 ## 6. Recheck checklist for Ton
 
-- [ ] The glosses in section 4 and in R1–R13 are accurate (especially 18926:5, 1413:30, 7870:3).
-- [ ] The degree table (3.2) matches how Thai speakers read ไม่ค่อยX, ไม่Xมาก, Xนิดๆ and Xกำลังดี.
-- [ ] **แซ่บ alone = 1** for T02, T07 and T12 feels right. Change it to 2 for T12 if แซ่บ by
+**Signed off by Ton on 2026-11-02.** All rules accepted as written (แซ่บ alone = 1 for T12; ชามะนาว
+counts as a fruit drink for T17 only if fruit/lime is the base). Guidelines frozen for C4, C5 and B2.
+
+- [x] The glosses in section 4 and in R1–R13 are accurate (especially 18926:5, 1413:30, 7870:3).
+- [x] The degree table (3.2) matches how Thai speakers read ไม่ค่อยX, ไม่Xมาก, Xนิดๆ and Xกำลังดี.
+- [x] **แซ่บ alone = 1** for T02, T07 and T12 feels right. Change it to 2 for T12 if แซ่บ by
       itself already means "sour-spicy-salty" to you.
-- [ ] **จืด = 1 for T10** (bland goes too far) and **อมน้ำมัน = 2 for T05** (complaints count) feel
+- [x] **จืด = 1 for T10** (bland goes too far) and **อมน้ำมัน = 2 for T05** (complaints count) feel
       natural.
-- [ ] The item lists are complete: T14 curries, T15 (ส้มตำ/ลาบ/พล่า as near-items only), T17
+- [x] The item lists are complete: T14 curries, T15 (ส้มตำ/ลาบ/พล่า as near-items only), T17
       fruit drinks (ชามะนาว in or out?), T09 herbs.
-- [ ] **T03 vs. T20:** ไม่หวานมาก/หวานน้อย is 1 for T03 but 2 for T20.
-- [ ] R4 (dish names give no taste evidence) does not feel unfair to obvious cases such as ต้มยำ
+- [x] **T03 vs. T20:** ไม่หวานมาก/หวานน้อย is 1 for T03 but 2 for T20.
+- [x] R4 (dish names give no taste evidence) does not feel unfair to obvious cases such as ต้มยำ
       for T01.
-- [ ] Every query has a clear rule. Note any row that needed a judgement call these rules don't
+- [x] Every query has a clear rule. Note any row that needed a judgement call these rules don't
       cover.
 
 ## Appendix A. The same scale for the explanation-support sheet (B2)

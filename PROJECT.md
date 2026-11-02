@@ -131,10 +131,11 @@ The sentence-level RIRD run is planned on a Colab GPU.
 - [x] A4 save per-query rankings and evidence (review level)
 - [ ] A1/A2 sentence-level rerun
 - [x] C1 Thai taste queries (24, frozen 2026-10-17)
-- [/] C2 Thai sentence pipeline (built on 2,000 reviews; segmentation spot-check pending)
+- [x] C2 Thai sentence pipeline (built on 2,000 reviews; segmentation spot-check done)
 - [ ] Progress report and slides (2026-10-19), presentation (2026-10-20)
 - [ ] B1 faithfulness test, B2 human support rating
-- [ ] C3–C7 Thai pooling, labelling, agreement, Thai nDCG@10 / P@10
+- [x] C3–C4 Thai pooling (452 pairs) and labelling (2026-11-02)
+- [/] C5–C7 Thai nDCG@10 / P@10 done (BM25 0.654 vs. dense 0.549, n.s.); agreement pending second annotator
 - [ ] Final report, slides, video
 
 ## 7. Evaluation

@@ -98,17 +98,29 @@ Papers the professor pointed to:
   - Pool built with [thai/build_label_pool.py](thai/build_label_pool.py): **452 blind pairs**, mean 18.8
     per query (range 13–20). Two systems barely overlap: mean 1.2 shared sentences in top 10. No BM25
     zero-score hits in any top 10.
-  - Files committed: [thai/labels/label_sheet.csv](thai/labels/label_sheet.csv) (452 pairs, to be
-    labelled by Ton), [thai/labels/label_sheet_annotator2.csv](thai/labels/label_sheet_annotator2.csv)
+  - Files committed: [thai/labels/label_sheet.csv](thai/labels/label_sheet.csv) (452 pairs), [thai/labels/label_sheet_annotator2.csv](thai/labels/label_sheet_annotator2.csv)
     (60 pairs for second annotator / C5), [thai/labels/pool_key.csv](thai/labels/pool_key.csv) (hidden
     key; annotators must not open it).
+- **C4 complete (2026-11-02):** all 452 pairs labelled by Ton under the frozen guidelines.
+  Final: 184 × 0, 180 × 1, 88 × 2; one query has no relevant sentence in its pool.
+- **C7 metrics (2026-11-02):** BM25 beats dense on Thai, but not significantly (24 queries):
+
+  | Metric | BM25 | Dense | Diff [95% CI] | Holm p |
+  |---|---|---|---|---|
+  | nDCG@10 | 0.654 | 0.549 | −0.105 [−0.298, +0.093] | 0.57 |
+  | P@10 (≥1) | 0.667 | 0.558 | −0.108 [−0.292, +0.075] | 0.57 |
+  | P@10 (=2) | 0.258 | 0.163 | −0.096 [−0.212, +0.029] | 0.47 |
+
+  By type: combo queries favour BM25 most (strict P@10 0.325 vs. 0.125, CI excludes 0); negation
+  queries are a tie (nDCG@10 0.574 vs. 0.607). Opposite of English, where dense wins.
+- **Still open:** C5 second annotator (60 pairs) → kappa.
 
 ### Writing / Report
 
 - **D1 complete:** three professor-assigned papers added to related work.
 - **D3 complete:** feedback summary page in [report/progress/main.pdf](report/progress/main.pdf).
 - **D4 complete:** progress report PDF and slides PDF submitted (2026-10-19).
-- **E1 in progress:** annotation guidelines drafted in [thai/annotation_guidelines.md](thai/annotation_guidelines.md); Ton to recheck using its own checklist before labelling starts.
+- **E1 complete (2026-11-02):** [thai/annotation_guidelines.md](thai/annotation_guidelines.md) signed off by Ton and frozen.
 
 ---
 
@@ -168,10 +180,10 @@ The sentence-level evidence output from A4 is the direct input for B1 and B2.
 | C1b | `[x]` Ton review and sign-off 2026-10-17; queries frozen; notebook rerun | — | Yes | C1 |
 | C2 | `[x]` Sentence pipeline on 2,000-review subsample; segmentation spot-check done | — | Code: No. Spot-check: Yes | — |
 | C3 | `[x]` 10k Colab run → `topk_n10000_s42.csv` → blind label pool built. 452 pairs in [thai/labels/label_sheet.csv](thai/labels/label_sheet.csv). 60-pair annotator-2 subset in [thai/labels/label_sheet_annotator2.csv](thai/labels/label_sheet_annotator2.csv). Key in `pool_key.csv` (do not open). | — | No | C1b, C2 |
-| C4 | `[ ]` **Hand-label `label_sheet.csv`** — 0/1/2 per (query, sentence) pair following [thai/annotation_guidelines.md](thai/annotation_guidelines.md). Start with a pilot of ~30 pairs; check consistency before continuing. | **High** | **Yes** | C3, E1 |
-| C5 | `[ ]` **Second annotator** labels `label_sheet_annotator2.csv` (60 pairs). Find a second Thai speaker now; fallback is re-labelling 50 of your own pairs at least 1 week later. | **Medium** | **Yes** | C4 |
-| C6 | `[ ]` *Optional:* LLM labelling of the full pool. Skip if pool ≤ 300 pairs and hand-labelling is feasible. With 452 pairs this is borderline — decide after C4 pilot. | Low | No (output check: Yes) | C3, E1 |
-| C7 | `[/]` **Agreement + Thai metrics:** run [thai/score_labels.py](thai/score_labels.py) — exact %, Cohen's kappa, nDCG@10 and P@10 (BM25 vs. dense). Script ready and tested on synthetic labels; `--partial` flag scores pilot subset before all rows are labelled. | **High** | No | C4, C5 (C6 if used) |
+| C4 | `[x]` **Done 2026-11-02.** All 452 pairs in [thai/labels/label_sheet.csv](thai/labels/label_sheet.csv) labelled 0/1/2 by Ton under the frozen guidelines. Final counts: 184 × 0, 180 × 1, 88 × 2. | — | Yes | C3, E1 |
+| C5 | `[ ]` **Second annotator** labels [thai/labels/label_sheet_annotator2.csv](thai/labels/label_sheet_annotator2.csv) (60 pairs) independently. Needs a second Thai speaker; fallback is Ton relabelling the same 60 pairs ≥ 1 week later without looking at the first labels. Then rerun `thai/score_labels.py` for kappa. | **Medium** | **Yes** | C4 ✅ |
+| C6 | `[-]` Not used. | — | — | — |
+| C7 | `[/]` **Thai metrics done 2026-11-02** with [thai/score_labels.py](thai/score_labels.py) → [thai/results/thai_scores_summary.csv](thai/results/thai_scores_summary.csv), [thai/results/thai_scores_per_query.csv](thai/results/thai_scores_per_query.csv). nDCG@10 BM25 0.654 vs. dense 0.549 (diff −0.105, CI [−0.298, +0.093], Holm p 0.57, not significant). **Remaining: kappa**, after C5. | **High** | No | C4 ✅, C5 |
 
 ---
 
@@ -190,7 +202,7 @@ The sentence-level evidence output from A4 is the direct input for B1 and B2.
 
 | ID | Task | Priority | Thai? | Depends on |
 |---|---|---|---|---|
-| E1 | `[/]` **Finalize annotation guidelines:** Ton rechecks [thai/annotation_guidelines.md](thai/annotation_guidelines.md) using its own checklist (real Wongnai examples, per-query rules, B2 appendix). Must be signed off before C4 or B2 labelling starts. | **High — do first** | Thai examples: **Yes** | — |
+| E1 | `[x]` **Signed off by Ton 2026-11-02.** **Finalize annotation guidelines:** Ton rechecks [thai/annotation_guidelines.md](thai/annotation_guidelines.md) using its own checklist (real Wongnai examples, per-query rules, B2 appendix). Must be signed off before C4 or B2 labelling starts. | **High — do first** | Thai examples: **Yes** | — |
 
 ---
 
@@ -247,16 +259,16 @@ These are the remaining code-facing checks beyond the existing ranking notebook 
 
 ```
 Start immediately (unblocked or nearly so):
-  1. E1   — Ton: finalize annotation guidelines → unblocks C4 and B2
+  1. E1   — ✅ done 2026-11-02
   2. B2   — Sam/Ton: complete human support labels and agreement
   3. H1/H2 — Sam: validate API and live corpus alignment
 
 After E1:
-  4. C4   — Ton: label Thai pool (pilot 30 pairs first, then continue)
+  4. C4   — ✅ done 2026-11-02
   5. C5   — Ton: second annotator labels annotator2 sheet (find person now)
 
 After C4 + C5:
-  6. C7   — Ton: score labels, compute Thai nDCG@10 / P@10 + kappa
+  6. C7   — Thai nDCG@10 / P@10 ✅ done; kappa waits on C5
 
 After B2, C7, and H1–H3:
   7. D2  — Both: rewrite title / claims / limitations
@@ -271,8 +283,8 @@ After B2, C7, and H1–H3:
 
 | Priority | Sam | Ton |
 |---|---|---|
-| **Do now** | Fill `cache/b2_support_sheet.csv` with 0/1/2 labels (open in Excel/Numbers, fill `label` col) | E1 (finalize guidelines), label `cache/b2_support_sheet_ann2.csv`; C4 pilot labelling |
-| **After labelling** | Run `python3 baselines/b2_score_agreement.py` for kappa + % supporting | C5 (second annotator), C7 (score Thai labels) |
+| **Do now** | Fill `cache/b2_support_sheet.csv` with 0/1/2 labels (open in Excel/Numbers, fill `label` col) | Label `cache/b2_support_sheet_ann2.csv` (B2); find second Thai annotator (C5) |
+| **After labelling** | Run `python3 baselines/b2_score_agreement.py` for kappa + % supporting | C5: second Thai annotator (or self-relabel ≥ 1 week later), then rerun `thai/score_labels.py` for kappa |
 | **Report / slides** | F4 baseline write-up (use A5 + B1 results now available), F1/F2 | F1/F2 together |
 
 ---
@@ -311,6 +323,9 @@ B1, B2, C7 ──► D2 ──► F1 (report) ──► F2 (slides) ──► F3
 
 Our off-the-shelf dense already approaches the fine-tuned external reference (MAP 0.618 vs 0.626),
 with no domain adaptation. B1 and B2 add the interpretability argument.
+
+**Thai (Wongnai, sentence level, 24 queries, C7):** BM25 nDCG@10 0.654 vs. dense 0.549; P@10 0.667
+vs. 0.558. Not significant (Holm p 0.57). Kappa pending (C5).
 
 ---
 

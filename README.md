@@ -174,8 +174,11 @@ random deletion. Human B2 support rating is the more meaningful faithfulness sig
 | Pool size | 452 blind (query, sentence) pairs |
 | Queries | 24 frozen Thai taste queries |
 | Systems compared | BM25 vs. Dense (same encoder, sentence-level) |
-| Labelling | In progress (C4) |
-| nDCG@10, P@10 | TBD after C7 |
+| Labelling | Done 2026-11-02 (Ton) |
+| nDCG@10 | BM25 **0.654** vs. dense 0.549 (diff −0.105, Holm p 0.57, n.s.) |
+| P@10 (label ≥ 1) | BM25 **0.667** vs. dense 0.558 |
+| P@10 (label = 2) | BM25 **0.258** vs. dense 0.163 |
+| Agreement (kappa) | Pending second annotator (C5) |
 
 ---
 
