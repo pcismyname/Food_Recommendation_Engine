@@ -238,6 +238,15 @@
       border-radius: 100px;
       letter-spacing: 0.05em;
     }
+    .badge-live {
+      background: #ff6b6b22;
+      border: 1px solid #ff6b6b44;
+      color: #ff9090;
+      font-size: 11px; font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 100px;
+      letter-spacing: 0.05em;
+    }
 
     /* ── Restaurant cards ───────────────────────────────────────────── */
     #results { display: flex; flex-direction: column; gap: 14px; }
@@ -607,7 +616,13 @@
 
       hideStatus();
 
-      if (data.matched_query) {
+      // Show rewritten query if available
+      if (data.rewritten_query) {
+        showStatus('info',
+          `🧠 <strong>Query rewritten:</strong> <em>"${escHtml(data.rewritten_query)}"</em>` +
+          (data.pipeline ? ` &nbsp;<span style="opacity:0.6;font-size:11px">[${escHtml(data.pipeline)}]</span>` : '')
+        );
+      } else if (data.matched_query) {
         showStatus('info', `ℹ Matched to: <em>"${escHtml(data.matched_query)}"</em>`);
       }
 
@@ -638,7 +653,9 @@
 
     header.style.display = 'flex';
     count.textContent = `${data.results.length} restaurants ranked`;
-    badge.style.display = data.is_precomputed ? 'inline-block' : 'none';
+    badge.style.display = 'inline-block';
+    badge.className    = data.is_precomputed ? 'badge-precomp' : 'badge-live';
+    badge.textContent  = data.is_precomputed ? '⚡ Pre-computed' : '🧠 Live B3';
 
     const maxScore = Math.max(...data.results.map(r => r.score));
 

@@ -87,6 +87,8 @@ class QueryResponse(BaseModel):
     lang: str
     is_precomputed: bool
     matched_query: Optional[str]
+    rewritten_query: Optional[str] = None
+    pipeline: Optional[str] = None
     results: List[RestaurantResult]
     error: Optional[str] = None
     hint: Optional[str] = None
@@ -124,6 +126,8 @@ def run_query(req: QueryRequest):
         lang=req.lang,
         is_precomputed=raw.get("is_precomputed", False),
         matched_query=raw.get("matched_query"),
+        rewritten_query=raw.get("rewritten_query"),
+        pipeline=raw.get("pipeline"),
         results=[RestaurantResult(**r) for r in raw.get("results", [])],
         error=raw.get("error"),
         hint=raw.get("hint"),

@@ -34,3 +34,4 @@ thai/cache/
 
 # Jupyter checkpoints
 .ipynb_checkpoints/
+.env
