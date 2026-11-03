@@ -1,5 +1,7 @@
 """Tests for the Thai tab: precomputed lookup, BM25/dense merge, human labels, API schema."""
 
+from contextlib import asynccontextmanager
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -22,15 +24,15 @@ def client():
     e = RetrievalEngine()
     e._load_thai_evidence()
     e.ready = True
-    old = main.engine
+    old_engine, old_lifespan = main.engine, main.app.router.lifespan_context
     main.engine = e
     main.app.router.lifespan_context = _no_lifespan
-    with TestClient(main.app) as c:
-        yield c
-    main.engine = old
-
-
-from contextlib import asynccontextmanager
+    try:
+        with TestClient(main.app) as c:
+            yield c
+    finally:
+        main.engine = old_engine
+        main.app.router.lifespan_context = old_lifespan
 
 
 @asynccontextmanager

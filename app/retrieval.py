@@ -326,10 +326,11 @@ class RetrievalEngine:
         ranked: Dict[str, Dict[str, List[dict]]] = defaultdict(lambda: defaultdict(list))
         for row in _load_csv(th_path):
             q = row.get("query_th", "").strip()
-            if not q:
+            sys_name = row.get("system", "")
+            if not q or sys_name not in ("bm25", "dense"):
                 continue
-            qid_of[q] = row["qid"]
-            ranked[q][row["system"]].append(row)
+            qid_of[q] = row.get("qid", "")
+            ranked[q][sys_name].append(row)
 
         for q, by_sys in ranked.items():
             for rows in by_sys.values():
