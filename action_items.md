@@ -1,6 +1,6 @@
 # Action Items — Group Flower
 
-Last updated 2026-11-02.
+Last updated 2026-11-03.
 
 **Progress presentation:** ✅ Completed 2026-10-20.
 **Next deadline: Final submission — December 1** — report (PDF, AIT thesis template), slides (PDF), and code.
@@ -122,6 +122,17 @@ Papers the professor pointed to:
 - **D4 complete:** progress report PDF and slides PDF submitted (2026-10-19).
 - **E1 complete (2026-11-02):** [thai/annotation_guidelines.md](thai/annotation_guidelines.md) signed off by Ton and frozen.
 
+### Demo app (2026-11-03)
+
+- **Thai tab fixed (PR #1, merged):** every Thai query used to return HTTP 500 (the response schema only
+  allowed restaurant results). Thai results now come back as sentences, BM25 and dense interleaved by
+  rank, each with Ton's C4 relevance label. [tests/test_thai_app.py](tests/test_thai_app.py) adds 8
+  tests (all passing).
+- **English live inference + Groq rewriting verified locally:** the gitignored sentence embeddings are
+  rebuilt with [app/build_sentence_embeddings.py](app/build_sentence_embeddings.py). New English
+  queries now run Groq rewrite → bi-encoder → selective CE in ~3–5s on a GTX 1650. The 100 suggested
+  queries still use instant pre-computed results (no Groq).
+
 ---
 
 ## 3. Tasks
@@ -162,7 +173,7 @@ The sentence-level evidence output from A4 is the direct input for B1 and B2.
 | ID | Task | Priority | Thai? | Depends on |
 |---|---|---|---|---|
 | B1 | `[x]` **Faithfulness (automatic):** [b1_faithfulness.ipynb](baselines/b1_faithfulness.ipynb) executed. **Result: mean faithfulness gap = 0.000, p=1.0 (n.s.).** Shown and random deletions hurt rank equally (both mean rank drop = 48). nDCG@10 drops from 0.682 to 0.379 under either deletion — deletion is very destructive but not differentially so. Interpretation: the pooled evidence store is small (top-10 per restaurant) so random and shown deletions always hit the same sentences. See `cache/b1_faithfulness_summary.csv` and `cache/b1_faithfulness_plot.png`. | **High** | No | A4 ✅ |
-| B2 | `[/]` **Support (human):** [b2_export_support_sheet.py](baselines/b2_export_support_sheet.py) run. Sheets generated: `cache/b2_support_sheet.csv` (full, Sam labels), `cache/b2_support_sheet_ann2.csv` (40-pair subset, Ton labels), `cache/b2_support_key.csv` (hidden key). **Next: Sam fills `label` column (0/1/2) in `b2_support_sheet.csv`; Ton fills `b2_support_sheet_ann2.csv`. Then run [b2_score_agreement.py](baselines/b2_score_agreement.py).** | **High** | No | A4 ✅, E1 |
+| B2 | `[/]` **Support (human):** [b2_export_support_sheet.py](baselines/b2_export_support_sheet.py) run. Sheets generated: `cache/b2_support_sheet.csv` (full, Sam labels), `cache/b2_support_sheet_ann2.csv` (40-pair subset, Ton labels), `cache/b2_support_key.csv` (hidden key). **Status 2026-11-03:** Ton's 40-pair `b2_support_sheet_ann2.csv` is done (19 × 1, 12 × 0, 9 × 2). **Next: Sam fills `label` column (0/1/2) in `b2_support_sheet.csv` (0 / 375 labelled). Then run [b2_score_agreement.py](baselines/b2_score_agreement.py).** | **High** | No | A4 ✅, E1 |
 | B3 | `[/]` **Improved retrieval** — notebook executed and integrated into [app/retrieval.py](app/retrieval.py). The live system uses selective CE because applying CE to every query reduced nDCG@10 from 0.682 to 0.658 and MAP from 0.618 to 0.586. **2026-11-03 (Ton):** live pipeline verified end-to-end locally — sentence embeddings rebuilt with [app/build_sentence_embeddings.py](app/build_sentence_embeddings.py) (240,660 × 768, GTX 1650), Groq rewrite + selective CE confirmed on new queries ("somewhere quiet without a long wait" → CE path, 5.4s; "cheat meal after the gym" → bi-encoder only, 3.1s). Remaining: B3f, and note in limitations that negation is still imperfect (e.g. a "no reservations… hassle to get seated" sentence ranked #3 for the no-wait query). | **High** | No | B2, A4 ✅ |
 | B3f | `[ ]` **Align app with B3 notebook:** (1) app's `GROQ_SYSTEM_PROMPT` is missing the notebook's *"healthy option"* example, so live rewrites can differ from what B3 measured; (2) the 100 pre-computed queries show Dense results and never use the B3 rewrites in `cache/b3_rewritten_queries.json` — decide whether the demo should show them. CE scores also display as raw logits (e.g. −8.78) next to 0–1 cosine scores. | Medium | No | B3 |
 | B3a | `[x]` **LLM query rewriting (Groq / qwen3.8-27b):** B2 labelling found two failure modes: (1) *negation blindness* — "no waitline" retrieves sentences about busy restaurants because the bi-encoder sees same-topic embeddings regardless of negation; (2) *idiomatic query failure* — "cheat meal", "I feel chubby" land in undefined embedding regions. Fix: call Groq API to rewrite query into explicit positive reviewer-language keywords before encoding. "No waitline" → "quick seating walk-in no queue no reservation". Results cached in-memory (second call instant). **Reason for PPT:** addresses a fundamental bi-encoder limitation; shows LLM integration for IR. | **High** | No | B2 |
@@ -225,8 +236,8 @@ FastAPI backend + single-page HTML/JS frontend, Dockerized for EC2. English tab:
 
 | ID | Task | Priority | Depends on |
 |---|---|---|---|
-| G1 | `[/]` **Backend API** — [app/main.py](app/main.py) (FastAPI) + [app/retrieval.py](app/retrieval.py). Endpoints are implemented; validate health, query validation, precomputed lookup, live routing, and response schemas. | **High** | A4 ✅, C3 ✅ |
-| G2 | `[/]` **Frontend UI** — [app/static/index.html](app/static/index.html). English and Thai result cards, explanations, and query chips are implemented; browser smoke-test remains. | **High** | G1 |
+| G1 | `[/]` **Backend API** — [app/main.py](app/main.py) (FastAPI) + [app/retrieval.py](app/retrieval.py). Endpoints are implemented; validate health, query validation, precomputed lookup, live routing, and response schemas. *2026-11-03: Thai 500 fixed (PR #1); health, precomputed EN/TH, and live EN routing (CE and non-CE paths) checked by hand. Still to do: query validation (empty/oversized) and schema checks.* | **High** | A4 ✅, C3 ✅ |
+| G2 | `[/]` **Frontend UI** — [app/static/index.html](app/static/index.html). English and Thai result cards, explanations, and query chips are implemented; browser smoke-test remains. *2026-11-03: Thai cards now show human labels and system ranks (PR #1).* | **High** | G1 |
 | G3 | `[ ]` **Local Docker test** — `docker compose up --build`, verify both tabs work, check `/api/health`. Fix any import/path issues. | **High** | G1, G2 |
 | G4 | `[ ]` **EC2 deployment** — once professor provides instance ID/IP: SSH in, install Docker, `rsync` or `git clone` project, `docker build -t food-recommender . && docker run ...`. Open port 8000 in security group. Follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). | **High** | G3, professor provides EC2 access |
 | G5 | `[ ]` **Live inference (optional)** — uncomment the embeddings `COPY` line in [Dockerfile](Dockerfile) to enable arbitrary English query inference (requires t2.large, ~750 MB extra). Only do this if EC2 instance has ≥ 8 GB RAM. The `.npy` is gitignored: build it with `python -m app.build_sentence_embeddings` (~30 min on a GTX 1650; much slower on CPU, so build locally and `rsync` it). Groq key must be in `.env` (model `qwen/qwen3.8-27b`; `llama-3.1-8b-instant` is not available on our account). | Low | G4 |
@@ -239,12 +250,12 @@ These are the remaining code-facing checks beyond the existing ranking notebook 
 
 | ID | Task | Priority | Depends on |
 |---|---|---|---|
-| H1 | `[ ]` **API and retrieval smoke tests** — test health, query listing, precomputed English/Thai queries, unknown English fallback, negation routing, empty/oversized requests, and response schema. | High | G1 |
+| H1 | `[/]` **API and retrieval smoke tests** — *Thai part done in [tests/test_thai_app.py](tests/test_thai_app.py) (8 tests passing); English side still to write.* Test health, query listing, precomputed English/Thai queries, unknown English fallback, negation routing, empty/oversized requests, and response schema. | High | G1 |
 | H2 | `[/]` **Live-pipeline regression checks** — *2026-11-03: corpus count (240,660) and embedding alignment confirmed — the build script uses the app's own splitter, and the app raises on a size mismatch at startup.* Still to do: turn these into asserted tests, and check that all 50 restaurants are represented, and explanations contain at most 5 sentences. | High | B3, G1 |
 | H3 | `[ ]` **B3 subgroup analysis** — report nDCG@10/MAP separately for explicit negation/exclusion queries and plain positive queries, plus query rewrite change rate and per-query deltas. This verifies that selective CE is justified rather than relying only on the overall average. | High | B3 |
 | H4 | `[ ]` **Operational metrics** — measure cold-start time, precomputed latency, live-query p50/p95 latency, CE-vs-bi-encoder latency, and cache-hit latency; record peak memory during startup. | Medium | G1, G3 |
 | H5 | `[ ]` **Robustness checks** — verify behavior with no Groq key, Groq timeout/error, missing optional embeddings, malformed CSV rows, and repeated/case-variant queries. | Medium | H1, H2 |
-| H6 | `[ ]` **Automated test suite** — add focused tests for helpers, routing, corpus alignment, API validation, and result contracts; run them before final packaging. | Medium | H1, H2 |
+| H6 | `[/]` **Automated test suite** — started: `tests/` with pytest (`python -m pytest -q tests`). Add focused tests for helpers, routing, corpus alignment, API validation, and result contracts; run them before final packaging. | Medium | H1, H2 |
 
 ### Metrics to report
 
