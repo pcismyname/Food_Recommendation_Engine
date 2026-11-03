@@ -11,7 +11,7 @@
 A user types a natural-language query such as *"I want a cozy bar with a patio"* or
 *"อยากกินอะไรเปรี้ยวๆ"* (Thai: "I want something sour"). The system:
 
-1. **Rewrites the query** using an LLM (Groq / Llama-3.1-8b-instant) to make vague or
+1. **Rewrites the query** using an LLM (Groq / `qwen/qwen3.8-27b`) to make vague or
    negation-heavy queries concrete — e.g. *"no waitline"* → *"quick seating walk-in no queue"*.
 2. **Retrieves** the most relevant review sentences for each restaurant using a multilingual
    dense encoder (`paraphrase-multilingual-mpnet-base-v2`).
@@ -32,7 +32,7 @@ The live demo runs at **http://localhost:8000** (see [Running the app](#running-
 └───────────────────────┬─────────────────────────────────────────────────────┘
                         │
             ┌───────────▼────────────┐
-            │  STAGE 0: Query         │  Groq / Llama-3.1-8b-instant
+            │  STAGE 0: Query         │  Groq / qwen3.8-27b         
             │  Rewriting (B3)        │  Converts negations + vague phrases
             │                        │  to reviewer-language keywords
             └───────────┬────────────┘
@@ -262,7 +262,20 @@ groq = your_groq_api_key_here
 The server reads this automatically at startup. Without it, query rewriting is disabled
 but pre-computed queries still work.
 
-### Step 3 — Start the server
+### Step 3 — Build the sentence embeddings (once per machine)
+
+Live inference — and therefore Groq query rewriting — only runs when
+`baselines/cache/sentence/emb_paraphrase-multilingual-mpnet-base-v2_sentence_len256.npy`
+exists. It is gitignored (~740 MB), so build it once:
+
+```bash
+python3 -m app.build_sentence_embeddings
+```
+
+Takes a few minutes on a GPU (much longer on CPU). Without it, the server still starts but
+only the pre-computed queries work.
+
+### Step 4 — Start the server
 
 ```bash
 # From the project root (Food_Recommendation_Engine/)
