@@ -82,6 +82,18 @@ class RestaurantResult(BaseModel):
     explanation: list[ExplanationSentence]
 
 
+class ThaiSentenceResult(BaseModel):
+    sent_id: str
+    text: str
+    star: str = ""
+    systems: List[str]                  # which systems retrieved it: "bm25", "dense"
+    bm25_rank: Optional[int] = None
+    bm25_score: Optional[float] = None
+    dense_rank: Optional[int] = None
+    dense_score: Optional[float] = None
+    label: Optional[int] = None         # human relevance 0/1/2 (C4), None if unlabelled
+
+
 class QueryResponse(BaseModel):
     query: str
     lang: str
@@ -89,7 +101,9 @@ class QueryResponse(BaseModel):
     matched_query: Optional[str]
     rewritten_query: Optional[str] = None
     pipeline: Optional[str] = None
-    results: List[RestaurantResult]
+    query_en: Optional[str] = None
+    results: List[RestaurantResult]                    # English tab
+    sentences: List[ThaiSentenceResult] = []           # Thai tab
     error: Optional[str] = None
     hint: Optional[str] = None
 
@@ -118,8 +132,12 @@ def run_query(req: QueryRequest):
 
     if req.lang == "en":
         raw = engine.query_english(req.query, req.n_results)
+        results = [RestaurantResult(**r) for r in raw.get("results", [])]
+        sentences = []
     else:
         raw = engine.query_thai(req.query, req.n_results)
+        results = []
+        sentences = [ThaiSentenceResult(**r) for r in raw.get("results", [])]
 
     return QueryResponse(
         query=req.query,
@@ -128,7 +146,9 @@ def run_query(req: QueryRequest):
         matched_query=raw.get("matched_query"),
         rewritten_query=raw.get("rewritten_query"),
         pipeline=raw.get("pipeline"),
-        results=[RestaurantResult(**r) for r in raw.get("results", [])],
+        query_en=raw.get("query_en"),
+        results=results,
+        sentences=sentences,
         error=raw.get("error"),
         hint=raw.get("hint"),
     )

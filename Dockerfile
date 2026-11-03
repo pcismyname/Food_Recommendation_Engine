@@ -35,6 +35,9 @@ COPY app/ ./app/
 #  but baked in for EC2 if you run `docker build` after downloading them)
 COPY baselines/cache/sentence/evidence_sentence.csv  ./baselines/cache/sentence/evidence_sentence.csv
 COPY thai/results/topk_n10000_s42.csv                ./thai/results/topk_n10000_s42.csv
+COPY thai/thai_queries.csv                           ./thai/thai_queries.csv
+COPY thai/labels/label_sheet.csv                     ./thai/labels/label_sheet.csv
+COPY thai/labels/pool_key.csv                        ./thai/labels/pool_key.csv
 COPY datasets/rir_data-main/reviews/50_restaurants_all_rates.csv \
                                                      ./datasets/rir_data-main/reviews/50_restaurants_all_rates.csv
 

@@ -437,6 +437,10 @@
     .pill-sys  { background: var(--accent)22;  border: 1px solid var(--accent)44;  color: var(--accent); }
     .pill-star { background: #ffd70022;         border: 1px solid #ffd70044;        color: var(--rank1); }
     .pill-score { background: var(--accent2)22; border: 1px solid var(--accent2)44; color: var(--accent2); }
+    .label-2 { background: #22c55e22; border: 1px solid #22c55e66; color: #4ade80; font-weight: 600; }
+    .label-1 { background: #eab30822; border: 1px solid #eab30866; color: #facc15; font-weight: 600; }
+    .label-0 { background: #ef444422; border: 1px solid #ef444466; color: #f87171; font-weight: 600; }
+    .thai-query-en { font-size: 13px; color: var(--text-muted); margin: 0 0 12px; font-style: italic; }
 
     /* ── Empty state ────────────────────────────────────────────────── */
     .empty-state {
@@ -716,34 +720,53 @@
     const badge  = document.getElementById('precomp-badge');
     const empty  = document.getElementById('empty-state');
 
-    if (!data.results || data.results.length === 0) {
+    const items = data.sentences || [];
+    if (items.length === 0) {
       empty.style.display = 'block';
       return;
     }
 
     header.style.display = 'flex';
-    count.textContent = `${data.results.length} sentences retrieved`;
+    const nRel = items.filter(r => r.label === 2).length;
+    const nPart = items.filter(r => r.label === 1).length;
+    count.textContent = `${items.length} sentences · ${nRel} clearly relevant, ${nPart} partly (human-labelled)`;
     badge.style.display = 'inline-block';
 
-    data.results.forEach((r, idx) => {
-      // Thai results are flat sentence objects from retrieval.py
+    if (data.query_en) {
+      const q = document.createElement('div');
+      q.className = 'thai-query-en';
+      q.textContent = `“${data.query_en}” — BM25 and dense results interleaved by rank`;
+      wrap.appendChild(q);
+    }
+
+    const LABELS = {
+      2: ['label-2', '✓ Clearly relevant'],
+      1: ['label-1', '~ Partly relevant'],
+      0: ['label-0', '✗ Not relevant'],
+    };
+
+    items.forEach((r, idx) => {
       const item = document.createElement('div');
       item.className = 'thai-item';
       item.style.animationDelay = `${idx * 40}ms`;
 
-      const sys   = r.system  || '';
-      const star  = r.star !== undefined && r.star !== '' ? `${r.star}★` : '';
-      const score = typeof r.score === 'number' ? r.score.toFixed(3) : '';
-      const text  = r.text || '';
+      const star = r.star ? `${escHtml(String(r.star))}★` : '';
+      const sysPills = (r.systems || []).map(s => {
+        const rank = r[`${s}_rank`];
+        const name = s === 'bm25' ? 'BM25' : 'Dense';
+        return `<span class="meta-pill pill-sys">${name}${rank ? ' #' + rank : ''}</span>`;
+      }).join('');
+      const lab = LABELS[r.label];
+      const labPill = lab ? `<span class="meta-pill ${lab[0]}" title="Human relevance label (0/1/2)">${lab[1]}</span>` : '';
 
       item.innerHTML = `
         <div class="thai-rank">${idx + 1}</div>
         <div class="thai-content">
-          <div class="thai-text">${escHtml(text)}</div>
+          <div class="thai-text">${escHtml(r.text || '')}</div>
           <div class="thai-meta">
-            ${sys   ? `<span class="meta-pill pill-sys">${escHtml(sys)}</span>` : ''}
-            ${star  ? `<span class="meta-pill pill-star">${star}</span>` : ''}
-            ${score ? `<span class="meta-pill pill-score">${score}</span>` : ''}
+            ${labPill}
+            ${sysPills}
+            ${star ? `<span class="meta-pill pill-star">${star}</span>` : ''}
           </div>
         </div>`;
       wrap.appendChild(item);

@@ -33,7 +33,8 @@ logger = logging.getLogger(__name__)
 # ── Paths ─────────────────────────────────────────────────────────────────────
 ROOT   = Path(__file__).resolve().parent.parent
 CACHE  = ROOT / "baselines" / "cache"
-THAI_R = ROOT / "thai" / "results"
+THAI   = ROOT / "thai"
+THAI_R = THAI / "results"
 DATA   = ROOT / "datasets" / "rir_data-main"
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -116,6 +117,7 @@ class RetrievalEngine:
         # Thai pre-computed (24 frozen queries → instant lookup)
         self._th_precomputed: Dict[str, List[dict]] = {}
         self._th_queries: List[str] = []
+        self._th_query_en: Dict[str, str] = {}
 
         # Stage 1: bi-encoder (lazy — only loaded if embeddings file exists)
         self._embedder = None
@@ -216,6 +218,7 @@ class RetrievalEngine:
         if matched:
             return {
                 "results": self._th_precomputed[matched][:n],
+                "query_en": self._th_query_en.get(matched),
                 "is_precomputed": True,
                 "matched_query": matched if matched.lower() != query.lower() else None,
                 "rewritten_query": None,
@@ -317,29 +320,78 @@ class RetrievalEngine:
             logger.warning("Thai results not found: %s", th_path)
             return
 
-        raw: Dict[str, Dict[str, List]] = defaultdict(lambda: defaultdict(list))
+        labels = self._load_thai_labels()
+
+        qid_of: Dict[str, str] = {}
+        ranked: Dict[str, Dict[str, List[dict]]] = defaultdict(lambda: defaultdict(list))
         for row in _load_csv(th_path):
-            q   = row.get("query_th", "").strip()
-            sys = row.get("system", "dense")
+            q = row.get("query_th", "").strip()
             if not q:
                 continue
-            raw[q][sys].append((
-                int(row.get("rank", 0)), float(row.get("score", 0)),
-                row.get("text", ""), row.get("star_rating", ""),
-            ))
+            qid_of[q] = row["qid"]
+            ranked[q][row["system"]].append(row)
 
-        for q, sys_dict in raw.items():
-            seen_texts: Dict[str, dict] = {}
-            for sys_name, items in sys_dict.items():
-                for rank, score, text, star in sorted(items, key=lambda x: x[0]):
-                    key = text.strip()
-                    if key not in seen_texts or score > seen_texts[key]["score"]:
-                        seen_texts[key] = {"text": text, "score": round(score, 4),
-                                           "system": sys_name, "star": star}
-            self._th_precomputed[q] = sorted(seen_texts.values(), key=lambda x: -x["score"])
+        for q, by_sys in ranked.items():
+            for rows in by_sys.values():
+                rows.sort(key=lambda r: int(r["rank"]))
+            self._th_precomputed[q] = self._merge_thai_systems(qid_of[q], by_sys, labels)
 
         self._th_queries = sorted(self._th_precomputed.keys())
         logger.info("Loaded %d Thai pre-computed queries", len(self._th_queries))
+
+        q_path = THAI / "thai_queries.csv"
+        if q_path.exists():
+            self._th_query_en = {r["query_th"].strip(): r["query_en"] for r in _load_csv(q_path)}
+
+    @staticmethod
+    def _load_thai_labels() -> Dict[Tuple[str, str], int]:
+        """Map (qid, sent_id) → human relevance label 0/1/2 from the C4 label sheet."""
+        sheet, key = THAI / "labels" / "label_sheet.csv", THAI / "labels" / "pool_key.csv"
+        if not (sheet.exists() and key.exists()):
+            logger.warning("Thai labels not found — results will show without relevance badges")
+            return {}
+        label_of = {r["pair_id"]: r["label"].strip() for r in _load_csv(sheet)}
+        out: Dict[Tuple[str, str], int] = {}
+        for r in _load_csv(key):
+            lab = label_of.get(r["pair_id"], "")
+            if lab in ("0", "1", "2"):
+                out[(r["qid"], r["sent_id"])] = int(lab)
+        return out
+
+    @staticmethod
+    def _merge_thai_systems(qid: str, by_sys: Dict[str, List[dict]],
+                            labels: Dict[Tuple[str, str], int]) -> List[dict]:
+        """Interleave BM25 and dense by rank (BM25 first, as it scored higher in C7).
+
+        Raw scores are not comparable (BM25 ~10–15, cosine < 1), so we merge by rank
+        and keep each system's own rank and score on the result.
+        """
+        merged: Dict[str, dict] = {}
+        order: List[str] = []
+        systems = [s for s in ("bm25", "dense") if s in by_sys]
+        depth = max((len(v) for v in by_sys.values()), default=0)
+        for i in range(depth):
+            for sys_name in systems:
+                if i >= len(by_sys[sys_name]):
+                    continue
+                row = by_sys[sys_name][i]
+                sid = row["sent_id"]
+                if sid not in merged:
+                    order.append(sid)
+                    merged[sid] = {
+                        "sent_id": sid,
+                        "text": row["text"],
+                        "star": row.get("star_rating", ""),
+                        "systems": [],
+                        "bm25_rank": None, "bm25_score": None,
+                        "dense_rank": None, "dense_score": None,
+                        "label": labels.get((qid, sid)),
+                    }
+                m = merged[sid]
+                m["systems"].append(sys_name)
+                m[f"{sys_name}_rank"] = int(row["rank"])
+                m[f"{sys_name}_score"] = round(float(row["score"]), 4)
+        return [merged[s] for s in order]
 
     def _try_load_live_pipeline(self):
         """Load bi-encoder + cross-encoder for live inference. Optional."""
