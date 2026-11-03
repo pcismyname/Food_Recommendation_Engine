@@ -1,0 +1,61 @@
+﻿pair_id,qid,query_th,query_en,text,llm_label,confidence,reason
+P0011,T01,อยากกินอะไรเปรี้ยวๆ,I want something sour,สำหรับ คนที่ชอบทานเปรี้ยวนะครับ,2,low,R9: general preference/advice implying the item is sour; hedged advice lowered one grade.
+P0014,T01,อยากกินอะไรเปรี้ยวๆ,I want something sour,เค็มหวานนำ มื้อนี้จัดไป,0,high,Salty-sweet only; no sour mentioned.
+P0017,T01,อยากกินอะไรเปรี้ยวๆ,I want something sour,อยากหาอะไรที่อร่อยๆทาน,0,high,Generic wish for tasty food; not about sour.
+P0023,T02,อยากกินอะไรเผ็ดๆ แบบจัดๆ,I want something really spicy,อะไรจัดโปรเด็ดๆ จัดมาคะ 555,0,high,"R5: จัด refers to promotions, unrelated sense."
+P0029,T02,อยากกินอะไรเผ็ดๆ แบบจัดๆ,I want something really spicy,ชอบอาหารคาวใช้ได้เลย,0,high,Liking savoury food; no spiciness.
+P0037,T02,อยากกินอะไรเผ็ดๆ แบบจัดๆ,I want something really spicy,รสธรรมดา เผ็ด แนะนะว่ากินเผ็ดดีกว่า,1,medium,3.2: plain เผ็ด is partial for a strong-spicy query.
+P0043,T03,ของหวานหวานกำลังดี,desserts that are just sweet enough,มีของหวานด้วยนะคะ,0,medium,Dessert mentioned with no sweetness info; T03 not a dish-name query under R4.
+P0044,T03,ของหวานหวานกำลังดี,desserts that are just sweet enough,ชุ่มฉ่ำหวานกำลังดี,1,medium,R8: หวานกำลังดี met but item not stated (not confirmed dessert).
+P0063,T04,น้ำซุปข้นๆ เข้มข้น,thick rich broth,น้ำซุปข้น หอมสมุนไพร,2,high,T04: broth described ข้น (one of ข้น/เข้มข้น is enough).
+P0065,T04,น้ำซุปข้นๆ เข้มข้น,thick rich broth,น้ำซุปเด็ดดมากกก.,1,medium,Broth praised but no thickness/richness described.
+P0075,T04,น้ำซุปข้นๆ เข้มข้น,thick rich broth,รสชาติน้ำซุปเข้มข้นมาก,2,high,T04: broth เข้มข้นมาก.
+P0085,T05,อยากกินของทอดมันๆ,I want oily fried food,สั่งเป็นราเมนต้มยำมาค่ะ,0,high,"Tom yum ramen, not fried, no oiliness."
+P0090,T05,อยากกินของทอดมันๆ,I want oily fried food,สั่งของทอดได้อีกนิดหน่อย,1,low,T05: fried food named with no oiliness (analogous to crispy-fried typical 1).
+P0092,T05,อยากกินของทอดมันๆ,I want oily fried food,ถ้าใครอยากทานข้าวเหนียว,0,high,Not about fried or oily food.
+P0104,T06,ร้านถูกๆ แต่อร่อย,cheap but tasty place,ราคาถูกๆเริ่มต้น,1,high,"T06/R6: cheap only, no taste = 1."
+P0108,T06,ร้านถูกๆ แต่อร่อย,cheap but tasty place,ร้านนี้อาหารราคาไม่แพงค่ะ,1,high,T06/R6: ราคาไม่แพง cheap only = 1.
+P0117,T07,อยากกินอะไรรสจัดๆ,I want something strongly flavoured,แล้วมีอะไรก็ทาน,0,high,Not about strong flavour.
+P0132,T07,อยากกินอะไรรสจัดๆ,I want something strongly flavoured,อร่อยดี อยากกินขนม แต่อิ่มแล้ว เฮ้อ อยากกิน,0,high,Not about strong flavour; wish to eat snacks.
+P0135,T08,อาหารรสเค็มนำ,salt-forward food,มีมันฝรั่งสีเหลือง ถั่วลันเตาสีเขียวและน้ำซอสสีแดงเข้มข้นรสชาติจัดจ้านออกรสเค็มนำ,2,high,T08: sauce (R7 part of dish) ออกรสเค็มนำ = salt leads.
+P0148,T08,อาหารรสเค็มนำ,salt-forward food,แถมรสชาติของหลนหวานเจี๊ยบ,0,high,T08: sweet-leading with no salt.
+P0151,T08,อาหารรสเค็มนำ,salt-forward food,เสียดายน้ำจิ้มรสเค็มไปนิด,2,medium,R3/T08: dip เค็มไป counts as salt-forward (complaints count); dip part of dish (R7).
+P0159,T09,น้ำซุปหอมสมุนไพร,broth fragrant with herbs,น้ำซุปที่นี้หอม,1,high,T09: broth หอม with no herb named = 1.
+P0161,T09,น้ำซุปหอมสมุนไพร,broth fragrant with herbs,น้ำซุป : ไม่ค่อยหอม,0,high,Broth ไม่ค่อยหอม contradicts fragrance.
+P0162,T09,น้ำซุปหอมสมุนไพร,broth fragrant with herbs,ด้วยน้ำซุปที่หอม,1,high,T09: broth หอม with no herb named = 1.
+P0180,T10,อาหารรสอ่อนๆ กินง่าย,mild easy-to-eat food,แต่รสอ่อนไปหน่อย,1,medium,T10: รสอ่อนไป goes too far (like จืดไป) and item not stated (R8).
+P0183,T10,อาหารรสอ่อนๆ กินง่าย,mild easy-to-eat food,เคี้ยวง่ายไม่เหนียว,0,medium,"Easy to chew is texture, not mild taste; T10 needs กินง่าย about taste."
+P0189,T11,ต้มยำเปรี้ยวๆ เผ็ดๆ,sour and spicy tom yum,ตรมเ้วย ผัดซีอิ๊วหมู,0,high,R13: garbled text; unreadable.
+P0197,T11,ต้มยำเปรี้ยวๆ เผ็ดๆ,sour and spicy tom yum,อร่อยดี เปรี้ยวๆ เผ็ดๆ แต่ไม่เข็ดฟันเด้อ - พิซซ่าญี่ปุ่น,1,medium,"3.1: sour+spicy fully met but item is pizza, not tom yum (wrong item = 1)."
+P0212,T12,อะไรแซ่บๆ เปรี้ยวเผ็ดเค็ม,something zesty: sour spicy salty,สะใจมากๆ ทั้งเปรี้ยว หวาน เค็ม เผ็ด,2,high,"T12: sour, spicy and salty all present."
+P0217,T12,อะไรแซ่บๆ เปรี้ยวเผ็ดเค็ม,something zesty: sour spicy salty,ไม่เปรี้ยวแซ่บ เร่าร้อนอะไรเลย,0,high,R1: ไม่เปรี้ยวแซ่บ contradicts.
+P0222,T12,อะไรแซ่บๆ เปรี้ยวเผ็ดเค็ม,something zesty: sour spicy salty,แซ่บมากๆ ทั้งเปรี้ยว ทั้งเผ็ด,2,high,T12: แซ่บมาก with sour and spicy (2+ parts).
+P0227,T13,ของหวานถูกๆ,cheap desserts,อร่อยราคาไม่แพง,1,medium,T13: cheap but item not stated as dessert = 1.
+P0239,T13,ของหวานถูกๆ,cheap desserts,เพราะคิดแล้วไม่ใช่ถูกๆ นะจ้ะ 5 คนเกือบ 2000 นึกถึงบุฟเฟ่เลย,0,high,R6: ไม่ใช่ถูกๆ contradicts cheap; not dessert.
+P0258,T14,แกงกะทิเข้มข้น หวานมัน,rich sweet creamy coconut curry,อันนี้ก็แกงกะทิ,1,high,"T14/R4: coconut curry named, no taste = 1."
+P0260,T14,แกงกะทิเข้มข้น หวานมัน,rich sweet creamy coconut curry,ก๋วยเตี๋ยวรสชาติแซบดีค่ะ ออกเผ็ดและหวาน,0,high,3.1: noodles (wrong item) with only one part (หวาน) = 0.
+P0270,T15,ยำรสจัด เปรี้ยวหวาน,strongly flavoured sweet-and-sour yam salad,น้ำต้มยำอร่อยๆ เปรี้ยวๆ ดี,0,medium,3.1: tom yum (not yam) with one part (sour) = partial taste + wrong item = 0.
+P0276,T15,ยำรสจัด เปรี้ยวหวาน,strongly flavoured sweet-and-sour yam salad,รสชาติจะออกหวานนำ - หลนปู มาพร้อมผัดสด,0,medium,"3.1: หลนปู not yam, only sweet = partial + wrong item = 0."
+P0289,T16,ร้านอาหารเผ็ดๆ ราคาถูก,cheap place with spicy food,ร้านนี้อาหารราคาไม่แพงค่ะ,1,high,T16: cheap only = 1.
+P0293,T16,ร้านอาหารเผ็ดๆ ราคาถูก,cheap place with spicy food,ทั้งยังมีข้าวผัดกระเทียมและขนมจีบซาลาเปามาช่วยลดความเลี่ยน ที่สำคัญร้านนี้ราคาค่อนข้างถูกทีเดียว,1,high,"T16: cheap only, no spice = 1."
+P0303,T17,น้ำผลไม้เปรี้ยวหวาน สดชื่น,refreshing sweet-and-sour fruit juice,น้ำส้มสายชูปรุงรสเปรี้ยวหวาน จี๊ดจ๊าดถูกใจ ...,1,low,"3.1: sour-sweet met but on seasoned vinegar, not a fruit drink (wrong item = 1)."
+P0308,T17,น้ำผลไม้เปรี้ยวหวาน สดชื่น,refreshing sweet-and-sour fruit juice,เปรี้ยวหวานก็เยอะ,1,low,R8: sour-sweet met but item not stated = 1 at most.
+P0311,T17,น้ำผลไม้เปรี้ยวหวาน สดชื่น,refreshing sweet-and-sour fruit juice,ไม่จืด ให้รสชาดของน้ำผลไม้อย่างเต็มๆ ชอบมากๆๆๆค่ะ,1,medium,"T17: fruit juice, full fruit flavour but none of sour/sweet/สดชื่น explicit = 1."
+P0323,T18,บุฟเฟต์คุ้มๆ,buffet that is good value,เอาเป็นว่าอาหารอร่อยนะ,0,high,No buffet or value; tasty food only.
+P0334,T18,บุฟเฟต์คุ้มๆ,buffet that is good value,เผื่อแผ่ฟามอร่อยกันไป,0,high,Not about buffet or value.
+P0350,T19,อาหารไม่เผ็ด เด็กกินได้,non-spicy food kids can eat,ทานยังไงก็ไม่เลี่ยน,0,high,No spice info; ไม่เลี่ยน irrelevant to T19.
+P0356,T19,อาหารไม่เผ็ด เด็กกินได้,non-spicy food kids can eat,คนกินเผ็ดได้น้อยอาจจะต้องบอกเค้าก่อนจะได้ไม่เผ็ดเกิน,0,high,R9: advice implying food can be too spicy; no non-spicy description.
+P0361,T20,ของหวานที่ไม่หวานมาก,desserts that are not too sweet,ส่วนของหวาน หวานไปหน่อย,0,high,T20: dessert หวานไป contradicts.
+P0368,T20,ของหวานที่ไม่หวานมาก,desserts that are not too sweet,ร้านหวานละมุนเป็นร้านของหวานที่หลายคนบอกว่าอร่อยมากกกกก ผมเองแล้วก็ไม่ค่อยชอบทานของหวานสักเท่าไหร่,0,medium,R4: หวาน only in shop name; no sweetness degree described.
+P0373,T20,ของหวานที่ไม่หวานมาก,desserts that are not too sweet,อร่อยหวานไม่มาก,1,medium,T20: หวานไม่มาก met but item not stated = 1.
+P0386,T21,ก๋วยเตี๋ยวน้ำซุปไม่เค็ม,noodle soup with broth that is not salty,น้ำซุปออกหวานไม่เข้มข้น,0,low,"T21: no salt info; sweetish non-rich broth, noodles not stated."
+P0387,T21,ก๋วยเตี๋ยวน้ำซุปไม่เค็ม,noodle soup with broth that is not salty,ซุปไม่เลียน เข้ากับขนมปังกระเทียม,0,high,"Soup not greasy; no salt info, not noodle broth."
+P0405,T22,อาหารไม่มัน ไม่เลี่ยน,food that is not oily or greasy,มันเลยไม่เลี่ยน - โรตีกล้วยหอม,1,medium,T22: roti (dessert) ไม่เลี่ยน = wrong item = 1; มัน here is pronoun (R5).
+P0406,T22,อาหารไม่มัน ไม่เลี่ยน,food that is not oily or greasy,ไม่เผ็ดจนเกินไป แต่ก็ไม่ถึงกับจืดจนเสียรสชาติ,0,high,"About spiciness/blandness, not oiliness."
+P0408,T22,อาหารไม่มัน ไม่เลี่ยน,food that is not oily or greasy,ผัดซีอิ๊วเส้นหอม ๆ ไม่มันไม่เลี่ยน,2,high,T22: ผัดซีอิ๊ว ไม่มันไม่เลี่ยน.
+P0420,T23,กาแฟเข้มๆ ไม่เปรี้ยว,strong coffee that is not sour,รสชาติกาแฟค่อยข้างเข้มดีค่ะ,1,high,"T23: coffee fairly strong, sour not mentioned = 1."
+P0421,T23,กาแฟเข้มๆ ไม่เปรี้ยว,strong coffee that is not sour,เป็นกาแฟคั่วเข้ม,1,medium,T23: dark-roast coffee implies strength only; sour not mentioned = 1.
+P0431,T23,กาแฟเข้มๆ ไม่เปรี้ยว,strong coffee that is not sour,กาแฟหอมไม่ขมมากเป็นกาแฟอินทนิล,0,low,"T23: coffee fragrant, ไม่ขมมาก suggests not strong; no strong or not-sour evidence."
+P0438,T24,อยากกินอะไรหวานๆ เค็มๆ,I want something sweet and salty,สดดีน้ำจิ้มหวานๆเค็มเต้าเจี้ยว,2,high,T24: dip หวานๆเค็ม = sweet + salty.
+P0444,T24,อยากกินอะไรหวานๆ เค็มๆ,I want something sweet and salty,ทานเล่นๆ หวานๆเปรี้ยวๆ,1,high,"T24: sweet only (sweet-sour), no salty = 1."
+P0446,T24,อยากกินอะไรหวานๆ เค็มๆ,I want something sweet and salty,แพนเค้กรสชาติใช้ได้ติดเค็มนิดๆ กินคู่ไอศกรีมหวานๆ,2,medium,T24: pancake เค็มนิดๆ (slight = met) with sweet ice cream = sweet + salty.
