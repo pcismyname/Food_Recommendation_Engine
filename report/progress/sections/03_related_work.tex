@@ -1,0 +1,72 @@
+\chapter{Related Work}
+
+\section{Review-based recommendation}
+Review-based recommender systems use review text to improve rating prediction, preference
+modelling or item discovery. Matrix factorisation is a classic collaborative-filtering
+baseline, but it mainly models user--item interactions and does not directly explain why an
+item satisfies a new textual request \citep{koren2009matrix}. Review-based retrieval addresses
+a different problem: the user describes a preference in natural language and the system
+retrieves reviewed items whose evidence matches that preference.
+
+The RIRD work is the closest foundation for this project. It defines reviewed-item retrieval
+with restaurant reviews, free-text queries and human relevance judgements
+\citep{rird2023}. The authors also provide a supervised fusion-based reference, which gives us
+a meaningful external comparison. We do not reproduce their fine-tuning; instead, we test
+frozen, off-the-shelf retrieval models so that the effect of representation, granularity and
+aggregation can be isolated.
+
+\section{Conversational and preference-based recommendation}
+Conversational recommender surveys describe systems that elicit preferences through dialogue
+and use those preferences to narrow a recommendation set \citep{gao2021conversational}. Work on
+preference elicitation also shows the value of asking or generating usage-related questions
+when the user's preference is underspecified \citep{kostric2024usage}. Our system is a
+single-query, retrieval-focused version of this idea: instead of conducting a conversation, it
+accepts one natural-language query and expands it only when the query is vague or contains an
+explicit exclusion. This keeps the experiment reproducible and makes the retrieved review
+sentence the primary evidence.
+
+\section{Lexical and dense retrieval}
+BM25 is the lexical baseline in the RIRD work and in our experiments. It uses term frequency,
+inverse document frequency and document-length normalisation
+\citep{robertson2009bm25}. BM25 is inexpensive, deterministic and interpretable, but it is
+limited by vocabulary mismatch: ``affordable'' and ``cheap'' may describe the same preference
+without sharing tokens.
+
+Dense retrieval addresses this limitation by representing queries and text in a shared vector
+space. BERT showed how bidirectional Transformer pretraining can provide contextual language
+representations \citep{devlin2019bert}; Sentence-BERT then made sentence-level similarity
+practical through Siamese encoders \citep{reimers2019sbert}. Dense passage retrieval further
+demonstrated the value of independently encoded queries and passages for semantic retrieval
+\citep{karpukhin2020dpr}. We use a multilingual sentence-transformer because the same retrieval
+procedure must operate on English RIRD text and Thai Wongnai text.
+
+\section{Thai language processing}
+Thai differs from English because word boundaries are not consistently marked by spaces.
+WangchanBERTa demonstrates the value of Thai-specific pretraining
+\citep{lowphansirikul2021wangchanberta}, while our project deliberately uses a single
+multilingual encoder to keep the English and Thai experiments comparable. Thai sentence
+segmentation and tokenisation are handled with a Thai NLP toolkit.
+This is a transfer study rather than a claim that the English RIRD model has been fine-tuned
+for Thai.
+
+\section{Granularity, fusion and explanations}
+A whole restaurant document preserves context but hides which review supports the result.
+Sentence units produce more precise explanations but also create more noise. Our fusion step
+therefore compares max, mean and mean-of-top-$k$, with $k\in\{3,5,10\}$. This follows the
+reviewed-item retrieval formulation, where unit scores must be converted into an item ranking
+\citep{rird2023}.
+
+Explainable recommendation research distinguishes between showing evidence and merely producing
+a recommendation that appears plausible. The explainable recommendation survey highlights the
+need to connect explanations to user preferences and recommendation decisions
+\citep{zhang2020explainable}. Our system selects existing review sentences rather than
+generating new claims, and evaluates whether deleting shown sentences affects the ranking.
+This makes interpretability a measurable property rather than only a user-interface feature.
+
+\section{Positioning and design justification}
+The proposal sources establish the components used here: BM25 for a strong lexical baseline,
+Transformer sentence representations for semantic retrieval, and RIRD for reviewed-item
+evaluation. We combine them in a deliberately simple pipeline rather than adding a learned
+fusion model or a large conversational architecture. The choice is justified by three needs:
+fair comparison on the same units, evidence that can be inspected by a diner, and a model that
+can be transferred to Thai text without training a separate task-specific system.

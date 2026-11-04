@@ -1,0 +1,72 @@
+\chapter{Introduction}
+
+\section{Background and motivation}
+Restaurant reviews contain detailed descriptions of food, service, price, atmosphere and
+accessibility. Conventional restaurant recommenders commonly predict ratings or popularity,
+but a user often expresses a need in natural language: ``a quiet place with outdoor seating'',
+``affordable food'', or ``something sour and spicy''. Review-based retrieval can answer this
+need directly by finding review evidence that matches the query and using it to rank restaurants.
+
+The central motivation of this work is explainability. A ranked restaurant without evidence is
+difficult for a user to verify. Our system returns existing review sentences alongside each
+restaurant, allowing a user to inspect why an item was retrieved. This is different from
+generating an explanation after recommendation: the explanation is selected from the same
+review evidence used by the retrieval system.
+
+The project began with a broader Thai food recommendation proposal. The data audit showed that
+the English RIRD benchmark contains restaurant identities and relevance judgements, while the
+available Wongnai data contains Thai reviews but no restaurant identities. We consequently
+separated the claims: English supports measured restaurant ranking and explainability; Thai
+supports a sentence-level transfer case study. This change prevents a common evaluation error
+in which a model is described as a Thai restaurant recommender without a Thai restaurant-level
+ground truth.
+
+\section{Business understanding and potential impact}
+The intended users are diners choosing a restaurant from a personal preference rather than a
+fixed category. The practical benefits are:
+\begin{itemize}
+  \item natural-language search instead of manually browsing categories;
+  \item transparent recommendations supported by real review text;
+  \item better handling of specific constraints such as price, waiting time and atmosphere;
+  \item multilingual sentence retrieval as a foundation for Thai food discovery.
+\end{itemize}
+For restaurant platforms, this can increase discovery of suitable businesses and reduce the
+trust gap caused by opaque ranking. The system does not claim to replace human judgement:
+reviews can be subjective, outdated or contradictory. Its value is to make relevant evidence
+easier to find.
+
+The business problem is not simply ``predict the highest-rated restaurant''. A user may accept
+a lower-rated restaurant because it is inexpensive, quiet, accessible or suitable for a dietary
+constraint. A global rating is therefore an incomplete proxy for utility. Query-conditioned
+review retrieval gives the platform a way to serve long-tail preferences while giving the user
+enough evidence to decide whether the recommendation is credible. For restaurants, this may
+improve discovery when a useful characteristic is present in reviews but not in a category
+label.
+
+\section{Stakeholders and success criteria}
+The primary stakeholder is the diner, who needs relevant choices and understandable evidence.
+Secondary stakeholders are restaurant platforms, which need a retrieval service that is
+measurable, computationally practical and robust to uneven review volume. We define success as:
+\begin{enumerate}
+  \item better query-conditioned ranking than a strong lexical baseline;
+  \item evidence that is traceable to original reviews;
+  \item acceptable behaviour for vague and negative queries;
+  \item a complexity level suitable for a small interactive demo.
+\end{enumerate}
+
+\section{Research objectives}
+The project has three objectives:
+\begin{enumerate}
+  \item compare BM25 and multilingual dense retrieval fairly using the same review units and
+  aggregation functions;
+  \item evaluate whether retrieved sentences are faithful to ranking and supportive of a query;
+  \item test sentence-level transfer to real Thai restaurant reviews using independently
+  annotated taste queries.
+\end{enumerate}
+
+\section{Contributions}
+The contributions are an evidence-based reviewed-item retrieval pipeline, a controlled
+comparison of review- and sentence-level retrieval, an analysis of review-volume bias, a
+sentence-level explanation interface, and a reproducible Thai taste case study. The live demo
+also includes query rewriting and selective cross-encoder reranking for difficult negation and
+exclusion queries.

@@ -1,0 +1,29 @@
+\chapter{Problem Statement}
+
+\section{Task definition}
+Given a query $q$ and a set of restaurants $R$, the system must return a ranking of restaurants
+and a small set of review sentences supporting each result. Let $U_r$ be the review or sentence
+units belonging to restaurant $r$. A retrieval model assigns a score $s(q,u)$ to each unit and
+the restaurant score is
+\[
+ S(q,r)=f(\{s(q,u):u\in U_r\}),
+ \qquad f\in\{\max,\mathrm{mean},\mathrm{top\mbox{-}k\ mean}\}.
+\]
+The primary proposed configuration is multilingual dense sentence retrieval with the mean of
+the ten highest sentence scores.
+
+\section{Research questions}
+\begin{description}
+  \item[RQ1.] When BM25 and dense retrieval use identical units and aggregation, which method
+  ranks restaurants better, and how does review volume affect the result?
+  \item[RQ2.] Do the displayed review sentences support the query and faithfully reflect the
+  ranking?
+  \item[RQ3.] Does sentence retrieval transfer to real Thai reviews when evaluated with frozen
+  taste queries and human relevance labels?
+\end{description}
+
+\section{Scope and limitations}
+Restaurant-level evaluation is performed in English on RIRD because it provides restaurant IDs
+and relevance judgements. Wongnai is used for Thai sentence-level evaluation because the
+available data has no restaurant identifiers. Thai restaurant ranking, model fine-tuning,
+generated explanations and learned fusion are outside the scope of this report.

@@ -1,0 +1,82 @@
+\chapter{Discussion}
+
+\section{Performance}
+The dense sentence model improves over both the fair BM25 sentence baseline and the review-level
+BM25 baseline. Its MAP is close to the RIRD fine-tuned reference despite using an off-the-shelf
+encoder. The result is not a universal leaderboard claim because the systems, training data and
+evaluation protocols differ. The meaningful conclusion is that a simple multilingual dense model
+is competitive while remaining reproducible and usable for Thai transfer.
+
+The comparison also explains why the proposed model is not simply ``the largest model''. BM25
+is competitive when reviews contain query vocabulary, but dense retrieval recovers paraphrases
+and related concepts. Sentence units provide better evidence for the top-$k$ configuration, but
+lexical sentence retrieval loses useful context. Top-10 mean is the practical compromise
+supported by the experiments.
+
+\section{Interpretability}
+The system exposes original review sentences that contribute to retrieval. This is more
+actionable than a rating score and allows users to detect disagreement, outdated information or
+negative evidence. However, the deletion experiment is inconclusive and a high-scoring sentence
+can contradict the query. Human support annotation is therefore essential. The system does not
+generate synthetic explanations, avoiding unsupported claims that were not present in the data.
+
+\section{Complexity and deployment}
+BM25 is inexpensive and interpretable at token level. Dense retrieval requires precomputed
+embeddings and model memory but supports semantic and multilingual matches. A cross-encoder is
+substantially slower, so the live demo restricts it to the top 20 restaurants and 15 sentences
+per restaurant. Query rewriting adds an API dependency and cost, so it is cached and used only
+on the live path. Precomputed benchmark queries return immediately; arbitrary English queries
+require embedding and optional Groq/CE inference.
+
+\begin{table}[H]
+\centering\small
+\caption{Practical comparison of system components.}
+\label{tab:complexity}
+\begin{tabularx}{\textwidth}{@{}lLLL@{}}
+\toprule
+Component & Strength & Cost & User-facing role\\
+\midrule
+BM25 & Exact lexical matches; deterministic & Low CPU cost & Transparent baseline\\
+Bi-encoder & Semantic and multilingual matching & Embedding storage and model memory & Main ranking model\\
+LLM rewrite & Expands vague language and constraints & API latency and possible drift & Query understanding\\
+Cross-encoder & Joint query--sentence matching & Slow inference & Selective negation reranking\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Comparison with Kaggle and Hugging Face solutions}
+Many available food datasets and example systems focus on star-rating prediction, sentiment
+classification or nearest-neighbour search. Our system offers a different user benefit:
+query-specific restaurant ranking with inspectable review evidence. Its unique features are fair
+BM25/dense comparison, top-$k$ aggregation analysis, review-volume control, sentence-level
+explanations, selective negation handling and a Thai taste case study. These features make it
+preferable when trust and preference matching matter more than predicting a single global rating.
+
+\section{What improved the final system}
+The final system is the result of several evidence-driven changes:
+\begin{enumerate}
+\item \textbf{Fair unit control:} BM25 and dense retrieval use identical review and sentence
+units with identical aggregation functions.
+\item \textbf{Sentence-level evidence:} dense sentence retrieval with top-10 mean makes every
+recommendation traceable to concrete text.
+\item \textbf{Volume control:} the 400-review experiment measures and reduces unequal review
+opportunities.
+\item \textbf{LLM query rewriting:} Groq rewrites vague phrases such as ``cheat meal'' into
+concrete reviewer language and converts ``no waiting line'' into searchable attributes.
+\item \textbf{Selective cross-encoder reranking:} B3 showed that reranking every query hurts
+average performance, so the live system activates it only for explicit negation and exclusion.
+\item \textbf{Evidence filtering and caching:} short generic sentences are excluded from live
+explanations, embeddings are precomputed, and repeated queries are cached.
+\end{enumerate}
+This sequence is important: the LLM and cross-encoder improve query handling and the demo
+experience, but they do not replace the measured dense baseline. The final architecture keeps
+the strongest validated ranking model as its default and adds complexity only where error
+analysis indicates a need.
+
+\section{Limitations and threats to validity}
+RIRD contains only 50 restaurants and English queries. Wongnai lacks restaurant IDs, so Thai
+results are sentence-level only. External model and Groq behaviour can change, and rewriting
+may introduce unsupported attributes. Review text may be biased or stale. The cross-encoder was
+not trained on this domain, and the deletion test is limited by the pooled evidence design.
+Future work should use larger multilingual reviewed-item benchmarks, domain-adapted rerankers and
+human-centred explanation studies.

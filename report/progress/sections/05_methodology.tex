@@ -1,0 +1,95 @@
+\chapter{Methodology}
+
+\section{Exploratory data analysis}
+EDA was used to determine what could be measured fairly before selecting a model. For RIRD,
+we measured restaurant review counts, review length, sentence count, rating distribution and
+the number of relevant restaurants per query. The 50 restaurants have between 406 and 2,281
+reviews, so an unconstrained top-$k$ aggregation could favour restaurants with more
+opportunities to obtain a high score. RIRD also has 100 queries and five-annotator judgements,
+making query-level paired evaluation possible.
+
+Wongnai contains real Thai review text and star ratings but no restaurant identifier. This EDA
+result changed the claim of the project: Wongnai can support a sentence-level Thai taste study,
+not Thai restaurant ranking. Approximately 10,000 reviews were sampled for the study, yielding
+93,810 sentences.
+
+\section{Pre-processing}
+English reviews are split at sentence-ending punctuation and newlines. Empty units are removed,
+while review and restaurant IDs are retained so every retrieved sentence can be traced to its
+source. Thai reviews are segmented with PyThaiNLP because Thai words are not separated
+consistently by spaces. BM25 uses lower-case English
+tokens and Thai tokenisation. Dense embeddings use
+\texttt{paraphrase-multilingual-mpnet-base-v2}, following the sentence-embedding approach of
+\citet{reimers2019sbert}.
+
+For the live English path, the full 240,660-sentence corpus is reconstructed in the same order
+as the cached embedding matrix. Sentences shorter than ten words are excluded from live
+candidate generation because inspection found generic fragments such as ``Solid meal!'' to be
+poor explanations. This filtering is applied only to the live evidence path; benchmark results
+are computed from the controlled exported evaluation data.
+
+\section{Baseline models and aggregation}
+The primary lexical baseline is BM25 \citep{robertson2009bm25}. The dense baseline encodes
+each review or sentence and computes cosine similarity with the query. We evaluate both at
+review and sentence level. For a query, each restaurant receives the scores of all its units,
+then we apply:
+\begin{align}
+ f_{\max}(S_r)&=\max S_r,\\
+ f_{\mathrm{mean}}(S_r)&=\frac{1}{|S_r|}\sum_{s\in S_r}s,\\
+ f_{\mathrm{top}k}(S_r)&=\frac{1}{k}\sum_{s\in \operatorname{TopK}(S_r)}s.
+\end{align}
+We test $k\in\{3,5,10\}$. This shared-unit design is the key methodological control: BM25 is
+not given a concatenated restaurant document while dense retrieval is given pooled reviews.
+
+\section{Proposed model and system architecture}
+The proposed evaluated model is dense sentence retrieval with top-10 mean aggregation. The
+live demo adds query rewriting and selective cross-encoder reranking:
+\begin{enumerate}
+  \item Groq rewrites vague phrases and converts exclusion language into reviewer-oriented
+  attributes;
+  \item the multilingual bi-encoder retrieves candidate sentences;
+  \item a cross-encoder reranks candidates only for explicit negation or exclusion;
+  \item top-ten scores are averaged and the five highest original sentences are shown.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+node distance=6mm and 7mm,
+block/.style={draw,rounded corners,align=center,minimum height=10mm,text width=2.8cm,fill=blue!7},
+decision/.style={draw,diamond,align=center,aspect=2,fill=orange!12},
+arrow/.style={-{Latex[length=2mm]},thick}]
+\node[block] (q) {User query\\English or Thai};
+\node[block,right=of q] (rw) {LLM rewrite\\vague/negative language};
+\node[block,right=of rw] (be) {BM25 or\\multilingual bi-encoder};
+\node[decision,below=of rw] (d) {Explicit\\exclusion?};
+\node[block,right=of be] (ag) {Top-$k$ mean\\restaurant score};
+\node[block,below=of ag] (ce) {Selective cross-encoder\\top 20 restaurants};
+\node[block,left=of ce] (ev) {Original review\\sentences};
+\draw[arrow](q)--(rw); \draw[arrow](rw)--(be); \draw[arrow](be)--(ag);
+\draw[arrow](rw)--(d); \draw[arrow](d)--node[right,font=\scriptsize]{yes}(ce);
+\draw[arrow](ce)--(ag); \draw[arrow](ag)--(ev);
+\end{tikzpicture}
+\caption{Architecture of the evaluated retrieval system and the improved live demo.}
+\label{fig:architecture}
+\end{figure}
+
+Plain positive queries use the dense baseline. Queries containing patterns such as ``no'',
+``not'', ``without'', ``avoid'' or ``instead of'' use the reranker on the top 20 restaurants and
+15 candidate sentences per restaurant. This reduces a naive 1,500 candidate comparisons to
+approximately 300 while preserving the stronger baseline for ordinary queries.
+
+\section{Explanation extraction}
+For each restaurant, the top ten unit scores are averaged. The five highest-scoring original
+sentences are returned as explanations. The system never generates synthetic evidence. The
+evidence CSV stores query, restaurant ID, rank, score, source review ID, sentence text and
+random seed, allowing the output to be reproduced and inspected.
+
+\section{Evaluation design}
+RIRD ranking is measured with nDCG@5, nDCG@10, MAP, MRR, Recall@5/10 and Precision@5/10.
+Confidence intervals use query-level bootstrap resampling and model differences use paired
+randomisation tests with Holm correction. Review-volume bias is measured by Pearson and
+Spearman correlations between restaurant score and review count before and after capping every
+restaurant at 400 reviews. Explanations are assessed by shown-versus-random deletion and human
+support labels on a 0--2 scale. Thai retrieval uses a blind pool from BM25 and dense top
+results, with query-level nDCG@10 and precision@10 plus annotator agreement.

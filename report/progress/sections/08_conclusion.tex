@@ -1,0 +1,23 @@
+\chapter{Conclusions}
+
+This work developed an explainable reviewed-item retrieval system for restaurant search. The
+main proposed configuration uses multilingual dense sentence embeddings and top-10 mean
+aggregation to rank restaurants and return original review sentences as evidence.
+
+On RIRD, the proposed model achieved nDCG@10 0.682 and MAP 0.618, outperforming the fair BM25
+sentence baseline and approaching the supervised fine-tuned reference. The experiments also
+showed that top-$k$ aggregation is more reliable than max or averaging every review, and that
+review-volume correlations can be reduced by capping the number of reviews.
+
+The B3 analysis produced an important negative result: applying query rewriting and a generic
+cross-encoder to every query reduced the overall ranking score. The deployed pipeline therefore
+uses the reranker selectively for explicit negation and exclusion queries, while preserving the
+strong dense baseline for ordinary queries. This is a practical example of using a more
+complex model only where its measured benefit justifies its cost.
+
+The Thai component demonstrates sentence-level retrieval over real Wongnai reviews, but cannot
+claim Thai restaurant ranking because restaurant identifiers are unavailable. Future work
+should complete the human support and Thai annotation studies, evaluate larger restaurant-level
+Thai datasets, and train or adapt a reranker on reviewed-item relevance. Overall, the project
+shows that semantic retrieval becomes substantially more useful when paired with transparent
+evidence, fair evaluation and explicit acknowledgement of its limitations.
