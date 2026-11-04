@@ -33,7 +33,7 @@ COPY app/ ./app/
 # Copy data artefacts needed at runtime
 # (datasets and cache are mounted as volumes in docker-compose for local dev,
 #  but baked in for EC2 if you run `docker build` after downloading them)
-COPY baselines/cache/sentence/evidence_sentence.csv  ./baselines/cache/sentence/evidence_sentence.csv
+COPY baselines/cache/evidence_sentence.csv           ./baselines/cache/evidence_sentence.csv
 COPY thai/results/topk_n10000_s42.csv                ./thai/results/topk_n10000_s42.csv
 COPY thai/thai_queries.csv                           ./thai/thai_queries.csv
 COPY thai/labels/label_sheet.csv                     ./thai/labels/label_sheet.csv

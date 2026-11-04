@@ -16,6 +16,9 @@ services:
       - ./thai/results:/app_root/thai/results:ro
       - ./datasets:/app_root/datasets:ro
       - model_cache:/model_cache
+    env_file:
+      - path: .env        # Groq API key for query rewriting
+        required: false
     environment:
       - PYTHONUNBUFFERED=1
       - TRANSFORMERS_CACHE=/model_cache

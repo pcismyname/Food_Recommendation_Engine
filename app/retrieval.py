@@ -22,7 +22,7 @@ import logging
 import os
 import re
 import time
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -42,6 +42,8 @@ BIENCODER_MODEL   = "paraphrase-multilingual-mpnet-base-v2"
 CE_MODEL          = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 GROQ_MODEL        = "qwen/qwen3.8-27b"
 MAX_RESULTS       = 10
+MAX_LIVE_RESULTS  = 50    # matches the API's n_results upper bound
+LIVE_CACHE_SIZE   = 256   # live queries kept in memory
 K_AGG             = 10    # top-k sentence scores averaged per restaurant
 K_EV              = 5     # evidence sentences returned per restaurant
 CE_INPUT_K         = 15    # top-N bi-encoder candidates per restaurant sent to cross-encoder
@@ -131,7 +133,8 @@ class RetrievalEngine:
         # Stage 0: Groq client (lazy — loaded if GROQ_API_KEY available)
         self._groq_client = None
         self._rewrite_cache: Dict[str, str] = {}   # in-memory, cleared on restart
-        self._live_cache: Dict[str, list] = {}     # query → results (avoids re-running pipeline)
+        # query → results, least recently used dropped first so memory stays bounded
+        self._live_cache: "OrderedDict[str, dict]" = OrderedDict()
 
     # ── Public ────────────────────────────────────────────────────────────────
 
@@ -177,26 +180,29 @@ class RetrievalEngine:
 
         # 2. Live B3 pipeline: rewrite → bi-encode → cross-encode
         if self._embedder is not None:
-            # Check live cache first
-            cache_key = query.lower().strip()
-            if cache_key in self._live_cache:
-                cached = self._live_cache[cache_key]
-                return {
-                    "results": cached["results"][:n],
-                    "is_precomputed": False,
-                    "matched_query": None,
-                    "rewritten_query": cached.get("rewritten_query"),
-                    "pipeline": cached.get("pipeline") + " (cached)",
-                }
-            rewritten = self._rewrite_query(query)
-            results   = self._live_infer_english(query, rewritten, n)
-            pipeline  = "rewrite+biencoder" if not self._cross_encoder else (
-                "rewrite+biencoder+crossencoder" if self._needs_cross_encoder(query, rewritten)
-                else "rewrite+biencoder (CE skipped: plain query)"
-            )
-            self._live_cache[cache_key] = {"results": results, "rewritten_query": rewritten, "pipeline": pipeline}
+            cache_key = query.lower()
+            cached = self._live_cache.get(cache_key)
+            if cached is not None:
+                self._live_cache.move_to_end(cache_key)
+                pipeline = cached["pipeline"] + " (cached)"
+            else:
+                rewritten = self._rewrite_query(query)
+                # Always compute the maximum list so later requests with a larger n
+                # can be served from the cache.
+                results = self._live_infer_english(query, rewritten, MAX_LIVE_RESULTS)
+                if self._cross_encoder is None:
+                    pipeline = "rewrite+biencoder"
+                elif self._needs_cross_encoder(query, rewritten):
+                    pipeline = "rewrite+biencoder+crossencoder"
+                else:
+                    pipeline = "rewrite+biencoder (CE skipped: plain query)"
+                cached = {"results": results, "rewritten_query": rewritten, "pipeline": pipeline}
+                self._live_cache[cache_key] = cached
+                if len(self._live_cache) > LIVE_CACHE_SIZE:
+                    self._live_cache.popitem(last=False)
+            rewritten = cached["rewritten_query"]
             return {
-                "results": results,
+                "results": cached["results"][:n],
                 "is_precomputed": False,
                 "matched_query": None,
                 "rewritten_query": rewritten if rewritten.lower() != query.lower() else None,

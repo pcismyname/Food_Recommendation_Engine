@@ -129,6 +129,8 @@ def get_queries(lang: str = "en"):
 def run_query(req: QueryRequest):
     if not engine.ready:
         raise HTTPException(status_code=503, detail="Engine not ready yet. Try again shortly.")
+    if not req.query.strip():
+        raise HTTPException(status_code=422, detail="Query must not be blank.")
 
     if req.lang == "en":
         raw = engine.query_english(req.query, req.n_results)

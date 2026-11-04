@@ -1,0 +1,18 @@
+# Allowlist: send only what the Dockerfile copies. Without this the build
+# context includes baselines/cache (~1.3 GB), datasets, reports and .env.
+**
+
+!app/
+!baselines/cache/evidence_sentence.csv
+!thai/results/topk_n10000_s42.csv
+!thai/thai_queries.csv
+!thai/labels/label_sheet.csv
+!thai/labels/pool_key.csv
+!datasets/rir_data-main/reviews/50_restaurants_all_rates.csv
+
+# To bake live-inference embeddings into the image, uncomment this line
+# together with the matching COPY line in the Dockerfile.
+# !baselines/cache/sentence/emb_paraphrase-multilingual-mpnet-base-v2_sentence_len256.npy
+
+**/__pycache__
+**/*.pyc

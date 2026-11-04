@@ -609,12 +609,16 @@
       const data = await res.json();
 
       if (!res.ok) {
-        showStatus('error', '⚠ ' + (data.detail || 'Request failed'));
+        // FastAPI validation errors come back as a list of {msg, ...} objects.
+        const detail = Array.isArray(data.detail)
+          ? data.detail.map(d => d.msg).join('; ')
+          : data.detail;
+        showStatus('error', '⚠ ' + escHtml(detail || 'Request failed'));
         return;
       }
 
       if (data.error) {
-        showStatus('warn', '⚠ ' + data.error + (data.hint ? ' — ' + data.hint : ''));
+        showStatus('warn', '⚠ ' + escHtml(data.error) + (data.hint ? ' — ' + escHtml(data.hint) : ''));
         return;
       }
 
@@ -661,14 +665,19 @@
     badge.className    = data.is_precomputed ? 'badge-precomp' : 'badge-live';
     badge.textContent  = data.is_precomputed ? '⚡ Pre-computed' : '🧠 Live B3';
 
-    const maxScore = Math.max(...data.results.map(r => r.score));
+    // Cross-encoder scores are raw logits and can be negative, so scale bars
+    // over [min(0, lowest), highest] instead of dividing by the top score.
+    const scores   = data.results.map(r => r.score);
+    const maxScore = Math.max(...scores);
+    const lowScore = Math.min(0, ...scores);
+    const span     = maxScore - lowScore;
 
     data.results.forEach((r, idx) => {
       const rankClass  = idx < 3 ? `rank-${idx + 1}` : 'rank-n';
       const rankLabel  = idx < 3
         ? ['🥇','🥈','🥉'][idx]
         : `#${r.rank}`;
-      const fillPct    = Math.round((r.score / (maxScore || 1)) * 100);
+      const fillPct    = span > 0 ? Math.round(((r.score - lowScore) / span) * 100) : 100;
       const sentences  = r.explanation.map((s, si) => `
         <div class="sentence-item">
           <div class="ev-rank">${si + 1}</div>
@@ -731,6 +740,8 @@
     const nPart = items.filter(r => r.label === 1).length;
     count.textContent = `${items.length} sentences · ${nRel} clearly relevant, ${nPart} partly (human-labelled)`;
     badge.style.display = 'inline-block';
+    badge.className   = 'badge-precomp';   // Thai is always pre-computed
+    badge.textContent = '⚡ Pre-computed';
 
     if (data.query_en) {
       const q = document.createElement('div');
@@ -784,6 +795,7 @@
     const bar = document.getElementById('status-bar');
     bar.className = type;
     bar.innerHTML = html;
+    bar.style.display = '';   // undo hideStatus() so the class CSS can show the bar
   }
 
   function hideStatus() {
