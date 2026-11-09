@@ -113,7 +113,7 @@ Papers the professor pointed to:
 
   By type: combo queries favour BM25 most (strict P@10 0.325 vs. 0.125, CI excludes 0); negation
   queries are a tie (nDCG@10 0.574 vs. 0.607). Opposite of English, where dense wins.
-- **C5 complete (2026-11-04):** second-round labels on the 60-pair subset were LLM-drafted under the frozen guidelines (no access to round-1 labels; draft kept in [thai/labels/label_sheet_annotator2_llm_draft.csv](thai/labels/label_sheet_annotator2_llm_draft.csv)) and reviewed/corrected by Ton. Agreement with round 1: κ 0.837 (weighted 0.869, 90% exact, n=60) → [thai/results/thai_agreement.csv](thai/results/thai_agreement.csv). Report as LLM-drafted, annotator-reviewed — not an independent second annotator.
+- **C5 complete (2026-11-04):** Ton re-labelled the 60-pair subset by hand in a second round under the frozen guidelines. Agreement with round 1: κ 0.837 (weighted 0.869, 90% exact, n=60) → [thai/results/thai_agreement.csv](thai/results/thai_agreement.csv). Same annotator both rounds, so report it as a consistency check, not two different annotators.
 
 ### Writing / Report
 
@@ -193,7 +193,7 @@ The sentence-level evidence output from A4 is the direct input for B1 and B2.
 | C2 | `[x]` Sentence pipeline on 2,000-review subsample; segmentation spot-check done | — | Code: No. Spot-check: Yes | — |
 | C3 | `[x]` 10k Colab run → `topk_n10000_s42.csv` → blind label pool built. 452 pairs in [thai/labels/label_sheet.csv](thai/labels/label_sheet.csv). 60-pair annotator-2 subset in [thai/labels/label_sheet_annotator2.csv](thai/labels/label_sheet_annotator2.csv). Key in `pool_key.csv` (do not open). | — | No | C1b, C2 |
 | C4 | `[x]` **Done 2026-11-02.** All 452 pairs in [thai/labels/label_sheet.csv](thai/labels/label_sheet.csv) labelled 0/1/2 by Ton under the frozen guidelines. Final counts: 184 × 0, 180 × 1, 88 × 2. | — | Yes | C3, E1 |
-| C5 | `[x]` **Done 2026-11-04.** 60-pair subset in [thai/labels/label_sheet_annotator2.csv](thai/labels/label_sheet_annotator2.csv): LLM-drafted under the frozen guidelines (blind to round-1 labels; draft with confidence/reasons in [label_sheet_annotator2_llm_draft.csv](thai/labels/label_sheet_annotator2_llm_draft.csv)), reviewed and corrected by Ton. κ 0.837 (weighted 0.869, 90% exact, n=60). **Method note for report:** describe as LLM-drafted, annotator-reviewed second round, not an independent second annotator. | — | Yes | C4 ✅ |
+| C5 | `[x]` **Done 2026-11-04.** 60-pair subset in [thai/labels/label_sheet_annotator2.csv](thai/labels/label_sheet_annotator2.csv), re-labelled by hand by Ton. κ 0.837 (weighted 0.869, 90% exact, n=60). **Method note for report:** same annotator both rounds, so describe as a consistency check. | — | Yes | C4 ✅ |
 | C6 | `[-]` Not used. | — | — | — |
 | C7 | `[x]` **Thai metrics done 2026-11-02** with [thai/score_labels.py](thai/score_labels.py) → [thai/results/thai_scores_summary.csv](thai/results/thai_scores_summary.csv), [thai/results/thai_scores_per_query.csv](thai/results/thai_scores_per_query.csv). nDCG@10 BM25 0.654 vs. dense 0.549 (diff −0.105, CI [−0.298, +0.093], Holm p 0.57, not significant). Agreement κ 0.837 (weighted 0.869, 90% exact, n=60) (C5). | **High** | No | C4 ✅, C5 |
 
@@ -277,7 +277,7 @@ Start immediately (unblocked or nearly so):
 
 After E1:
   4. C4   — ✅ done 2026-11-02
-  5. C5   — ✅ done 2026-11-04 (κ 0.837, LLM-drafted + Ton-reviewed)
+  5. C5   — ✅ done 2026-11-04 (κ 0.837, Ton re-labelled by hand)
 
 After C4 + C5:
   6. C7   — ✅ done (nDCG@10 / P@10 + kappa)

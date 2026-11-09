@@ -91,7 +91,6 @@ Food_Recommendation_Engine/
 │   └── cache/                     # result tables (embeddings are gitignored)
 ├── thai/
 │   ├── thai_queries.csv           # frozen Thai taste queries (C1)
-│   ├── thai_queries_ai_draft.csv  # original LLM draft (record)
 │   ├── query_guidelines.md        # query rules, change log, sign-off
 │   ├── thai_retrieval.ipynb       # Wongnai sentence-level BM25 vs. dense (C2)
 │   └── build_thai_retrieval_notebook.py

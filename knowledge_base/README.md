@@ -15,7 +15,7 @@ Status (2026-11-02):
 
 - **A:** done at review level (dense top-10 mean best, nDCG@10 0.668), volume control A3 done (capping changes nDCG@10 by ≤ 0.011), rankings and evidence exported (A4), sentence-level run done (dense top-10 mean 0.682).
 - **B:** first manual look at the explanations done ([05](05_explainability.md) §6); B1 deletion test and B2 human rating not run yet.
-- **C:** 452-pair pool labelled; Thai nDCG@10 BM25 0.654 vs. dense 0.549, not significant. Second annotator (kappa) still pending.
+- **C:** done. 452-pair pool labelled; Thai nDCG@10 BM25 0.654 vs. dense 0.549, not significant; re-check κ 0.837. Full write-up in [10](10_thai_results_summary.md).
 
 The progress report (LaTeX source, PDF, figures) lives in [report/progress/](../report/progress/) (`main.tex` → `main.pdf`).
 
@@ -52,6 +52,7 @@ Out of scope: see [action_items.md](../action_items.md) §7.
 | 5 | [03_aggregation_and_fusion.md](03_aggregation_and_fusion.md) | Retrieval unit, max/mean/top-k, volume bias | 25 min | A1–A3, D3 |
 | 6 | [05_explainability.md](05_explainability.md) | Faithfulness vs. plausibility, deletion test | 25 min | B1, B2, E1 |
 | — | [09_related_work_novelty.md](09_related_work_novelty.md) | What others already did, what is new in our project, what to cite | 20 min | D1, D2, D3 |
+| — | [10_thai_results_summary.md](10_thai_results_summary.md) | Final Thai results, findings, what we can claim, and where each goes in report Chapters 5–8 | 15 min | F1, F2 (Sam) |
 | — | [07_reading_list.md](07_reading_list.md) | Papers to read, in priority order, with links | — | D1 and all tasks |
 | — | [glossary.md](glossary.md) | One-line definitions of every term | — | Lookup |
 
