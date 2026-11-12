@@ -1,0 +1,188 @@
+% =====================================================================
+%  CHAPTER 4 (PART 2): DISCUSSION
+%  This file continues the chapter opened in results.tex (no \chapter here)
+% =====================================================================
+\providecommand{\mpnet}{\texttt{paraphrase-\allowbreak multilingual-\allowbreak mpnet-\allowbreak base-\allowbreak v2}}
+\providecommand{\cemodel}{\texttt{ms-marco-\allowbreak MiniLM-\allowbreak L-6-\allowbreak v2}}
+\emergencystretch=3em
+\providecommand{\pending}[1]{\textbf{[PENDING: #1]}}
+
+% ---------------------------------------------------------------------
+\section{Discussion}
+\label{sec:discussion}
+
+This section interprets the results of the previous sections. It first explains the main empirical patterns, then compares the proposed approach with the baselines and with other approaches in terms of performance, interpretability, and complexity, and finally states the limitations that bound the conclusions. Where an explanation is a hypothesis that the experiments did not test directly, it is described as such.
+
+\subsection{Why Dense Retrieval Outperforms BM25 on RIRD}
+\label{sec:discdense}
+
+Dense retrieval outperformed BM25 under every aggregation function at review level and under the maximum and every top-$k$ mean at sentence level. A plausible reason is the nature of the RIRD queries, which are written as everyday requests (for example ``I am on a budget'' or ``I am tired so I don't want to wait for seats'') and rarely share exact words with the sentences that express the same need, such as a reviewer writing that the prices were very reasonable. Lexical matching needs the same words in both texts, whereas dense retrievers map both texts into a shared semantic space where paraphrases lie close together \citep{karpukhin2020, reimers2019}. We could not verify this explanation by query category, because the PMD file does not label query types, so it remains an interpretation consistent with the overall pattern and not a measured result.
+
+\subsection{Aggregation and Retrieval Unit}
+\label{sec:discaggregation}
+
+The aggregation results show a consistent ordering: the top-$k$ means were better than the maximum, which in turn was better than or similar to the mean over all units, depending on the model. The mean over all units is diluted by the many sentences that have nothing to do with the query, so the restaurant score approaches the average similarity of everything that was ever written about the restaurant and carries little information about whether the query is satisfied. The maximum has the opposite weakness, because it depends on a single unit that may be a chance match. The top-$k$ mean averages a handful of the best units and is therefore both focused and stable. This agrees with the observation by \citet{korikov2024} that late fusion over reviews is sensitive to how the information relevant to a query is distributed across reviews.
+
+The comparison of retrieval units adds a nuance. Sentences did not improve ranking significantly in general; the top-10 mean gained 0.013 nDCG@10, which was not significant, and the plain mean lost 0.055. The reason sentence units are still valuable lies elsewhere: a sentence is the smallest piece of text that can be shown to a user as evidence, whereas a whole review is too long to serve as an explanation. The sentence-level design therefore gives explainability at no significant cost in ranking quality, provided that a top-$k$ aggregation is used. The review-volume control supports this reading, because the better scores of top-$k$ aggregation cannot be attributed to restaurants with more reviews.
+
+\subsection{The Thai Case Study}
+\label{sec:discthai}
+
+On the 24 Thai queries, BM25 obtained higher mean scores than dense retrieval, which is the opposite of the English direction, but the differences were not statistically significant and the confidence intervals are wide. With only 24 queries, a single annotator, and a pool made of the two systems' top-ten lists, the study can neither confirm nor reject an advantage for either system. What can be said is that sentence retrieval on Thai reviews works at a moderate level for both systems, and that the English finding that dense retrieval wins should not be assumed to carry over to Thai.
+
+The breakdown by query type suggests a hypothesis for the direction of the difference. Queries that combine several taste requirements favour BM25 most (strict precision at ten of 0.325 versus 0.125), and this is the only difference whose confidence interval excludes zero. Combined requests contain several specific content words, and exact lexical matching on a dictionary-tokenised Thai text can reward sentences that contain all of them, whereas a general-purpose multilingual encoder that was not adapted to Thai restaurant language may blur these specific terms. This explanation was not tested, and it should be read as a hypothesis for future work. The tie on negated queries is consistent with the negation blindness of both models, since neither BM25 nor a bi-encoder understands that a negated term means the opposite.
+
+\subsection{When Query Rewriting and Cross-Encoder Re-ranking Help}
+\label{sec:discb3}
+
+Applied to every query, the extension lowered overall quality, yet it produced very large gains on a subset of queries, in particular those with an explicit exclusion such as ``not Thai but Asian''. This pattern supports the original motivation: a bi-encoder cannot represent negation, and a rewrite that replaces ``not Thai but Asian'' with a list of other Asian cuisines converts a negation into a positive request that the bi-encoder can handle. The losses on plain positive queries, for example ``An ice cream shop with bubble tea'', are likely to have two sources that the experiment could not separate: the rewrite may add vocabulary that shifts the query away from its intent, and the cross-encoder was trained on web search relevance and not on restaurant reviews, so its judgement of sentence relevance can differ from that of the human annotators. The observation that the live system should therefore apply the extension only where it is expected to help is a sound design decision, but the evidence for it is indirect, because the selective configuration has not been evaluated as such and the two components have not been ablated.
+
+\subsection{Comparison Across Performance, Interpretability, and Complexity}
+\label{sec:disccompare}
+
+The approaches considered in this project are compared on three dimensions: how well they rank, how well a user can understand why a restaurant was ranked, and how much computation and infrastructure they need. Performance is taken from Chapter~\ref{chap:results}, except for the external reference, which is the best late-fusion contrastive model reported in the original reviewed-item retrieval study \citep{abdollahpour2023}.
+
+\subsubsection{Performance}
+\label{sec:discperformance}
+
+Table~\ref{tab:discperf} compares the measured performance of the approaches. The proposed sentence-level dense model has the best nDCG@10 and MAP among the models evaluated in this project, and it improves on the BM25 baseline by 0.060 in nDCG@10 and 0.057 in MAP. The extension with rewriting and cross-encoder re-ranking, applied to every query, is below the proposed model. The reference MAP of 0.626 reported for the fine-tuned model of the original study is 0.008 above the MAP of the proposed model (0.618). Both evaluations share the same 100 PMD preference queries, the same 50 restaurants, the same majority-vote binary relevance labels, and MAP calculated over all 50 restaurants with top-10 mean late fusion. The crucial distinction is model training: \citet{abdollahpour2023} used contrastive self-supervised fine-tuning of \texttt{bert-base-uncased} on review data, whereas our proposed model uses a frozen, general-purpose multilingual encoder without domain-specific training. The comparison is therefore informative: a frozen encoder with a simple top-$k$ aggregation reaches ranking accuracy comparable to a fine-tuned in-domain model while natively supporting sentence-level explainability and multilingual transfer.
+
+\begin{table}[htbp]
+\centering
+\caption{Performance Comparison on RIRD}
+\label{tab:discperf}
+\small
+\begin{tabular}{|p{0.43\textwidth}|c|c|p{0.22\textwidth}|}
+\hline
+\textbf{Approach} & \textbf{nDCG@10} & \textbf{MAP} & \textbf{Source} \\
+\hline
+BM25, concatenated doc (baseline) & 0.621 & 0.561 & This study \\
+\hline
+Dense, pooled vector & 0.645 & 0.585 & This study \\
+\hline
+Dense, review level, top-10 mean & 0.668 & 0.608 & This study \\
+\hline
+\textbf{Dense, sentence level, top-10 mean (proposed)} & \textbf{0.682} & \textbf{0.618} & This study \\
+\hline
+Proposed + rewriting + cross-encoder (all queries) & 0.658 & 0.586 & This study \\
+\hline
+Fine-tuned late-fusion model & --- & 0.626 & \citet{abdollahpour2023} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Interpretability}
+\label{sec:discinterp}
+
+Table~\ref{tab:discinterp} compares what a user or developer can learn from each approach about its decisions. BM25 is the most transparent model mathematically, since the contribution of every matching term is visible, but its transparency is limited to words that literally match. Dense retrieval is opaque as a model, because a cosine similarity between 768-dimensional vectors cannot be inspected term by term, but the sentence-level design converts this opacity into an extractive, example-based explanation: the system can show the review sentences that were most similar to the query. The pooled-vector baseline cannot do this, because it merges all reviews of a restaurant into one vector and therefore has no evidence sentences to show.
+
+An important caveat applies to our explanations. A sentence that is relevant to the query is not automatically a faithful account of why the restaurant was ranked, and the automatic faithfulness test was inconclusive (Section~\ref{sec:resb1}). In the human support evaluation (Section~\ref{sec:resb2}), 60.5\% of displayed review sentences were judged by human annotators to genuinely support the restaurant ranking for the given query (with 22.4\% clearly supporting and moderate inter-annotator agreement of $\kappa = 0.544$). We therefore claim that the proposed system makes its evidence visible and that the majority of displayed sentences are supportive, but we acknowledge that automatic verification of explanation faithfulness remains an open research problem.
+
+\begin{table}[htbp]
+\centering
+\caption{Interpretability Comparison}
+\label{tab:discinterp}
+\small
+\begin{tabular}{|p{0.22\textwidth}|p{0.36\textwidth}|p{0.30\textwidth}|}
+\hline
+\textbf{Approach} & \textbf{What the user can see} & \textbf{Main limitation} \\
+\hline
+BM25 on concatenated documents & Ranked list; matching terms can be inspected & No evidence sentences; no semantic matching \\
+\hline
+Dense pooled vector & Ranked list only & One vector per restaurant, so no evidence to show \\
+\hline
+Proposed sentence-level dense model & Ranked list with the top review sentences as extractive evidence & Evidence relevance is shown, evidence faithfulness is not yet established \\
+\hline
+Proposed + rewriting + cross-encoder & As above, plus a rewritten query and cross-encoder scores for filtering the evidence & Additional opaque components; effect of each is not isolated \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Complexity}
+\label{sec:disccomplexity}
+
+Table~\ref{tab:disccomplexity} summarises the computational and engineering complexity. None of the approaches in this study requires training: BM25 needs only an index, and the dense models use a frozen pretrained encoder. The proposed model adds a one-off cost for encoding the corpus (about 30 minutes for 240,660 sentences on a GTX 1650 laptop GPU) and a cache of about 740 MB, and in exchange it answers a query with one query encoding and a vector comparison. The extension adds the largest operational complexity: every new query needs a call to an external language-model service and up to 300 cross-encoder evaluations, which raised the time to answer a new query to roughly two to four seconds in our informal observations, and which adds a dependency on an external API. In contrast, a fine-tuned model, such as the reference model of the original study, requires a training procedure and domain data in addition to the retrieval step. Our complexity figures are informal observations made during development, and a systematic measurement of latency and memory has not been carried out.
+
+\begin{table}[htbp]
+\centering
+\caption{Complexity Comparison}
+\label{tab:disccomplexity}
+\small
+\begin{tabular}{|p{0.22\textwidth}|p{0.13\textwidth}|p{0.27\textwidth}|p{0.27\textwidth}|}
+\hline
+\textbf{Approach} & \textbf{Training} & \textbf{Storage and preparation} & \textbf{Query-time cost} \\
+\hline
+BM25 on concatenated documents & None & Small lexical index over 50 documents & Negligible; CPU only \\
+\hline
+Dense pooled vector & None (frozen encoder) & 50 restaurant vectors & One query encoding \\
+\hline
+Proposed sentence-level dense model & None (frozen encoder) & 240,660 $\times$ 768 embedding cache (about 740 MB); one-off encoding of about 30 min on a GTX 1650 & One query encoding and similarity against all sentences \\
+\hline
+Proposed + rewriting + cross-encoder & None (frozen models) & As above & External language-model call and up to 300 cross-encoder evaluations; about 2--4 s \\
+\hline
+Fine-tuned late-fusion model \citep{abdollahpour2023} & Contrastive fine-tuning on review data & Not assessed in this study & Not assessed in this study \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Comparison with Existing Public Solutions}
+\label{sec:discexisting}
+
+The project proposal also asked how the system compares with solutions available on public platforms such as Kaggle and Hugging Face. A direct numerical comparison is not possible, because the publicly shared food and restaurant systems address fundamentally different tasks. Specifically, we examined representative public solutions:
+\begin{enumerate}[label=(\alph*)]
+    \item \emph{Collaborative and metadata filtering}: Public implementations such as the Kaggle restaurant recommendation notebook by \texttt{samayashar} and preference-based filtering by \texttt{sasha18} match static categorical attributes (cuisine, price tier, location) or user--item rating matrices, but cannot process unconstrained free-text preference queries such as ``somewhere quiet without a long wait''.
+    \item \emph{Whole-document lexical retrieval}: Related content-based restaurant recommenders that employ Lucene BM25 or BM25L score single concatenated restaurant documents; they lack sentence-level granularity and do not extract supporting review evidence.
+    \item \emph{Sentiment and rating prediction}: Widely used Kaggle restaurant review datasets (such as \texttt{d4rklucif3r}'s restaurant reviews and the Wongnai Kaggle/Hugging Face challenge) formulate review modeling as rating regression or sentiment classification (e.g., predicting 1--5 stars), rather than ranking items against natural-language queries.
+\end{enumerate}
+None of these public systems is evaluated against human relevance labels for natural-language preference queries. Reporting their classification accuracy or RMSE alongside our nDCG or MAP would compare unrelated tasks; we therefore compare qualitatively along the dimensions that matter for the task in Table~\ref{tab:discexisting}.
+
+\begin{table}[htbp]
+\centering
+\caption{Qualitative Comparison with Typical Public Food Recommendation Solutions}
+\label{tab:discexisting}
+\small
+\begin{tabular}{|p{0.17\textwidth}|p{0.36\textwidth}|p{0.36\textwidth}|}
+\hline
+\textbf{Dimension} & \textbf{Typical public solutions} & \textbf{This project} \\
+\hline
+Query type & Collaborative filtering, tag or keyword search, or rating prediction & Free-text preference queries, including indirect and negated ones \\
+\hline
+Explainability & Ranked list or predicted score without justification & Each restaurant is returned with the review sentences that matched the query \\
+\hline
+Language & Mostly English; Thai tools are keyword-based & One multilingual encoder for English and Thai sentences \\
+\hline
+Evaluation & Accuracy on star-rating prediction & Rank-aware metrics (nDCG, MAP) against human relevance labels, with confidence intervals and significance tests \\
+\hline
+Evidence of what helps & Single model, rarely ablated & Controlled comparison of retrieval model, unit, and aggregation, with floors and a volume control \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Unique Features and User Benefits}
+\label{sec:discfeatures}
+
+The system offers four features that distinguish it from the typical solutions of Table~\ref{tab:discexisting}. The first is \emph{taste-based search}: a user can type what they want in their own words, such as an affordable place for a date night, and obtain restaurants whose reviews describe that need, without knowing a dish name or category. This benefits tourists and newcomers, who have no rating history and therefore cannot be served by collaborative filtering. The second is \emph{visible evidence}: each restaurant is accompanied by the review sentences that support its position, so the user can quickly check why it was suggested and judge it against their own priorities. The third is \emph{handling of difficult queries}, since the rewriting stage turns exclusion and idiomatic queries into explicit requests, and the live system applies the cross-encoder selectively where it helps. The fourth is \emph{multilingual coverage}: the same encoder serves English and Thai, so the approach can be extended to Thai restaurant data as soon as it has restaurant identifiers. The first two features are supported by the ranking results and by the design of the system, while the quality of the evidence is only partly established (Section~\ref{sec:resexplain}).
+
+\subsection{Limitations and Threats to Validity}
+\label{sec:disclimits}
+
+Several limitations bound the conclusions of this study and should be kept in mind when interpreting its results.
+
+\begin{itemize}
+    \item \textbf{Small, single-domain benchmark.} RIRD contains 50 restaurants from one city and 100 queries, so the confidence intervals are wide, and the improvement of the proposed model over the baseline is consistent but not decisive. The results may not generalise to other cities, cuisines, or larger catalogues.
+    \item \textbf{No query-category analysis.} The PMD labels have no query-type field, so we cannot say which kinds of queries benefit from dense retrieval or from the extension. The selective use of the cross-encoder in the live system is therefore a design decision with indirect support.
+    \item \textbf{Combined and unablated extension.} Query rewriting and cross-encoder re-ranking were evaluated together and on all queries, so the contribution of each component and the performance of the selective strategy are unknown.
+    \item \textbf{Explanation evidence is incomplete.} The automatic faithfulness test was inconclusive because of its design, and the human support rating is not complete, so the faithfulness of the shown sentences is not established.
+    \item \textbf{Thai study is small and partly dependent on language-model assistance.} The Thai study has 24 queries, all labels were produced by one annotator, the queries were drafted with language-model assistance before human review, and the second labelling round was drafted by a language model and then reviewed. The Thai evaluation is at sentence level only, so it does not show how restaurants would be ranked.
+    \item \textbf{Remaining weaknesses in negation.} Negation is still handled imperfectly: during live testing, a sentence complaining about a long wait for seating was ranked third for a query asking for no wait.
+    \item \textbf{Informal complexity measurements.} Latency and memory observations are informal, and the live system was tested only lightly.
+    \item \textbf{Dependence on an external service.} The rewriting stage depends on a commercial language-model API and on a specific model that may change or become unavailable.
+\end{itemize}
+
+Several concerns that were raised about the proposal, such as the size of the dish gazetteer and the alignment of the aspect-sentiment dataset with flavour axes, are no longer relevant, because those datasets were removed from the scope of the final study.
+
+% ---------------------------------------------------------------------
+\section{Chapter Summary}
+\label{sec:chap4summary}
+
+This chapter presented and discussed the results of the study. On RIRD, dense retrieval outperformed BM25 under every aggregation, the top-10 mean was the best aggregation, and the proposed sentence-level dense model reached an nDCG@10 of 0.682 and a MAP of 0.618, which is higher than the BM25 baseline (0.621 and 0.561). The review-volume control showed that these differences are not caused by the number of reviews per restaurant, and the comparison of review and sentence units showed that sentences are valuable mainly for explainability and not for ranking accuracy. The explanation experiments were inconclusive for the automatic test and are still in progress for the human rating, while the query-rewriting and cross-encoder extension helped exclusion queries but lowered the overall average when applied to every query. In the Thai case study, BM25 scored higher than dense retrieval, but the difference was not significant. The discussion compared the approaches in terms of performance, interpretability, and complexity, and listed the limitations that qualify these findings. The next chapter summarises the contributions and gives recommendations and directions for future work.

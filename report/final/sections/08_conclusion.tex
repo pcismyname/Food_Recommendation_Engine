@@ -1,0 +1,79 @@
+% =====================================================================
+%  CHAPTER 5: CONCLUSION AND RECOMMENDATIONS
+% =====================================================================
+\providecommand{\mpnet}{\texttt{paraphrase-\allowbreak multilingual-\allowbreak mpnet-\allowbreak base-\allowbreak v2}}
+\emergencystretch=3em
+\providecommand{\pending}[1]{\textbf{[PENDING: #1]}}
+
+\chapter{Conclusion and Recommendations}
+\label{chap:conclusion}
+
+This chapter summarises what the project achieved, states what the evidence does and does not support, and proposes recommendations and directions for future work. The chapter first answers the three research questions that guided the study and lists the contributions that resulted from the work. It then gives recommendations for building similar systems and ends with future research directions.
+
+% ---------------------------------------------------------------------
+\section{Conclusions}
+\label{sec:conclusions}
+
+The project set out to build and evaluate an explainable reviewed-item retrieval system: given a free-text taste preference, return a ranked list of restaurants together with the review sentences that justify the ranking. The original proposal described this as a Thai restaurant recommender with a fusion step as its contribution. After feedback on the proposal, the claims were narrowed to what could be measured with the available labels, so the final study evaluates restaurant ranking and explanations in English on the RIRD benchmark and treats Thai as a sentence-level case study.
+
+\subsection{Answers to the Research Questions}
+\label{sec:rqanswers}
+
+\paragraph{Fair fusion.} When BM25 and dense retrieval score the same unit and are aggregated with the same functions, dense retrieval outperforms BM25 under every aggregation at review level, and under the maximum and every top-$k$ mean at sentence level. The top-$k$ mean is the most effective aggregation, whereas the mean over all units is the least effective. The number of reviews per restaurant does not materially bias these results: after subsampling every restaurant to 400 reviews, the correlation between score and review count was close to zero and nDCG@10 changed by at most 0.011.
+
+\paragraph{Explanation quality.} The automatic faithfulness test did not distinguish the shown sentences from random sentences (a gap of exactly 0.000), which we attribute to the small evidence pool and regard as inconclusive instead of as evidence for or against faithfulness. The human support rating across all 375 items demonstrated that 60.5\% of displayed review sentences were rated as supporting the restaurant recommendation for the given query (22.4\% clearly supporting), with moderate agreement ($\kappa = 0.544$, 70.0\% exact agreement) between annotators on the shared subset.
+
+\paragraph{Thai transfer.} Sentence retrieval works on real Thai reviews at a moderate level. On 24 frozen Thai queries with 452 human-labelled pooled sentences, BM25 reached an nDCG@10 of 0.654 and dense retrieval reached 0.549, but the difference is not statistically significant. The English advantage of dense retrieval therefore did not transfer to Thai in this small study, and the study provides no evidence that either system is better.
+
+\subsection{Summary of Contributions}
+\label{sec:contributions}
+
+The main contributions of the project are the following.
+
+\begin{enumerate}
+    \item \textbf{A fair comparison of lexical and dense retrieval for reviewed-item retrieval.} We re-implemented BM25 and dense retrieval so that they score the same unit and use the same five aggregation functions, at review and sentence level, with bootstrap confidence intervals, Holm-corrected significance tests, and three query-independent floors. This corrected the unequal comparison of the first baselines and showed that dense retrieval is better under every aggregation at review level.
+    \item \textbf{A review-volume control.} We showed with a controlled subsampling experiment that aggregation by maximum or top-$k$ mean is not materially driven by restaurants having more reviews on this dataset.
+    \item \textbf{A proposed sentence-level model that explains its rankings.} Dense sentence retrieval with top-10 mean aggregation reaches an nDCG@10 of 0.682 and a MAP of 0.618 on RIRD, an absolute improvement of 0.060 and 0.057 over the BM25 baseline on concatenated documents, without any training, and returns the supporting review sentences with every ranking.
+    \item \textbf{A paired comparison of review and sentence units.} The comparison showed that sentence units mainly add explainability and not ranking accuracy, and that sentence units hurt the plain mean aggregation significantly.
+    \item \textbf{An evaluation design for explanations.} We built an automatic faithfulness test and a blind human support-rating protocol, and we reported openly that the automatic test was inconclusive.
+    \item \textbf{A diagnosis and a partial remedy for bi-encoder failure modes.} Human labelling revealed negation blindness, idiomatic query failure, and a bias towards very short sentences. We added LLM query rewriting, selective cross-encoder re-ranking, and a minimum sentence-length filter to the live system. The evaluation showed that rewriting with cross-encoder re-ranking helps queries with explicit exclusions but lowers the overall score when applied to every query.
+    \item \textbf{A Thai taste-preference test collection and case study.} We created 24 frozen Thai taste queries and 452 blind, pooled, human-labelled query--sentence pairs, with written annotation guidelines, and compared BM25 and dense retrieval on them.
+    \item \textbf{A working demonstration system.} A web application with English and Thai tabs, pre-computed results for the benchmark and Thai queries, live English retrieval, and an automated test suite, packaged for deployment.
+\end{enumerate}
+
+\subsection{What the Evidence Does Not Show}
+\label{sec:notshown}
+
+The conclusions are bounded by the limitations discussed in Section~\ref{sec:disclimits}. The benchmark is small and covers one city, so the gain of the proposed model over the baseline is consistent but not decisive. Faithfulness of the displayed explanations has not been established. The query-rewriting and cross-encoder components were not ablated, and the selective strategy of the live system has not been evaluated as a separate configuration. The Thai results rest on 24 queries and one annotator, with the second labelling round drafted by a language model. These points are not weaknesses hidden from the reader; they define the claims that the evidence supports and those it does not.
+
+% ---------------------------------------------------------------------
+\section{Recommendations}
+\label{sec:recommendations}
+
+Based on the experiments, we make the following recommendations for practitioners who build review-based retrieval systems for restaurants or similar items.
+
+\begin{itemize}
+    \item \textbf{Use a top-$k$ mean to aggregate sentence scores.} It consistently outperformed the maximum and the mean over all units, and it is simple and parameter-free apart from $k$.
+    \item \textbf{Retrieve at sentence level when explanations are required.} Sentences did not significantly improve ranking accuracy, but they provide evidence of a size that can be shown to a user.
+    \item \textbf{Always report query-independent floors.} A popularity ranking that ignores the query already reached an nDCG@10 of 0.484 in our data, so a model is only meaningful relative to such floors.
+    \item \textbf{Use rank-aware metrics with confidence intervals and paired tests.} With sparse positive labels and 100 queries, differences of a few hundredths in a metric cannot be interpreted without uncertainty estimates.
+    \item \textbf{Apply expensive components selectively and evaluate them.} Query rewriting and cross-encoder re-ranking can help queries with negation or idiomatic wording but hurt others, so they should be activated only where they are expected to help, and the selective strategy should itself be measured.
+    \item \textbf{Filter very short sentences from the evidence.} Sentences with fewer than ten words were frequent (45.1\% of the sentences in our human rating sample) and are often high-scoring but uninformative.
+    \item \textbf{Use blind, pooled human labelling for new languages.} When a dataset has no relevance labels, as for Thai, pooling the top results of several systems and labelling them without revealing the source is an efficient way to build a small reusable test collection.
+\end{itemize}
+
+% ---------------------------------------------------------------------
+\section{Future Research Directions}
+\label{sec:futurework}
+
+Several extensions would address the limitations of this study and strengthen its conclusions.
+
+\begin{itemize}
+    \item \textbf{Complete and redesign the explanation evaluation.} Finish the human support rating with a second independent annotator and report the agreement, and redesign the faithfulness test with a larger candidate pool per restaurant, so that deleting the displayed sentences can be meaningfully compared with deleting other sentences.
+    \item \textbf{Ablate and extend the retrieval extension.} Evaluate query rewriting and cross-encoder re-ranking separately, evaluate the selective strategy of the live system, analyse performance by query type (for example by labelling the PMD queries as negation, indirect, or contradictory), and test a cross-encoder that is better matched to review text.
+    \item \textbf{Thai restaurant-level ranking.} Collect or obtain Thai reviews with restaurant identifiers and relevance judgements, so that the aggregation study can be repeated in Thai. This would also allow the optional flavour-aware layer that was proposed originally, using dish and ingredient resources, to be tested against independent labels.
+    \item \textbf{Larger and more independent Thai evaluation.} Increase the number of Thai queries, use at least two independent human annotators, and evaluate retrieval models that are adapted to Thai.
+    \item \textbf{Learned or adaptive fusion and query decomposition.} Compare the fixed aggregation functions with learned fusion, and with decomposing a multi-aspect query into its aspects before retrieval, as studied by \citet{korikov2024}.
+    \item \textbf{Evaluation of explanation quality from the user perspective.} Study how users judge the displayed explanations, using criteria such as those proposed for recommendation explanations by \citet{zhang2025}, and place the approach among review-based recommender systems \citep{hasan2025}.
+    \item \textbf{Operational evaluation.} Measure latency, memory, and robustness of the demonstration system systematically, and extend it to multi-turn interaction.
+\end{itemize}
