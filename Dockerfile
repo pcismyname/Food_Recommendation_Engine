@@ -8,7 +8,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential && rm -rf /var/lib/apt/lists/*
 
 COPY app/requirements.txt ./
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+# CPU-only PyTorch: the default PyPI torch wheel bundles ~4 GB of CUDA libs
+# that a CPU server (EC2 t3) never uses.
+RUN pip install --no-cache-dir --prefix=/install \
+      --index-url https://download.pytorch.org/whl/cpu \
+      --extra-index-url https://pypi.org/simple \
+      torch -r requirements.txt
 
 
 # ── Stage 2: runtime ───────────────────────────────────────────────────────
