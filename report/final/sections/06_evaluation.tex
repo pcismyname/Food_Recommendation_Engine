@@ -182,11 +182,13 @@ The test is therefore \emph{inconclusive} and not a demonstration of faithfulnes
 \subsection{Human Support Rating}
 \label{sec:resb2}
 
-The human support sheet contains 375 items (25 queries $\times$ 3 restaurants $\times$ 5 sentences). Both annotators have now completed their labelling. Annotator~1 (Sam) labelled all 375 items; annotator~2 (Ton) labelled a 40-item subset. Of the full 375 items, 148 were rated 0, 143 were rated 1, and 84 were rated 2, so 227 of 375 items (60.5\%) were rated as at least partially supporting the restaurant (label~$\ge 1$), and 84 of 375 (22.4\%) were rated as clearly supporting (label~$=2$). On the 40-pair overlap, exact agreement was 70.0\% and Cohen's $\kappa$ was 0.544 (moderate).
+The human support sheet contains 375 items (25 queries $\times$ 3 restaurants $\times$ 5 sentences). Both annotators completed their labelling in full. Annotator~1 (Sam) labelled all 375 items; annotator~2 (Ton) labelled a 40-item subset for inter-annotator agreement. Of the 375 items labelled by annotator~1, 148 were rated~0 (not supporting), 143 were rated~1 (partially supporting), and 84 were rated~2 (clearly supporting), so 227 of 375 items (60.5\%) were rated as at least partially supporting the restaurant for the query (label~$\ge 1$), and 84 of 375 (22.4\%) were rated as clearly supporting (label~$=2$). On the 40-pair overlap between the two annotators, exact agreement was 70.0\% and Cohen's $\kappa$ was 0.544, interpreted as moderate agreement.
+
+The per-query support rates (annotator~1) vary widely. Some queries achieved 100\% support (for example ``A date place for valentines with affordable drinks'' and ``I want a place to hang out with my work friends''), while others received 0\% support (for example ``I am looking for a restaurant with no waiting line'', ``Late for work and I need to fill up before leaving'', and ``outdoor space without live music''). The two zero-support queries related to waiting reflect the negation blindness of the bi-encoder: the retrieved sentences discuss busy restaurants or long waits, which is the opposite of what the query requests. The B3 fix addresses this for the live system but the pre-computed evidence for these queries was produced before the fix.
 
 \begin{table}[htbp]
 \centering
-\caption{Human Support Ratings of Displayed Sentences}
+\caption{Human Support Ratings of Displayed Sentences (Full Sheet)}
 \label{tab:b2}
 \small
 \begin{tabular}{|p{0.42\textwidth}|p{0.40\textwidth}|}
@@ -195,15 +197,19 @@ The human support sheet contains 375 items (25 queries $\times$ 3 restaurants $\
 \hline
 Items in the rating sheet & 375 \\
 \hline
-Items rated so far (preliminary subset) & 40 \\
+Items labelled by annotator 1 (Sam) & 375 / 375 (complete) \\
 \hline
-Rated 0 / 1 / 2 (preliminary) & 12 / 19 / 9 \\
+Items labelled by annotator 2 (Ton) & 40 / 375 (agreement subset) \\
 \hline
-Share rated as supporting ($\ge 1$), full sheet & 60.5\% (227\,/\,375) \\
+Rated 0 / 1 / 2 (annotator 1, full sheet) & 148 / 143 / 84 \\
 \hline
-Share rated as clearly supporting ($=2$), full sheet & 22.4\% (84\,/\,375) \\
+Share rated as supporting ($\ge 1$) & 60.5\% (227\,/\,375) \\
 \hline
-Cohen's $\kappa$ between annotators (40-pair overlap) & 0.544 (moderate) \\
+Share rated as clearly supporting ($=2$) & 22.4\% (84\,/\,375) \\
+\hline
+Exact agreement on 40-pair overlap & 70.0\% \\
+\hline
+Cohen's $\kappa$ on 40-pair overlap & 0.544 (moderate) \\
 \hline
 \end{tabular}
 \end{table}
@@ -374,7 +380,7 @@ The main quantitative findings of the English and Thai experiments are summarise
 \hline
 Fair fusion & Dense beats BM25 under every aggregation at review level; the top-10 mean is best (nDCG@10 0.668). The sentence-level proposed model reaches nDCG@10 0.682 and MAP 0.618. Review volume has little effect ($\le 0.011$ nDCG@10). \\
 \hline
-Explanation quality & The automatic faithfulness test is inconclusive (gap 0.000). The human support rating (375 items, full sheet): 60.5\% of sentences rated as at least partially supporting; Cohen's $\kappa = 0.544$ on the 40-pair overlap. \\
+Explanation quality & The automatic faithfulness test is inconclusive (gap 0.000). Human support rating (375 items, full): 60.5\% of sentences rated as at least partially supporting; 22.4\% clearly supporting; Cohen's $\kappa = 0.544$ (moderate) on the 40-pair overlap. Per-query support ranges from 0\% (negation queries) to 100\% (direct queries). \\
 \hline
 Rewriting and re-ranking & Applied to every query it lowers nDCG@10 from 0.682 to 0.658 (44 queries improve, 53 degrade). \\
 \hline
